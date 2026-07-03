@@ -36,18 +36,18 @@
         <strong>Private by design:</strong> everything you type here stays in this browser. Autosave uses <code>localStorage</code>, which stores the draft only on this device in your browser. This page has no accounts, backend sync, analytics, telemetry, or cloud persistence that can observe your profile content.
       </div>
 
-      <div class="editor-grid">
-        <div class="field-group">
-          <label for="profile-editor">Markdown profile</label>
+      <div class="canonical-editor">
+        <div class="field-group markdown-field">
+          <label for="profile-editor">Canonical Markdown document</label>
+          <p id="editor-help" class="help-text">The raw Markdown below is the source of truth. Keep editing the full document directly here; any future helper fields should only assist this same Markdown, not replace it.</p>
           <textarea id="profile-editor" spellcheck="true" aria-describedby="editor-help"></textarea>
-          <p id="editor-help" class="help-text">Edit the Markdown directly, then download it when you are ready to use it elsewhere. Drafts may be stored locally in this browser so you can come back to them later; use Clear local draft to remove the browser copy. The downloaded Markdown file is the canonical PortableAI User Model document.</p>
         </div>
-
-        <aside class="preview-card" aria-labelledby="preview-title">
-          <h3 id="preview-title">Preview</h3>
-          <div id="profile-preview" class="preview-content"></div>
-        </aside>
       </div>
+
+      <aside class="preview-card" aria-labelledby="preview-title">
+        <h3 id="preview-title">Preview</h3>
+        <div id="profile-preview" class="preview-content"></div>
+      </aside>
 
       <div class="editor-actions" aria-label="Editor actions">
         <button class="button secondary" type="button" id="copy-markdown">Copy Markdown</button>
