@@ -146,10 +146,9 @@ textarea:focus-visible {
   font-weight: 700;
 }
 
-.editor-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.85fr);
-  gap: 1rem;
+.canonical-editor {
+  max-width: 880px;
+  margin: 0 auto;
 }
 
 .field-group {
@@ -164,7 +163,7 @@ label {
 }
 
 textarea {
-  min-height: 560px;
+  min-height: 70vh;
   width: 100%;
   padding: 1rem;
   border: 1px solid var(--border);
@@ -182,11 +181,13 @@ textarea {
 }
 
 .help-text {
-  margin: 0.6rem 0 0;
+  margin: 0 0 0.6rem;
 }
 
 .preview-card {
+  max-width: 880px;
   min-width: 0;
+  margin: 1rem auto 0;
   padding: 1rem;
   border: 1px solid var(--border);
   border-radius: 0.85rem;
@@ -242,8 +243,7 @@ footer {
     padding-top: 3rem;
   }
 
-  .editor-heading,
-  .editor-grid {
+  .editor-heading {
     display: block;
   }
 
@@ -252,7 +252,7 @@ footer {
     margin-top: 1rem;
   }
 
-  .preview-card {
-    margin-top: 1rem;
+  textarea {
+    min-height: 560px;
   }
 }
