@@ -1,6 +1,6 @@
 # Portable AI
 
-Portable AI is an open initiative for helping people own and carry their AI context across systems.
+Portable AI is an open standard that helps people own their AI context.
 
 The first standard in this project is the **Portable AI User Model**: a single, human-readable Markdown document that captures durable information about a person so it can be used across AI assistants, tools, and workflows.
 
@@ -22,23 +22,31 @@ A Portable AI User Model is intended to be:
 ```text
 .
 ├── README.md
+├── WHY.md
 ├── LICENSE
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── GOVERNANCE.md
 ├── ROADMAP.md
-├── specification/
-├── templates/
-├── examples/
+├── adr/
 ├── docs/
+├── examples/
+├── spec/
+├── templates/
 └── website/
 ```
 
 ## Canonical format
 
-The canonical Portable AI User Model format is a single **GitHub-Flavored Markdown** file.
+The canonical Portable AI User Model format is a single **GitHub-Flavored Markdown** file using the `.md` file extension.
 
 AI-specific exports, JSON representations, validation formats, and future integrations are derived from that canonical Markdown document.
+
+## Website
+
+The `website/` directory contains the PortableAI.org site and reference editor.
+
+Version 1 intentionally uses plain HTML, CSS, and JavaScript with no framework, no backend, no login, and no database.
 
 ## Project status
 
