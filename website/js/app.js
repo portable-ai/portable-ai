@@ -122,9 +122,11 @@ const downloadMarkdown = () => {
   const link = document.createElement("a");
   link.href = url;
   link.download = "portable-ai-user-model.md";
+  document.body.appendChild(link);
   link.click();
+  link.remove();
   URL.revokeObjectURL(url);
-  setStatus("Markdown downloaded. Your draft remains local to this browser.");
+  setStatus("Markdown downloaded as the canonical PortableAI User Model document. Your draft remains local to this browser.");
 };
 
 const copyMarkdown = async () => {

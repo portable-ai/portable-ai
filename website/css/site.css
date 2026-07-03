@@ -125,6 +125,13 @@ textarea:focus-visible {
   margin-bottom: 1rem;
 }
 
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
 .privacy-note {
   margin: 1.25rem 0;
   padding: 1rem;
@@ -240,7 +247,8 @@ footer {
     display: block;
   }
 
-  .editor-heading .button {
+  .editor-toolbar {
+    justify-content: flex-start;
     margin-top: 1rem;
   }
 
