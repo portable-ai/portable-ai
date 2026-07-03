@@ -29,7 +29,6 @@ A Portable AI User Model is intended to be:
 ├── GOVERNANCE.md
 ├── ROADMAP.md
 ├── adr/
-├── docs/
 ├── examples/
 ├── spec/
 ├── templates/
