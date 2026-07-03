@@ -123,8 +123,8 @@ Add any additional sections that are useful for your own model.
 `;
 
 // The editor state is intentionally just Markdown text. The Markdown document
-// is the only canonical source; previews and any AI-specific exports must be
-// generated from this text rather than stored as separate primary artifacts.
+// is the only canonical source; previews and any future AI-specific exports must
+// be generated from this text rather than stored as separate primary artifacts.
 const editor = document.querySelector("#profile-editor");
 const preview = document.querySelector("#profile-preview");
 const status = document.querySelector("#save-status");
@@ -132,6 +132,29 @@ const copyButton = document.querySelector("#copy-markdown");
 const downloadButton = document.querySelector("#download-markdown");
 const clearButton = document.querySelector("#clear-draft");
 const newFromTemplateButton = document.querySelector("#new-from-template");
+const editorToolbar = document.querySelector(".editor-toolbar");
+
+const githubLink = document.querySelector("a[href='https://github.com/PortableAI/portable-ai']");
+if (githubLink) {
+  githubLink.href = "https://github.com/refineryllc/portable-ai-working";
+}
+
+const importButton = document.createElement("button");
+importButton.className = "button secondary";
+importButton.type = "button";
+importButton.id = "import-markdown";
+importButton.textContent = "Load Markdown";
+
+const fileInput = document.createElement("input");
+fileInput.type = "file";
+fileInput.id = "markdown-file";
+fileInput.accept = ".md,.markdown,text/markdown,text/plain";
+fileInput.style.display = "none";
+
+if (editorToolbar) {
+  editorToolbar.appendChild(importButton);
+  editorToolbar.appendChild(fileInput);
+}
 
 const escapeHtml = (value) =>
   value
@@ -256,6 +279,31 @@ const copyMarkdown = async () => {
   }
 };
 
+const loadMarkdownFile = async (file) => {
+  if (!file) {
+    return;
+  }
+
+  if (
+    hasEditorContent() &&
+    !window.confirm("Replace the current Markdown draft with the selected file?")
+  ) {
+    fileInput.value = "";
+    setStatus("Kept the current draft.");
+    return;
+  }
+
+  try {
+    const text = await file.text();
+    setEditorValue(text);
+    setStatus(`Loaded ${file.name} into the editor. Draft saved locally in this browser.`);
+  } catch {
+    setStatus("Could not load the selected Markdown file.");
+  } finally {
+    fileInput.value = "";
+  }
+};
+
 const restoredDraft = localStorage.getItem(STORAGE_KEY);
 
 if (restoredDraft !== null) {
@@ -272,6 +320,10 @@ editor.addEventListener("input", () => {
 
 copyButton.addEventListener("click", copyMarkdown);
 downloadButton.addEventListener("click", downloadMarkdown);
+newFromTemplateButton.addEventListener("click", createNewFromTemplate);
+importButton.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", () => loadMarkdownFile(fileInput.files[0]));
+
 clearButton.addEventListener("click", () => {
   if (
     hasEditorContent() &&
@@ -286,4 +338,3 @@ clearButton.addEventListener("click", () => {
   updatePreview();
   setStatus("Local draft cleared from this browser.");
 });
-newFromTemplateButton.addEventListener("click", createNewFromTemplate);

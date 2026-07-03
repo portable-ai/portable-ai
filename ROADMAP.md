@@ -3,7 +3,7 @@
 ## v0.1 — Project Formation
 
 - Define the project vision.
-- Draft the Portable AI User Model specification.
+- Draft the PortableAI User Model specification.
 - Create the initial repository structure.
 - Establish basic governance and contribution files.
 
