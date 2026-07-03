@@ -1,13 +1,13 @@
-# Portable AI User Model Specification
+# PortableAI User Model Specification
 
 **Version:** 0.2 Draft  
 **Date:** July 3, 2026
 
 ## 1. Purpose
 
-The Portable AI User Model is an open, vendor-neutral standard for representing durable information about a person in a format that is both human-readable and AI-friendly.
+The PortableAI User Model is an open, vendor-neutral standard for representing durable information about a person in a format that is both human-readable and AI-friendly.
 
-The goal is to allow individuals—not AI providers—to own and manage a canonical profile that can be used across AI systems.
+The goal is to allow individuals, not AI providers, to own and manage a canonical profile that can be used across AI systems.
 
 This specification defines that canonical format.
 
@@ -90,9 +90,9 @@ Example:
 
 ```yaml
 ---
-standard: Portable AI User Model
+standard: PortableAI User Model
 standard_version: 0.2
-profile_name: Example Portable AI User Model
+profile_name: Example PortableAI User Model
 profile_version: 1.0.0
 last_updated: 2026-07-03
 ---
@@ -123,7 +123,7 @@ Applications SHOULD suggest these sections but MUST allow users to add, remove, 
 
 ## 8. Validity
 
-A conforming Portable AI User Model MUST:
+A conforming PortableAI User Model MUST:
 
 - Be valid GitHub-Flavored Markdown.
 - Contain a single canonical document.
@@ -151,18 +151,19 @@ AI-specific formats SHOULD be generated automatically whenever possible.
 
 Users SHOULD NOT be required to manually maintain multiple provider-specific profiles.
 
+AI-specific exports are a future extension for the reference editor and are not required for v0.2 draft conformance.
+
 ---
 
 ## 11. Reference Editor Requirements
 
-A reference editor SHOULD:
+A v0.2 reference editor SHOULD:
 
 - Create new profiles.
 - Load existing Markdown profiles.
-- Edit all sections.
+- Edit all sections as Markdown.
 - Allow custom sections.
 - Export canonical Markdown.
-- Generate AI-specific exports.
 
 The reference editor SHOULD require no account for basic use.
 
@@ -174,6 +175,7 @@ Future versions MAY define:
 
 - JSON representation
 - Validation rules
+- AI-specific exports
 - Synchronization mechanisms
 - Import/export APIs
 - Digital signatures
@@ -198,6 +200,6 @@ This specification does not define:
 
 ## 14. Philosophy
 
-The Portable AI User Model is intended to become a durable personal artifact that remains useful regardless of which AI systems exist in the future.
+The PortableAI User Model is intended to become a durable personal artifact that remains useful regardless of which AI systems exist in the future.
 
 People should own their context.
