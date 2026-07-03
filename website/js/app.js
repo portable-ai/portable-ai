@@ -1,6 +1,7 @@
 const STORAGE_KEY = "portable-ai-user-model-draft";
 
-const template = `# Portable AI User Model
+// Keep this browser-only prototype template aligned with the canonical PortableAI User Model template as it evolves.
+const template = `# PortableAI User Model
 
 ## Basics
 - Name:
