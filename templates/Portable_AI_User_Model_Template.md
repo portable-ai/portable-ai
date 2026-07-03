@@ -1,7 +1,7 @@
 ---
-standard: Portable AI User Model
+standard: PortableAI User Model
 standard_version: 0.2
-profile_name: My Portable AI User Model
+profile_name: My PortableAI User Model
 profile_version: 1.0.0
 last_updated: YYYY-MM-DD
 ---
