@@ -3,20 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Portable AI</title>
+  <title>PortableAI</title>
   <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
   <main class="page">
-    <section class="hero">
+    <section class="hero" aria-labelledby="site-title">
       <p class="eyebrow">PortableAI.org</p>
-      <h1>Portable AI</h1>
+      <h1 id="site-title">PortableAI</h1>
       <p class="tagline">Own your AI context.</p>
       <p>An open initiative for creating portable AI user models that work across AI systems.</p>
-      <p>The first standard is the <strong>Portable AI User Model</strong>: a single human-readable Markdown document that captures durable information about a person.</p>
+      <p>The first standard is the <strong>PortableAI User Model</strong>: a single human-readable Markdown document that captures durable information about a person.</p>
       <div class="actions">
-        <a class="button primary" href="#">Reference Editor Coming Soon</a>
-        <a class="button secondary" href="#">GitHub</a>
+        <a class="button primary" href="#editor">Open Reference Editor</a>
+        <a class="button secondary" href="https://github.com/PortableAI/portable-ai" rel="noreferrer">GitHub</a>
+      </div>
+    </section>
+
+    <section class="editor-panel" id="editor" aria-labelledby="editor-title">
+      <div class="editor-heading">
+        <div>
+          <p class="eyebrow">Browser-only reference editor</p>
+          <h2 id="editor-title">Draft your PortableAI User Model</h2>
+        </div>
+        <button class="button secondary" type="button" id="reset-template">Reset template</button>
+      </div>
+
+      <div class="privacy-note" role="note">
+        <strong>Private by design:</strong> everything you type here stays in this browser. Autosave uses <code>localStorage</code>, which stores the draft only on this device in your browser. This page has no accounts, backend sync, analytics, telemetry, or cloud persistence that can observe your profile content.
+      </div>
+
+      <div class="editor-grid">
+        <div class="field-group">
+          <label for="profile-editor">Markdown profile</label>
+          <textarea id="profile-editor" spellcheck="true" aria-describedby="editor-help"></textarea>
+          <p id="editor-help" class="help-text">Edit the Markdown directly, then copy or download it when you are ready to use it elsewhere.</p>
+        </div>
+
+        <aside class="preview-card" aria-labelledby="preview-title">
+          <h3 id="preview-title">Preview</h3>
+          <div id="profile-preview" class="preview-content"></div>
+        </aside>
+      </div>
+
+      <div class="editor-actions" aria-label="Editor actions">
+        <button class="button primary" type="button" id="copy-markdown">Copy Markdown</button>
+        <button class="button secondary" type="button" id="download-markdown">Download .md</button>
+        <button class="button secondary" type="button" id="clear-draft">Clear local draft</button>
+        <span id="save-status" class="save-status" role="status" aria-live="polite">Draft saved locally in this browser.</span>
       </div>
     </section>
   </main>
