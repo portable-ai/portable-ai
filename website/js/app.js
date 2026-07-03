@@ -1,4 +1,4 @@
-const STORAGE_KEY = "portable-ai-user-model-draft";
+const STORAGE_KEY = "portableAiUserModelDraft";
 
 // Static browser-only copy of templates/Portable_AI_User_Model_Template.md.
 // Embedded here so the GitHub Pages editor can create a new document without
@@ -248,7 +248,13 @@ const copyMarkdown = async () => {
   }
 };
 
-editor.value = localStorage.getItem(STORAGE_KEY) || "";
+const restoredDraft = localStorage.getItem(STORAGE_KEY);
+
+if (restoredDraft !== null) {
+  editor.value = restoredDraft;
+  setStatus("Restored a local draft from this browser.");
+}
+
 updatePreview();
 
 editor.addEventListener("input", () => {
@@ -259,6 +265,14 @@ editor.addEventListener("input", () => {
 copyButton.addEventListener("click", copyMarkdown);
 downloadButton.addEventListener("click", downloadMarkdown);
 clearButton.addEventListener("click", () => {
+  if (
+    hasEditorContent() &&
+    !window.confirm("Clear the current Markdown draft from the editor and this browser?")
+  ) {
+    setStatus("Kept the current draft.");
+    return;
+  }
+
   editor.value = "";
   localStorage.removeItem(STORAGE_KEY);
   updatePreview();
