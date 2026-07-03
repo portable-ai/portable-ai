@@ -126,7 +126,7 @@ const downloadMarkdown = () => {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-  setStatus("Markdown downloaded as the canonical Portable AI User Model document. Your draft remains local to this browser.");
+  setStatus("Markdown downloaded as the canonical PortableAI User Model document. Your draft remains local to this browser.");
 };
 
 const copyMarkdown = async () => {
