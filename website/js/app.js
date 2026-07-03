@@ -1,32 +1,125 @@
 const STORAGE_KEY = "portable-ai-user-model-draft";
 
-// Keep this browser-only prototype template aligned with the canonical PortableAI User Model template as it evolves.
-const template = `# PortableAI User Model
+// Static browser-only copy of templates/Portable_AI_User_Model_Template.md.
+// Embedded here so the GitHub Pages editor can create a new document without
+// depending on fetch paths that may vary by deployment location.
+const portableAiUserModelTemplate = `---
+standard: Portable AI User Model
+standard_version: 0.2
+profile_name: My Portable AI User Model
+profile_version: 1.0.0
+last_updated: YYYY-MM-DD
+---
 
-## Basics
-- Name:
-- Pronouns:
-- Location or time zone:
-- Languages:
+# Profile
 
-## Communication preferences
-- Preferred tone:
-- Preferred level of detail:
-- Formatting preferences:
+Briefly describe who you are and the durable context you want AI systems to know.
 
-## Durable context
-- Work, projects, or studies:
-- Recurring goals:
-- Important constraints:
+## Identity
 
-## AI collaboration preferences
-- What the AI should remember:
-- What the AI should avoid assuming:
-- How the AI should handle uncertainty:
+-
 
-## Privacy boundaries
-- Sensitive topics to avoid storing:
-- Information that should expire or be re-confirmed:
+## Roles
+
+-
+
+## Long-Term Goals
+
+-
+
+---
+
+# Preferences
+
+Describe stable preferences that should shape AI assistance.
+
+## General Preferences
+
+-
+
+## Product Preferences
+
+-
+
+## Recommendation Preferences
+
+-
+
+---
+
+# Persona
+
+Describe your personality, working style, and how you tend to think.
+
+-
+
+---
+
+# Projects
+
+List active, planned, inactive, or completed projects that are durable enough to belong in the model.
+
+## Active Projects
+
+-
+
+## Planned Projects
+
+-
+
+## Inactive Projects
+
+-
+
+## Completed Projects
+
+-
+
+---
+
+# Interests
+
+List durable interests, hobbies, and topics.
+
+-
+
+---
+
+# Knowledge & Expertise
+
+List areas where you have meaningful background knowledge or expertise.
+
+-
+
+---
+
+# Decision Style
+
+Describe how you make decisions.
+
+-
+
+---
+
+# Communication Style
+
+Describe how AI systems should communicate with you.
+
+-
+
+---
+
+# AI Collaboration Instructions
+
+Describe how AI systems should work with you.
+
+-
+
+---
+
+# Custom Sections
+
+Add any additional sections that are useful for your own model.
 `;
 
 const editor = document.querySelector("#profile-editor");
@@ -35,7 +128,7 @@ const status = document.querySelector("#save-status");
 const copyButton = document.querySelector("#copy-markdown");
 const downloadButton = document.querySelector("#download-markdown");
 const clearButton = document.querySelector("#clear-draft");
-const resetButton = document.querySelector("#reset-template");
+const newFromTemplateButton = document.querySelector("#new-from-template");
 
 const escapeHtml = (value) =>
   value
@@ -116,6 +209,21 @@ const setEditorValue = (value) => {
   updatePreview();
 };
 
+const hasEditorContent = () => editor.value.trim().length > 0;
+
+const createNewFromTemplate = () => {
+  if (
+    hasEditorContent() &&
+    !window.confirm("Replace the current Markdown draft with a new PortableAI User Model template?")
+  ) {
+    setStatus("Kept the current draft.");
+    return;
+  }
+
+  setEditorValue(portableAiUserModelTemplate);
+  setStatus("New PortableAI User Model template loaded. Edit the Markdown directly.");
+};
+
 const downloadMarkdown = () => {
   const blob = new Blob([editor.value], { type: "text/markdown" });
   const url = URL.createObjectURL(blob);
@@ -140,7 +248,7 @@ const copyMarkdown = async () => {
   }
 };
 
-editor.value = localStorage.getItem(STORAGE_KEY) || template;
+editor.value = localStorage.getItem(STORAGE_KEY) || "";
 updatePreview();
 
 editor.addEventListener("input", () => {
@@ -156,4 +264,4 @@ clearButton.addEventListener("click", () => {
   updatePreview();
   setStatus("Local draft cleared from this browser.");
 });
-resetButton.addEventListener("click", () => setEditorValue(template));
+newFromTemplateButton.addEventListener("click", createNewFromTemplate);
