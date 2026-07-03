@@ -122,6 +122,9 @@ Describe how AI systems should work with you.
 Add any additional sections that are useful for your own model.
 `;
 
+// The editor state is intentionally just Markdown text. The Markdown document
+// is the only canonical source; previews and any AI-specific exports must be
+// generated from this text rather than stored as separate primary artifacts.
 const editor = document.querySelector("#profile-editor");
 const preview = document.querySelector("#profile-preview");
 const status = document.querySelector("#save-status");
@@ -225,6 +228,9 @@ const createNewFromTemplate = () => {
 };
 
 const downloadMarkdown = () => {
+  // Download the canonical Markdown document itself. Any future downloads for
+  // prompts, JSON, or vendor-specific assistant formats must be derived from
+  // editor.value at export time so Markdown remains the single source of truth.
   const blob = new Blob([editor.value], { type: "text/markdown" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -238,6 +244,8 @@ const downloadMarkdown = () => {
 };
 
 const copyMarkdown = async () => {
+  // Copy the same canonical Markdown text used by preview and download flows.
+  // Do not maintain hand-authored provider-specific source alongside it.
   try {
     await navigator.clipboard.writeText(editor.value);
     setStatus("Markdown copied to clipboard.");
