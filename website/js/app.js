@@ -1,5 +1,25 @@
 const STORAGE_KEY = "portableAiPersonaDraft";
 
+const contextExportPrompt = `Please summarize and export the durable context you know about me as a PortableAI Document in Markdown.
+
+Focus only on information that is likely to remain useful across future AI conversations, such as:
+
+- Stable preferences
+- Communication style
+- Working style
+- Long-term goals
+- Durable projects
+- Ongoing responsibilities
+- Areas of expertise
+- Recurring constraints
+- Important context I would want another AI assistant to know
+
+Do not include sensitive personal details unless I have clearly treated them as useful long-term context. Do not include temporary details, one-off tasks, private speculation, or anything you are uncertain about.
+
+Use clear Markdown headings and concise bullet points. Keep the result human-readable and easy for me to edit.
+
+Structure the output so I can paste it into a PortableAI Persona document. If a section has no useful durable information, omit it rather than inventing content.`;
+
 // Static browser-only copy of templates/Portable_AI_Persona_Template.md.
 // Embedded here so the GitHub Pages editor can create a new document without
 // depending on fetch paths that may vary by deployment location.
@@ -133,6 +153,14 @@ const downloadButton = document.querySelector("#download-markdown");
 const clearButton = document.querySelector("#clear-draft");
 const newFromTemplateButton = document.querySelector("#new-from-template");
 const editorToolbar = document.querySelector(".editor-toolbar");
+const openContextOverlayButton = document.querySelector("#open-context-overlay");
+const contextOverlay = document.querySelector("#context-overlay");
+const closeContextOverlayButton = document.querySelector("#close-context-overlay");
+const contextOverlayStatus = document.querySelector("#context-overlay-status");
+const contextExportPromptField = document.querySelector("#context-export-prompt");
+const copyContextPromptButton = document.querySelector("#copy-context-prompt");
+const contextOverlayCloseTargets = document.querySelectorAll("[data-close-context-overlay]");
+let lastFocusedElement = null;
 
 const githubLink = document.querySelector("a[href='https://github.com/PortableAI/portable-ai']");
 if (githubLink) {
@@ -154,6 +182,10 @@ fileInput.style.display = "none";
 if (editorToolbar) {
   editorToolbar.appendChild(importButton);
   editorToolbar.appendChild(fileInput);
+}
+
+if (contextExportPromptField) {
+  contextExportPromptField.value = contextExportPrompt;
 }
 
 const escapeHtml = (value) =>
@@ -220,6 +252,10 @@ const setStatus = (message) => {
   status.textContent = message;
 };
 
+const setContextOverlayStatus = (message) => {
+  contextOverlayStatus.textContent = message;
+};
+
 const saveDraft = () => {
   localStorage.setItem(STORAGE_KEY, editor.value);
   setStatus("Draft saved locally in this browser.");
@@ -266,17 +302,44 @@ const downloadMarkdown = () => {
   setStatus("Markdown downloaded as the canonical PortableAI Document. Your draft remains local to this browser.");
 };
 
+const copyTextToClipboard = async (text, fallbackField) => {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    fallbackField.focus();
+    fallbackField.select();
+    document.execCommand("copy");
+  }
+};
+
 const copyMarkdown = async () => {
   // Copy the same canonical Markdown text used by preview and download flows.
   // Do not maintain hand-authored provider-specific source alongside it.
-  try {
-    await navigator.clipboard.writeText(editor.value);
-    setStatus("Markdown copied to clipboard.");
-  } catch {
-    editor.select();
-    document.execCommand("copy");
-    setStatus("Markdown copied to clipboard.");
+  await copyTextToClipboard(editor.value, editor);
+  setStatus("Markdown copied to clipboard.");
+};
+
+const openContextOverlay = () => {
+  lastFocusedElement = document.activeElement;
+  contextOverlay.hidden = false;
+  document.body.classList.add("overlay-open");
+  setContextOverlayStatus("");
+  copyContextPromptButton.focus();
+};
+
+const closeContextOverlay = () => {
+  contextOverlay.hidden = true;
+  document.body.classList.remove("overlay-open");
+  setContextOverlayStatus("");
+
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
   }
+};
+
+const copyContextPrompt = async () => {
+  await copyTextToClipboard(contextExportPrompt, contextExportPromptField);
+  setContextOverlayStatus("Prompt copied to clipboard.");
 };
 
 const loadMarkdownFile = async (file) => {
@@ -323,6 +386,18 @@ downloadButton.addEventListener("click", downloadMarkdown);
 newFromTemplateButton.addEventListener("click", createNewFromTemplate);
 importButton.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", () => loadMarkdownFile(fileInput.files[0]));
+openContextOverlayButton.addEventListener("click", openContextOverlay);
+closeContextOverlayButton.addEventListener("click", closeContextOverlay);
+copyContextPromptButton.addEventListener("click", copyContextPrompt);
+contextOverlayCloseTargets.forEach((target) => {
+  target.addEventListener("click", closeContextOverlay);
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !contextOverlay.hidden) {
+    closeContextOverlay();
+  }
+});
 
 clearButton.addEventListener("click", () => {
   if (
