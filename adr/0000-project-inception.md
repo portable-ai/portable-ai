@@ -5,17 +5,17 @@
 
 ## Context
 
-Portable AI began with a design discussion centered on a simple question:
+PortableAI began with a design discussion centered on a simple question:
 
-> How can a person own their AI profile rather than rebuilding it separately for every AI system?
+> How can a person own their AI context rather than rebuilding it separately for every AI system?
 
 The discussion evolved into an open standard centered on a single GitHub-Flavored Markdown document.
 
 ## Decision
 
-Portable AI will be developed as an open standard before it becomes an application.
+PortableAI will be developed as an open standard before it becomes an application.
 
-The canonical artifact is a single GitHub-Flavored Markdown document known as the Portable AI User Model.
+The canonical artifact is a single GitHub-Flavored Markdown PortableAI Document. The first document type is Persona.
 
 ## Consequences
 
