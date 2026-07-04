@@ -3,21 +3,21 @@
 ## v0.1 — Project Formation
 
 - Define the project vision.
-- Draft the PortableAI User Model specification.
+- Draft the PortableAI Persona specification.
 - Create the initial repository structure.
 - Establish basic governance and contribution files.
 
 ## v0.2 — Specification Draft
 
 - Define canonical Markdown format.
-- Define recommended profile sections.
+- Define recommended context sections.
 - Clarify metadata expectations.
 - Clarify derived AI-specific exports.
-- Create a starter template and example profile.
+- Create a starter template and example PortableAI Document.
 
 ## v0.3 — Reference Editor
 
-- Build a static website for creating, loading, editing, and exporting profiles.
+- Build a static website for creating, loading, editing, and exporting PortableAI Documents.
 - Require no login for basic use.
 - Support custom sections.
 - Export canonical Markdown.
