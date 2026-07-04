@@ -14,7 +14,7 @@
       <p class="tagline">PortableAI is an open standard that lets you take your context anywhere.</p>
       <p class="hero-summary">Keep durable preferences, projects, goals, and working style in a human-readable Markdown PortableAI Document that you own.</p>
       <div class="actions" aria-label="Primary actions">
-        <a class="button primary" href="#editor">Download your context</a>
+        <button class="button primary" type="button" id="open-context-overlay">Download your context</button>
         <a class="button secondary" href="#editor">Create a new profile</a>
       </div>
     </section>
@@ -56,6 +56,45 @@
       </div>
     </section>
   </main>
+
+  <div class="overlay" id="context-overlay" role="dialog" aria-modal="true" aria-labelledby="context-overlay-title" aria-describedby="context-overlay-description" hidden>
+    <div class="overlay-backdrop" data-close-context-overlay></div>
+    <section class="overlay-panel">
+      <div class="overlay-header">
+        <div>
+          <p class="eyebrow">Bring existing AI context into PortableAI</p>
+          <h2 id="context-overlay-title">Download your context</h2>
+        </div>
+        <button class="button secondary close-button" type="button" id="close-context-overlay" aria-label="Close download your context overlay">Close</button>
+      </div>
+
+      <p id="context-overlay-description" class="overlay-intro">
+        Use this browser-only workflow to ask an AI assistant you already use to summarize the durable context it knows about you. Then paste or load that result into the PortableAI reference editor.
+      </p>
+
+      <ol class="workflow-list">
+        <li>Open the AI assistant that already has useful context about you.</li>
+        <li>Copy the prompt below and send it in that AI.</li>
+        <li>Review the AI's Markdown result and remove anything you do not want to keep.</li>
+        <li>Paste the cleaned result into the editor below, or save it as a Markdown file and use <strong>Load Markdown</strong>.</li>
+        <li>Use <strong>Download Markdown</strong> to keep your PortableAI Document wherever you choose.</li>
+      </ol>
+
+      <div class="prompt-card">
+        <div class="prompt-card-heading">
+          <h3>Reusable export prompt</h3>
+          <button class="button primary" type="button" id="copy-context-prompt">Copy prompt</button>
+        </div>
+        <textarea id="context-export-prompt" class="prompt-textarea" readonly aria-label="Prompt for asking an AI to summarize durable user context"></textarea>
+      </div>
+
+      <p class="help-text">
+        PortableAI does not connect to your AI accounts or send this prompt anywhere. Copying, reviewing, pasting, loading, and downloading all happen in your browser.
+      </p>
+      <p id="context-overlay-status" class="save-status" role="status" aria-live="polite"></p>
+    </section>
+  </div>
+
   <footer>People should own their context.</footer>
   <script src="js/app.js"></script>
 </body>
