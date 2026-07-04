@@ -82,13 +82,13 @@ adr/
   0004-no-login-reference-editor.md
 
 spec/
-  Portable_AI_Persona_Specification_v0.2.md
+  portable-ai-persona-spec-v0.2.md
 
 templates/
-  Portable_AI_Persona_Template.md
+  portable-ai-persona-template.md
 
 examples/
-  Example_Portable_AI_Persona.md
+  example-portable-ai-persona.md
 
 website/
   README.md
@@ -154,7 +154,7 @@ Requirements:
   - Load Markdown File
   - Download Markdown
   - Clear
-- Use the existing template from `templates/Portable_AI_Persona_Template.md` as the starting content.
+- Use the existing template from `templates/portable-ai-persona-template.md` as the starting content.
 - If fetching that file directly from the static site is awkward, embed the initial template in JavaScript for v1.
 - Do not add dependencies.
 - Do not require a build step.

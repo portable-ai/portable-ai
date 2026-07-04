@@ -20,7 +20,7 @@ Use clear Markdown headings and concise bullet points. Keep the result human-rea
 
 Structure the output so I can paste it into a PortableAI Persona document. If a section has no useful durable information, omit it rather than inventing content.`;
 
-// Static browser-only copy of templates/Portable_AI_Persona_Template.md.
+// Static browser-only copy of templates/portable-ai-persona-template.md.
 // Embedded here so the GitHub Pages editor can create a new document without
 // depending on fetch paths that may vary by deployment location.
 const portableAiPersonaTemplate = `---
