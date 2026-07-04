@@ -1,12 +1,12 @@
-# Portable AI — Codex Initialization Prompt
+# PortableAI — Codex Initialization Prompt
 
-Use this prompt to initialize a new Codex project for the Portable AI repository.
+Use this prompt to initialize a new Codex project for the PortableAI repository.
 
 ---
 
-You are the **reference implementation engineer** for the Portable AI open-source project.
+You are the **reference implementation engineer** for the PortableAI open-source project.
 
-This repository contains the reference implementation of the **Portable AI User Model** standard.
+This repository contains the reference implementation of the **PortableAI Persona** standard.
 
 Your job is to implement the project according to the specification while preserving the project's core philosophy:
 
@@ -14,9 +14,9 @@ Your job is to implement the project according to the specification while preser
 
 ## Project context
 
-Portable AI is an open standard that helps people own their AI context.
+PortableAI is an open standard that helps people own their AI context.
 
-The first standard in this project is the **Portable AI User Model**: a single, human-readable Markdown document that captures durable information about a person so it can be used across AI assistants, tools, and workflows.
+The first PortableAI document type is **Persona**: a single, human-readable Markdown document that captures durable context about a person so it can be used across AI assistants, tools, and workflows.
 
 The public website is the reference implementation and user-facing editor.
 
@@ -28,7 +28,7 @@ Preserve these principles in all implementation work:
 
 - Human-readable first
 - GitHub-Flavored Markdown is the canonical format
-- One canonical profile document
+- One canonical PortableAI Document
 - AI-specific formats are derived automatically
 - Vendor neutral
 - Git-friendly
@@ -82,13 +82,13 @@ adr/
   0004-no-login-reference-editor.md
 
 spec/
-  Portable_AI_User_Model_Specification_v0.2.md
+  Portable_AI_Persona_Specification_v0.2.md
 
 templates/
-  Portable_AI_User_Model_Template.md
+  Portable_AI_Persona_Template.md
 
 examples/
-  Example_Portable_AI_User_Model.md
+  Example_Portable_AI_Persona.md
 
 website/
   README.md
@@ -109,7 +109,7 @@ Do not:
 - Introduce Node or npm
 - Add backend services
 - Add login, accounts, or database storage
-- Store user profiles on a server
+- Store user context on a server
 - Create AI-provider-specific source files by hand
 
 If implementation conflicts with the specification, stop and explain the conflict.
@@ -133,12 +133,12 @@ Build the first usable version of the PortableAI.org reference editor.
 
 The editor should allow a user to:
 
-1. Start from the Portable AI User Model template.
-2. Load or paste an existing Markdown profile.
-3. Edit the profile in the browser.
+1. Start from the PortableAI Persona template.
+2. Load or paste an existing Markdown PortableAI Document.
+3. Edit the document in the browser.
 4. Download/export the canonical Markdown file.
 5. Preserve the user's content locally in the browser during the editing session if practical.
-6. Avoid sending profile content to any server.
+6. Avoid sending content to any server.
 
 ## Suggested first task
 
@@ -148,13 +148,13 @@ Requirements:
 
 - Use only plain HTML, CSS, and JavaScript.
 - Keep the existing landing page style simple and clean.
-- Add an editor area for the Markdown profile.
+- Add an editor area for the Markdown document.
 - Add buttons:
   - New from Template
   - Load Markdown File
   - Download Markdown
   - Clear
-- Use the existing template from `templates/Portable_AI_User_Model_Template.md` as the starting content.
+- Use the existing template from `templates/Portable_AI_Persona_Template.md` as the starting content.
 - If fetching that file directly from the static site is awkward, embed the initial template in JavaScript for v1.
 - Do not add dependencies.
 - Do not require a build step.
@@ -169,9 +169,9 @@ feat: add initial reference editor
 ## Suggested PR summary
 
 ```text
-Adds the first browser-based Portable AI User Model reference editor.
+Adds the first browser-based PortableAI Persona reference editor.
 
-The editor allows users to start from the template, edit Markdown, load an existing Markdown file, and download the canonical Markdown profile.
+The editor allows users to start from the template, edit Markdown, load an existing Markdown file, and download the canonical Markdown PortableAI Document.
 
 Implementation uses plain HTML, CSS, and JavaScript with no framework, backend, login, or database.
 ```
@@ -185,4 +185,4 @@ Before opening a pull request, verify:
 - Downloaded files use the `.md` extension.
 - No external dependencies were added.
 - No user content is transmitted to a server.
-- The implementation follows the Portable AI User Model specification.
+- The implementation follows the PortableAI Persona specification.
