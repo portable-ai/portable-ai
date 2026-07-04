@@ -2,13 +2,13 @@
 
 PortableAI is an open standard that helps people own their AI context.
 
-The first standard in this project is the **PortableAI User Model**: a single, human-readable Markdown document that captures durable information about a person so it can be used across AI assistants, tools, and workflows.
+The first PortableAI document type is the **PortableAI Persona**: a single, human-readable Markdown document that captures durable context about a person so it can be used across AI assistants, tools, and workflows.
 
 ## Core idea
 
 People should own their context.
 
-A PortableAI User Model is intended to be:
+A PortableAI Persona is intended to be:
 
 - Human-readable first
 - Vendor neutral
@@ -37,7 +37,7 @@ A PortableAI User Model is intended to be:
 
 ## Canonical format
 
-The canonical PortableAI User Model format is a single **GitHub-Flavored Markdown** file using the `.md` file extension.
+The canonical PortableAI Persona format is a single **GitHub-Flavored Markdown** PortableAI Document using the `.md` file extension.
 
 AI-specific exports, JSON representations, validation formats, and future integrations are derived from that canonical Markdown document.
 
