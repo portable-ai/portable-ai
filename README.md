@@ -33,7 +33,7 @@ A PortableAI Persona is intended to be:
 ├── adr/               Architecture Decision Records
 ├── ai/                Bootstrap prompts for AI coding assistants
 ├── examples/          Example PortableAI documents
-├── spec/              PortableAI specifications (Core + Persona)
+├── spec/              PortableAI specs (Core + Persona)
 ├── templates/         Starter templates
 └── website/           PortableAI.org site and reference editor
 ```

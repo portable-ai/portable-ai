@@ -19,7 +19,7 @@ The canonical artifact is a single GitHub-Flavored Markdown PortableAI Document.
 
 ## Consequences
 
-The specification defines the standard.
+The spec defines the standard.
 
 The reference editor implements the standard.
 

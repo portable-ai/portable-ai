@@ -12,7 +12,7 @@ This project is in early draft form. Contributions should preserve the core prin
 
 ## Ways to contribute
 
-- Improve the specification
+- Improve the spec
 - Improve examples and templates
 - Build or refine the reference editor
 - Propose AI-specific export formats
@@ -25,9 +25,9 @@ This project is in early draft form. Contributions should preserve the core prin
 3. Submit a pull request.
 4. Keep changes focused and reviewable.
 
-## Specification language
+## Spec language
 
-When editing the specification, use requirement words consistently:
+When editing the spec, use requirement words consistently:
 
 - MUST
 - MUST NOT
