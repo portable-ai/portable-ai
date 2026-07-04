@@ -5,18 +5,18 @@
 
 ## Context
 
-Portable AI needs a canonical format that people can read, edit, version, and share without specialized software.
+PortableAI needs a canonical format that people can read, edit, version, and share without specialized software.
 
 The format also needs to be easy for AI systems, developer tools, and future integrations to process.
 
 ## Decision
 
-The canonical Portable AI User Model SHALL be a single GitHub-Flavored Markdown document using the `.md` file extension.
+The canonical PortableAI Persona SHALL be a single GitHub-Flavored Markdown PortableAI Document using the `.md` file extension.
 
 ## Consequences
 
 Markdown remains the source of truth.
 
-Users can edit profiles with ordinary text editors and version them with Git.
+Users can edit PortableAI Documents with ordinary text editors and version them with Git.
 
-Machine-readable formats such as JSON or provider-specific exports are derived from the Markdown profile rather than maintained separately.
+Machine-readable formats such as JSON or provider-specific exports are derived from the Markdown document rather than maintained separately.

@@ -1,14 +1,14 @@
 ---
-standard: Portable AI User Model
+standard: PortableAI Persona
 standard_version: 0.2
-profile_name: Example Portable AI User Model
+profile_name: Example PortableAI Persona
 profile_version: 1.0.0
 last_updated: 2026-07-03
 ---
 
 # Profile
 
-This is a fictional example profile used to demonstrate the Portable AI User Model format.
+This is a fictional example profile used to demonstrate the PortableAI Persona format.
 
 ## Identity
 

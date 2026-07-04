@@ -1,13 +1,13 @@
-# PortableAI User Model Specification
+# PortableAI Persona Specification
 
 **Version:** 0.2 Draft  
 **Date:** July 3, 2026
 
 ## 1. Purpose
 
-The PortableAI User Model is an open, vendor-neutral standard for representing durable information about a person in a format that is both human-readable and AI-friendly.
+The PortableAI Persona is an open, vendor-neutral standard for representing durable context about a person in a format that is both human-readable and AI-friendly.
 
-The goal is to allow individuals, not AI providers, to own and manage a canonical profile that can be used across AI systems.
+The goal is to allow individuals, not AI providers, to own and manage a canonical PortableAI Document that can be used across AI systems.
 
 This specification defines that canonical format.
 
@@ -29,7 +29,7 @@ The standard SHALL:
 
 ## 3. Canonical Format
 
-The canonical representation SHALL be a single GitHub-Flavored Markdown document using the `.md` file extension.
+The canonical representation SHALL be a single GitHub-Flavored Markdown PortableAI Document using the `.md` file extension.
 
 Conforming implementations MAY use any internal representation. However, the canonical exchange format defined by this specification SHALL be a single GitHub-Flavored Markdown document.
 
@@ -39,15 +39,15 @@ Future representations, including JSON, YAML, XML, AI-specific formats, or other
 
 ## 4. Ownership
 
-The user owns the canonical profile.
+The user owns the canonical context.
 
-AI providers, editors, websites, and applications are consumers of the profile rather than its owners.
+AI providers, editors, websites, and applications are consumers of the context rather than its owners.
 
 ---
 
 ## 5. Scope
 
-The User Model contains durable information.
+The Persona contains durable context.
 
 Examples include:
 
@@ -61,7 +61,7 @@ Examples include:
 - Knowledge and expertise
 - AI collaboration instructions
 
-The following SHOULD NOT be stored in the canonical profile:
+The following SHOULD NOT be stored in the canonical PortableAI Document:
 
 - Temporary conversation context
 - Working memory
@@ -73,7 +73,7 @@ The following SHOULD NOT be stored in the canonical profile:
 
 ## 6. Metadata
 
-A profile MAY begin with a YAML front matter block containing metadata.
+A PortableAI Document MAY begin with a YAML front matter block containing metadata.
 
 YAML front matter is RECOMMENDED because it is widely supported by GitHub and many Markdown tools, but it is NOT REQUIRED.
 
@@ -90,9 +90,9 @@ Example:
 
 ```yaml
 ---
-standard: PortableAI User Model
+standard: PortableAI Persona
 standard_version: 0.2
-profile_name: Example PortableAI User Model
+profile_name: Example PortableAI Persona
 profile_version: 1.0.0
 last_updated: 2026-07-03
 ---
@@ -123,19 +123,19 @@ Applications SHOULD suggest these sections but MUST allow users to add, remove, 
 
 ## 8. Validity
 
-A conforming PortableAI User Model MUST:
+A conforming PortableAI Persona MUST:
 
 - Be valid GitHub-Flavored Markdown.
-- Contain a single canonical document.
+- Contain a single canonical PortableAI Document.
 - Include a profile version.
-- Contain durable user information.
+- Contain durable user context.
 - Remain readable without specialized software.
 
 ---
 
 ## 9. Current State
 
-The profile represents the user's current understanding of themselves.
+The PortableAI Document represents the user's current understanding of themselves.
 
 Historical versions belong in version control or other external systems.
 
@@ -149,7 +149,7 @@ The Markdown document is the canonical source.
 
 AI-specific formats SHOULD be generated automatically whenever possible.
 
-Users SHOULD NOT be required to manually maintain multiple provider-specific profiles.
+Users SHOULD NOT be required to manually maintain multiple provider-specific documents.
 
 AI-specific exports are a future extension for the reference editor and are not required for v0.2 draft conformance.
 
@@ -159,8 +159,8 @@ AI-specific exports are a future extension for the reference editor and are not 
 
 A v0.2 reference editor SHOULD:
 
-- Create new profiles.
-- Load existing Markdown profiles.
+- Create new PortableAI Documents.
+- Load existing Markdown documents.
 - Edit all sections as Markdown.
 - Allow custom sections.
 - Export canonical Markdown.
@@ -181,7 +181,7 @@ Future versions MAY define:
 - Digital signatures
 - Optional confidence or interest-strength metadata
 
-Future extensions MUST preserve compatibility with the canonical Markdown profile.
+Future extensions MUST preserve compatibility with the canonical Markdown document.
 
 ---
 
@@ -200,6 +200,6 @@ This specification does not define:
 
 ## 14. Philosophy
 
-The PortableAI User Model is intended to become a durable personal artifact that remains useful regardless of which AI systems exist in the future.
+The PortableAI Persona is intended to become a durable personal artifact that remains useful regardless of which AI systems exist in the future.
 
 People should own their context.

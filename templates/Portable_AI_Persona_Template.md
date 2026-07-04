@@ -1,7 +1,7 @@
 ---
-standard: PortableAI User Model
+standard: PortableAI Persona
 standard_version: 0.2
-profile_name: My PortableAI User Model
+profile_name: My PortableAI Persona
 profile_version: 1.0.0
 last_updated: YYYY-MM-DD
 ---
@@ -52,7 +52,7 @@ Describe your personality, working style, and how you tend to think.
 
 # Projects
 
-List active, planned, inactive, or completed projects that are durable enough to belong in the model.
+List active, planned, inactive, or completed projects that are durable enough to belong in the context.
 
 ## Active Projects
 
@@ -114,4 +114,4 @@ Describe how AI systems should work with you.
 
 # Custom Sections
 
-Add any additional sections that are useful for your own model.
+Add any additional sections that are useful for your own context.

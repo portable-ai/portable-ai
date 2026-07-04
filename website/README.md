@@ -8,8 +8,8 @@ The current editor is a simple static website that can be deployed to GitHub Pag
 
 The editor allows users to:
 
-- Create a new PortableAI User Model from a template.
-- Load an existing Markdown profile from a local file.
+- Create a new PortableAI Persona from a template.
+- Load an existing Markdown PortableAI Document from a local file.
 - Edit the canonical Markdown directly.
 - Add custom sections in Markdown.
 - Preview the Markdown in the browser.
@@ -22,5 +22,5 @@ The editor allows users to:
 - AI-specific exports
 - JSON export
 - Validation
-- Profile linting
+- Context checks
 - GitHub integration

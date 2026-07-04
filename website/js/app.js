@@ -1,12 +1,12 @@
-const STORAGE_KEY = "portableAiUserModelDraft";
+const STORAGE_KEY = "portableAiPersonaDraft";
 
-// Static browser-only copy of templates/Portable_AI_User_Model_Template.md.
+// Static browser-only copy of templates/Portable_AI_Persona_Template.md.
 // Embedded here so the GitHub Pages editor can create a new document without
 // depending on fetch paths that may vary by deployment location.
-const portableAiUserModelTemplate = `---
-standard: PortableAI User Model
+const portableAiPersonaTemplate = `---
+standard: PortableAI Persona
 standard_version: 0.2
-profile_name: My PortableAI User Model
+profile_name: My PortableAI Persona
 profile_version: 1.0.0
 last_updated: YYYY-MM-DD
 ---
@@ -57,7 +57,7 @@ Describe your personality, working style, and how you tend to think.
 
 # Projects
 
-List active, planned, inactive, or completed projects that are durable enough to belong in the model.
+List active, planned, inactive, or completed projects that are durable enough to belong in the context.
 
 ## Active Projects
 
@@ -119,14 +119,14 @@ Describe how AI systems should work with you.
 
 # Custom Sections
 
-Add any additional sections that are useful for your own model.
+Add any additional sections that are useful for your own context.
 `;
 
 // The editor state is intentionally just Markdown text. The Markdown document
 // is the only canonical source; previews and any future AI-specific exports must
 // be generated from this text rather than stored as separate primary artifacts.
-const editor = document.querySelector("#profile-editor");
-const preview = document.querySelector("#profile-preview");
+const editor = document.querySelector("#persona-editor");
+const preview = document.querySelector("#persona-preview");
 const status = document.querySelector("#save-status");
 const copyButton = document.querySelector("#copy-markdown");
 const downloadButton = document.querySelector("#download-markdown");
@@ -240,14 +240,14 @@ const hasEditorContent = () => editor.value.trim().length > 0;
 const createNewFromTemplate = () => {
   if (
     hasEditorContent() &&
-    !window.confirm("Replace the current Markdown draft with a new PortableAI User Model template?")
+    !window.confirm("Replace the current Markdown draft with a new PortableAI Persona template?")
   ) {
     setStatus("Kept the current draft.");
     return;
   }
 
-  setEditorValue(portableAiUserModelTemplate);
-  setStatus("New PortableAI User Model template loaded. Edit the Markdown directly.");
+  setEditorValue(portableAiPersonaTemplate);
+  setStatus("New PortableAI Persona template loaded. Edit the Markdown directly.");
 };
 
 const downloadMarkdown = () => {
@@ -258,12 +258,12 @@ const downloadMarkdown = () => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "portable-ai-user-model.md";
+  link.download = "portable-ai-persona.md";
   document.body.appendChild(link);
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-  setStatus("Markdown downloaded as the canonical PortableAI User Model document. Your draft remains local to this browser.");
+  setStatus("Markdown downloaded as the canonical PortableAI Document. Your draft remains local to this browser.");
 };
 
 const copyMarkdown = async () => {
