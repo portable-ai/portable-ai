@@ -34,8 +34,8 @@ body {
 }
 
 .hero {
-  max-width: 760px;
-  padding: 2rem 0 3rem;
+  max-width: 860px;
+  padding: 2rem 0 4rem;
 }
 
 .eyebrow {
@@ -54,8 +54,10 @@ h3 {
 }
 
 h1 {
+  max-width: 12ch;
   margin: 0;
   font-size: clamp(3rem, 10vw, 5rem);
+  letter-spacing: -0.05em;
 }
 
 h2 {
@@ -69,9 +71,18 @@ h3 {
 }
 
 .tagline {
-  margin: 1rem 0;
-  font-size: 1.4rem;
+  max-width: 780px;
+  margin: 1.25rem 0 0;
+  font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 700;
+  line-height: 1.25;
+}
+
+.hero-summary {
+  max-width: 680px;
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: 1.1rem;
 }
 
 .actions,
@@ -253,6 +264,24 @@ footer {
 @media (max-width: 820px) {
   .page {
     padding-top: 3rem;
+  }
+
+  .hero {
+    padding-bottom: 3rem;
+  }
+
+  h1 {
+    max-width: none;
+    font-size: clamp(2.75rem, 14vw, 4rem);
+  }
+
+  .tagline {
+    font-size: 1.35rem;
+  }
+
+  .actions .button {
+    width: 100%;
+    text-align: center;
   }
 
   .editor-heading {
