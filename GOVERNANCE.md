@@ -1,6 +1,6 @@
 # Governance
 
-Portable AI is currently in early project formation.
+PortableAI is currently in early project formation.
 
 ## Stewardship
 
@@ -19,6 +19,6 @@ Project decisions should prioritize:
 
 ## Scope control
 
-Portable AI should avoid becoming a general personal database, social network, cloud storage provider, or proprietary identity platform.
+PortableAI should avoid becoming a general personal database, social network, cloud storage provider, or proprietary identity platform.
 
-The first goal is to define and implement the Portable AI User Model standard.
+The first goal is to define and implement the PortableAI Persona standard.
