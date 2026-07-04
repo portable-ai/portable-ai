@@ -4,7 +4,7 @@ AI assistants are becoming more useful when they understand the people they help
 
 Today, that context usually lives inside a vendor-specific system.
 
-That creates a problem: people repeatedly rebuild their context across tools, lose continuity when switching systems, and often do not manage the most useful model of themselves.
+That creates a problem: people repeatedly rebuild their context across tools, lose continuity when switching systems, and often do not manage the most useful context about themselves.
 
 PortableAI starts from a simple premise:
 
@@ -12,15 +12,15 @@ PortableAI starts from a simple premise:
 
 ## What PortableAI does
 
-PortableAI defines a simple, open way for a person to create and maintain a durable AI user model.
+PortableAI defines a simple, open way for a person to create and maintain durable AI context.
 
-The first standard is the **PortableAI User Model**: a single, human-readable Markdown document that captures durable information about a person in a format that is useful to both humans and AI systems.
+The first PortableAI document type is the **PortableAI Persona**: a single, human-readable Markdown document that captures durable context about a person in a format that is useful to both humans and AI systems.
 
 ## Why Markdown?
 
 Markdown is readable, portable, versionable, and already widely supported.
 
-A person should be able to open their profile in any text editor, commit it to Git, email it, print it, or share it with an AI assistant without needing proprietary software.
+A person should be able to open their PortableAI Document in any text editor, commit it to Git, email it, print it, or share it with an AI assistant without needing proprietary software.
 
 ## What this project is not
 
@@ -30,4 +30,4 @@ It is an open standard and reference implementation for portable AI context.
 
 ## What success looks like
 
-A person can maintain one readable profile and use it across AI systems, editors, tools, and workflows without starting over each time.
+A person can maintain one readable PortableAI Document and use it across AI systems, editors, tools, and workflows without starting over each time.
