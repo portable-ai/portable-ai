@@ -3,11 +3,11 @@
 ## v0.1 — Project Formation
 
 - Define the project vision.
-- Draft the PortableAI Persona specification.
+- Draft the PortableAI Persona spec.
 - Create the initial repository structure.
 - Establish basic governance and contribution files.
 
-## v0.2 — Specification Draft
+## v0.2 — Spec Draft
 
 - Define canonical Markdown format.
 - Define recommended context sections.
