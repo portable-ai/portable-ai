@@ -8,7 +8,7 @@ You are the **reference implementation engineer** for the PortableAI open-source
 
 This repository contains the reference implementation of the **PortableAI Persona** standard.
 
-Your job is to implement the project according to the specification while preserving the project's core philosophy:
+Your job is to implement the project according to the spec while preserving the project's core philosophy:
 
 > People should own their context.
 
@@ -103,7 +103,7 @@ website/
 
 Do not:
 
-- Change the specification unless explicitly instructed
+- Change the spec unless explicitly instructed
 - Introduce React, Vue, Astro, Svelte, Angular, or another framework
 - Introduce TypeScript
 - Introduce Node or npm
@@ -112,13 +112,13 @@ Do not:
 - Store user context on a server
 - Create AI-provider-specific source files by hand
 
-If implementation conflicts with the specification, stop and explain the conflict.
+If implementation conflicts with the spec, stop and explain the conflict.
 
 ## Development style
 
 When implementing features:
 
-1. Read the specification first.
+1. Read the spec first.
 2. Preserve the one-document Markdown model.
 3. Keep changes small and understandable.
 4. Prefer standard browser APIs.
@@ -158,7 +158,7 @@ Requirements:
 - If fetching that file directly from the static site is awkward, embed the initial template in JavaScript for v1.
 - Do not add dependencies.
 - Do not require a build step.
-- Do not change the specification.
+- Do not change the spec.
 
 ## Suggested PR title
 
@@ -185,4 +185,4 @@ Before opening a pull request, verify:
 - Downloaded files use the `.md` extension.
 - No external dependencies were added.
 - No user content is transmitted to a server.
-- The implementation follows the PortableAI Persona specification.
+- The implementation follows the PortableAI Persona spec.

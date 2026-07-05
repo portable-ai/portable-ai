@@ -4,7 +4,7 @@
 
 PortableAI is an open standard and reference implementation for a Markdown document format. It intentionally does not store user data (see [ADR-0005](adr/0005-non-storage-principle.md)). "Security" in this project therefore concerns:
 
-- The specification itself (ambiguities or design flaws that could lead to unsafe interoperability)
+- The spec itself (ambiguities or design flaws that could lead to unsafe interoperability)
 - The reference editor at PortableAI.org (client-side code shipped as a static site)
 - Any tooling published under the PortableAI project
 
