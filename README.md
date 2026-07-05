@@ -33,7 +33,7 @@ A PortableAI Persona is intended to be:
 ├── adr/               Architecture Decision Records
 ├── ai/                Bootstrap prompts for AI coding assistants
 ├── examples/          Example PortableAI documents
-├── spec/              PortableAI specifications (Core + Persona)
+├── spec/              PortableAI specs (Core + Persona)
 ├── templates/         Starter templates
 └── website/           PortableAI.org site and reference editor
 ```
@@ -58,6 +58,12 @@ The v0.3 spec is being split into two documents:
 
 - `spec/portable-ai-core-spec-v0.3.md` — the shared PortableAI Document envelope
 - `spec/portable-ai-persona-spec-v0.3.md` — Persona-specific sections
+
+## Contact
+
+- General: **hello@portableai.org**
+- Security: **security@portableai.org** (see [SECURITY.md](SECURITY.md))
+- Maintainers: **maintainers@portableai.org** (see [GOVERNANCE.md](GOVERNANCE.md))
 
 ## License
 
