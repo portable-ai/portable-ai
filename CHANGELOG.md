@@ -17,6 +17,10 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
 - **Core spec v0.3 (DRAFT)** — `spec/portable-ai-core-spec-v0.3.md` — shared envelope for all PortableAI documents: canonical format, front-matter identity, sections, integrity block, Non-Storage Principle, versioning (#45, #46, #48, #49)
 - **Persona spec v0.3 (DRAFT)** — `spec/portable-ai-persona-spec-v0.3.md` — Persona-specific layer on top of Core (#45)
 - **Well-Known Section Registry v1 (DRAFT)** — `spec/registry/well-known-sections-v1.md` — centrally assigned `snake_case` section keys, additive within v1 (#47)
+- Skeleton drafts of `spec/portable-ai-core-spec-v0.3.md` and `spec/portable-ai-persona-spec-v0.3.md` (Core + Persona split)
+- Project email identity at `portableai.org`: `inbox@` mailbox with aliases `security@`, `hello@`, `maintainers@`
+- `README.md` Contact section and `GOVERNANCE.md` Contact section
+- Website footer contact links to `hello@portableai.org` and `security@portableai.org`
 
 ### Changed
 
@@ -26,6 +30,7 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
   - `examples/Example_Portable_AI_Persona.md` → `examples/example-portable-ai-persona.md`
 - `README.md` repo tree updated to reflect the new structure
 - Renamed "Specification" to "Spec" in prose across `README.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, `adr/0000-project-inception.md`, `ai/codex-bootstrap.md`, and `ai/project-bootstrap.md` (#44). The frozen v0.2 spec file is unchanged.
+- `SECURITY.md` now uses the real `security@portableai.org` address (removed the earlier placeholder note)
 
 ### Deprecated
 

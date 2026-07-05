@@ -59,6 +59,12 @@ The v0.3 spec is being split into two documents:
 - `spec/portable-ai-core-spec-v0.3.md` — the shared PortableAI Document envelope
 - `spec/portable-ai-persona-spec-v0.3.md` — Persona-specific sections
 
+## Contact
+
+- General: **hello@portableai.org**
+- Security: **security@portableai.org** (see [SECURITY.md](SECURITY.md))
+- Maintainers: **maintainers@portableai.org** (see [GOVERNANCE.md](GOVERNANCE.md))
+
 ## License
 
 This project is licensed under the MIT License.

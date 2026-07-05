@@ -25,7 +25,7 @@ Only the current spec version and the latest deployed reference editor are activ
 If you believe you have found a security issue in the reference editor, the website, or the spec:
 
 1. **Do not open a public GitHub issue.**
-2. Email the maintainers at **security@portableai.org** (placeholder — update once alias exists) with:
+2. Email the maintainers at **security@portableai.org** with:
    - A description of the issue
    - Steps to reproduce
    - The affected file, URL, or spec section
