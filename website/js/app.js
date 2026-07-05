@@ -188,6 +188,18 @@ if (contextExportPromptField) {
   contextExportPromptField.value = contextExportPrompt;
 }
 
+// Markdown preview rendering.
+//
+// We use vendored marked.js (see website/js/vendor/marked.min.js) so the
+// preview supports the full GitHub-Flavored Markdown grammar without a build
+// step or CDN. This aligns with ADR-0001 (canonical Markdown) and ADR-0004
+// (no login / no build reference editor).
+//
+// Security: PortableAI documents are Markdown-first. Raw HTML in a document
+// is out of scope for the spec, so the preview escapes any raw HTML block
+// or inline HTML rather than rendering it. This prevents XSS when a user
+// loads a Markdown file from an untrusted source.
+
 const escapeHtml = (value) =>
   value
     .replace(/&/g, "&amp;")
@@ -196,56 +208,36 @@ const escapeHtml = (value) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
-const renderInlineMarkdown = (value) =>
-  escapeHtml(value)
-    .replace(/`([^`]+)`/g, "<code>$1</code>")
-    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*([^*]+)\*/g, "<em>$1</em>");
+const configureMarked = () => {
+  if (!window.marked || typeof window.marked.Marked !== "function") {
+    return null;
+  }
 
-const renderMarkdown = (markdown) => {
-  const lines = markdown.split("\n");
-  const html = [];
-  let inList = false;
-
-  const closeList = () => {
-    if (inList) {
-      html.push("</ul>");
-      inList = false;
-    }
+  const escapingRenderer = {
+    html({ text }) {
+      return escapeHtml(text);
+    },
   };
 
-  lines.forEach((line) => {
-    const trimmed = line.trim();
-
-    if (!trimmed) {
-      closeList();
-      return;
-    }
-
-    const heading = trimmed.match(/^(#{1,3})\s+(.+)$/);
-    if (heading) {
-      closeList();
-      const level = heading[1].length;
-      html.push(`<h${level}>${renderInlineMarkdown(heading[2])}</h${level}>`);
-      return;
-    }
-
-    const listItem = trimmed.match(/^[-*]\s+(.+)$/);
-    if (listItem) {
-      if (!inList) {
-        html.push("<ul>");
-        inList = true;
-      }
-      html.push(`<li>${renderInlineMarkdown(listItem[1])}</li>`);
-      return;
-    }
-
-    closeList();
-    html.push(`<p>${renderInlineMarkdown(trimmed)}</p>`);
+  const instance = new window.marked.Marked({
+    gfm: true,
+    breaks: false,
+    pedantic: false,
+    renderer: escapingRenderer,
   });
 
-  closeList();
-  return html.join("\n");
+  return instance;
+};
+
+const markedInstance = configureMarked();
+
+const renderMarkdown = (markdown) => {
+  if (!markedInstance) {
+    // Fallback: if marked failed to load, show escaped source so the user
+    // still sees their content rather than a broken preview.
+    return `<pre>${escapeHtml(markdown)}</pre>`;
+  }
+  return markedInstance.parse(markdown);
 };
 
 const setStatus = (message) => {

@@ -21,6 +21,8 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
 - Project email identity at `portableai.org`: `inbox@` mailbox with aliases `security@`, `hello@`, `maintainers@`
 - `README.md` Contact section and `GOVERNANCE.md` Contact section
 - Website footer contact links to `hello@portableai.org` and `security@portableai.org`
+- Reference editor now renders full GitHub-Flavored Markdown in the live preview via vendored `marked.js` v14.1.4 — headings, lists, tables, fenced code with language classes, task lists, and inline formatting all render correctly. Raw HTML in the source is escaped, so the preview is safe for Markdown from untrusted authors (#53).
+- `THIRD_PARTY_NOTICES.md` — attribution for vendored third-party code (currently `marked.js`, MIT)
 
 ### Changed
 
@@ -30,6 +32,7 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
   - `examples/Example_Portable_AI_Persona.md` → `examples/example-portable-ai-persona.md`
 - `README.md` repo tree updated to reflect the new structure
 - Renamed "Specification" to "Spec" in prose across `README.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, `adr/0000-project-inception.md`, `ai/codex-bootstrap.md`, and `ai/project-bootstrap.md` (#44). The frozen v0.2 spec file is unchanged.
+- Reference editor preview: replaced the hand-rolled Markdown-subset renderer (headings + lists + inline bold/italic/code only) with vendored `marked.js` for full GFM support (#53)
 - `SECURITY.md` now uses the real `security@portableai.org` address (removed the earlier placeholder note)
 
 ### Deprecated
