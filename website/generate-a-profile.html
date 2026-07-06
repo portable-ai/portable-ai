@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Generate a profile · PortableAI</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-wordmark" href="index.html">PortableAI</a>
+      <button class="nav-toggle" type="button" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a class="site-nav-link" href="generate-a-profile.html" id="nav-generate-profile" aria-current="page">Generate a profile</a>
+        <a class="site-nav-link" href="learn.html" id="nav-learn">Learn more</a>
+        <a class="site-nav-link" href="https://github.com/refineryllc/portable-ai-working" id="nav-github">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero" aria-labelledby="prompt-title">
+      <h1 id="prompt-title">Generate a profile</h1>
+      <p class="tagline">
+        Ask an AI you already use to draft your profile. Pick a type, copy the prompt, and send it.
+        The reply is Markdown you own — paste it back here, or load it into any other AI.
+      </p>
+    </section>
+
+    <section class="prompt-page" aria-labelledby="prompt-page-heading">
+      <h2 id="prompt-page-heading" class="visually-hidden">Choose a profile type and copy its prompt</h2>
+
+      <!-- Profile-type selector. Extensible to N types; options rendered from
+           window.PORTABLE_AI_PROMPTS by generate-a-profile.js. -->
+      <div class="type-selector">
+        <p class="type-selector-label" id="type-selector-label">What type of profile do you want to extract?</p>
+        <div class="type-options" role="radiogroup" aria-labelledby="type-selector-label" id="type-options">
+          <!-- Populated by generate-a-profile.js -->
+        </div>
+        <p class="type-selector-hint" id="type-selector-hint"></p>
+      </div>
+
+      <ol class="workflow-list">
+        <li>Open an AI assistant you already use.</li>
+        <li>Copy the prompt below and send it in that AI.</li>
+        <li>Save the Markdown result as a file, or copy the text.</li>
+        <li>Come back to PortableAI to review or make changes, or load the Markdown into a new AI.</li>
+      </ol>
+
+      <!-- Full read-only prompt readout. Rendered in full (no scroll box) so the
+           whole prompt is visible; Copy buttons sit above and below it. -->
+      <div class="prompt-readout" aria-label="Extraction prompt">
+        <div class="prompt-readout-bar prompt-readout-bar--top">
+          <span class="prompt-readout-name" id="prompt-readout-name"></span>
+          <button class="link" type="button" id="copy-prompt-top">Copy prompt</button>
+        </div>
+        <pre class="prompt-readout-body" id="prompt-readout-body" tabindex="0"></pre>
+        <div class="prompt-readout-bar prompt-readout-bar--bottom">
+          <button class="link" type="button" id="copy-prompt-bottom">Copy prompt</button>
+        </div>
+      </div>
+
+      <p class="prompt-status save-status" id="prompt-status" role="status" aria-live="polite"></p>
+
+      <p class="prompt-privacy">
+        PortableAI does not connect to your AI accounts or send this prompt anywhere. Choosing a type,
+        copying, reviewing, pasting, loading, and downloading all happen in your browser.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-meta">
+      PortableAI
+      <span aria-hidden="true"> · </span>
+      open source (<a href="https://github.com/refineryllc/portable-ai-working/blob/main/LICENSE">MIT</a>)
+      <span aria-hidden="true"> · </span>
+      v0.3 draft
+      <span aria-hidden="true"> · </span>
+      <a href="https://github.com/refineryllc/portable-ai-working">GitHub</a>
+    </p>
+    <p class="footer-note">
+      PortableAI is an open standard. The reference editor runs in your browser.
+    </p>
+    <p class="footer-contact">
+      <a href="mailto:hello@portableai.org">hello@portableai.org</a>
+      <span aria-hidden="true"> · </span>
+      <a href="mailto:security@portableai.org">security@portableai.org</a>
+    </p>
+  </footer>
+  <script src="js/prompt.js"></script>
+  <script src="js/generate-a-profile.js"></script>
+  <script src="js/header.js"></script>
+</body>
+</html>

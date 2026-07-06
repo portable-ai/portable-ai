@@ -1,30 +1,5 @@
 const STORAGE_KEY = "portableAiPersonaDraft";
 
-// Prompt sent to another AI to draft a PortableAI profile.
-//
-// Design intent (locked in PR A):
-// - Ask the AI to actively draft a profile — this is not just an export flow.
-// - Instruct Markdown first, since Markdown works in every AI.
-// - Ask for a downloadable .md file on a best-effort basis.
-// - Standard filename: portableai-profile-YYYY-MM-DD.md so profiles from
-//   different assistants line up predictably on disk.
-// - Do NOT ask the user's name. PortableAI never asks the user's name and
-//   never stores anything.
-// - Close with instructions the user can act on: load the file into another
-//   AI, or open it in PortableAI to review or edit.
-const contextExportPrompt = `Please draft a PortableAI profile for me based on the durable context you already know about me.
-
-A PortableAI profile is a human-readable Markdown document that captures the durable, cross-session context another AI would find useful — stable preferences, communication style, working style, long-term goals, durable projects, ongoing responsibilities, areas of expertise, and recurring constraints.
-
-Please do the following, in order:
-
-1. Output the full profile as Markdown, directly in this conversation, using clear H1 headings for top-level sections (# Profile, # Preferences, # Persona, # Projects, # Interests, # Knowledge & Expertise, # Decision Style, # Communication Style, # AI Collaboration Instructions, # Notes). Use concise bullet points under each section. If a section has no useful durable content, omit it rather than inventing.
-2. If you can attach or offer a downloadable file, also provide the same content as a downloadable .md file named exactly \`portableai-profile-YYYY-MM-DD.md\` (using today's date). If you cannot attach files, that's fine — the Markdown in the conversation is enough.
-3. Do not ask me for my name. Do not include a name field. Skip anything you're not confident is durable context.
-4. Do not include sensitive personal details unless I have clearly treated them as useful long-term context. Do not include one-off tasks or private speculation.
-
-When you're done, close with a short note telling me: "You can take this file and load it into another AI, or open it in PortableAI to review or edit."`;
-
 // Static browser-only copy of templates/portable-ai-persona-template.md.
 // Embedded here so the GitHub Pages editor can create a new document without
 // depending on fetch paths that may vary by deployment location.
@@ -180,21 +155,15 @@ const status = document.querySelector("#save-status");
 const copyButton = document.querySelector("#copy-markdown");
 const downloadButton = document.querySelector("#download-markdown");
 const clearButton = document.querySelector("#clear-draft");
-const openContextOverlayButton = document.querySelector("#open-context-overlay");
-const contextOverlay = document.querySelector("#context-overlay");
-const closeContextOverlayButton = document.querySelector("#close-context-overlay");
-const contextOverlayStatus = document.querySelector("#context-overlay-status");
-const contextExportPromptField = document.querySelector("#context-export-prompt");
-const copyContextPromptButton = document.querySelector("#copy-context-prompt");
-const contextOverlayCloseTargets = document.querySelectorAll("[data-close-context-overlay]");
+// The in-app AI-draft flow was removed in favor of the dedicated
+// "Generate a profile" page (generate-a-profile.html). The empty-state link to
+// that page is all that remains in the editor.
 
 const emptyState = document.querySelector("#empty-state");
 const editorSurface = document.querySelector("#editor-surface");
 const loadSampleButton = document.querySelector("#load-sample");
-const openFileButton = document.querySelector("#open-file");
-const emptyCopyPromptButton = document.querySelector("#empty-copy-prompt");
-const emptyShowFullButton = document.querySelector("#empty-show-full");
-const togglePromptLengthButton = document.querySelector("#toggle-prompt-length");
+const openProfileButton = document.querySelector("#open-profile");
+// The empty-state secondary card links straight to generate-a-profile.html; no JS.
 
 const restoreBanner = document.querySelector("#restore-banner");
 const restoreDraftButton = document.querySelector("#restore-draft");
@@ -206,8 +175,6 @@ const panelEdit = document.querySelector("#panel-edit");
 const panelRead = document.querySelector("#panel-read");
 const modeButtons = [modeEditButton, modeReadButton];
 
-let lastFocusedElement = null;
-
 // Hidden file input, created programmatically so the HTML stays clean.
 const fileInput = document.createElement("input");
 fileInput.type = "file";
@@ -215,17 +182,6 @@ fileInput.id = "markdown-file";
 fileInput.accept = ".md,.markdown,text/markdown,text/plain";
 fileInput.style.display = "none";
 document.body.appendChild(fileInput);
-
-if (contextExportPromptField) {
-  contextExportPromptField.value = contextExportPrompt;
-}
-
-// Show the first two lines of the prompt as a preview on the empty state
-// card. Users can expand via "Show full instructions" (opens the overlay).
-if (false) {
-  // (empty-state prompt preview removed in PR A3 — secondary card is copy-only)
-  const previewLines = "";
-}
 
 // Markdown preview rendering.
 //
@@ -281,10 +237,6 @@ const renderMarkdown = (markdown) => {
 
 const setStatus = (message) => {
   status.textContent = message;
-};
-
-const setContextOverlayStatus = (message) => {
-  contextOverlayStatus.textContent = message;
 };
 
 // Guarded localStorage access. Browsers throw SecurityError when the page is
@@ -423,34 +375,6 @@ const copyTextToClipboard = async (text, fallbackField) => {
 const copyMarkdown = async () => {
   await copyTextToClipboard(editor.value, editor);
   setStatus("Markdown copied to clipboard.");
-};
-
-const openContextOverlay = () => {
-  lastFocusedElement = document.activeElement;
-  contextOverlay.hidden = false;
-  document.body.classList.add("overlay-open");
-  setContextOverlayStatus("");
-  copyContextPromptButton.focus();
-};
-
-const closeContextOverlay = () => {
-  contextOverlay.hidden = true;
-  document.body.classList.remove("overlay-open");
-  setContextOverlayStatus("");
-
-  if (lastFocusedElement) {
-    lastFocusedElement.focus();
-  }
-};
-
-const copyContextPrompt = async () => {
-  await copyTextToClipboard(contextExportPrompt, contextExportPromptField);
-  setContextOverlayStatus("Prompt copied to clipboard.");
-};
-
-const copyContextPromptFromEmptyState = async () => {
-  await copyTextToClipboard(contextExportPrompt, null);
-  setStatus("Prompt copied. Send it to an AI you already use.");
 };
 
 const loadMarkdownFile = async (file) => {
@@ -654,36 +578,11 @@ editor.addEventListener("input", () => {
 copyButton.addEventListener("click", copyMarkdown);
 downloadButton.addEventListener("click", downloadMarkdown);
 loadSampleButton.addEventListener("click", loadSampleTemplate);
-openFileButton.addEventListener("click", () => fileInput.click());
+openProfileButton.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", () => loadMarkdownFile(fileInput.files[0]));
 
-emptyCopyPromptButton.addEventListener("click", copyContextPromptFromEmptyState);
-emptyShowFullButton.addEventListener("click", openContextOverlay);
-
-if (openContextOverlayButton) {
-  openContextOverlayButton.addEventListener("click", openContextOverlay);
-}
-closeContextOverlayButton.addEventListener("click", closeContextOverlay);
-copyContextPromptButton.addEventListener("click", copyContextPrompt);
-
-// PR A3: collapse the overlay prompt textarea by default so the whole overlay
-// fits on screen. "Show full prompt" expands it in place; "Show less" collapses.
-if (togglePromptLengthButton && contextExportPromptField) {
-  togglePromptLengthButton.addEventListener("click", () => {
-    const collapsed = contextExportPromptField.classList.toggle("prompt-textarea--collapsed");
-    togglePromptLengthButton.textContent = collapsed ? "Show full prompt" : "Show less";
-    togglePromptLengthButton.setAttribute("aria-expanded", String(!collapsed));
-  });
-}
-contextOverlayCloseTargets.forEach((target) => {
-  target.addEventListener("click", closeContextOverlay);
-});
-
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !contextOverlay.hidden) {
-    closeContextOverlay();
-  }
-});
+// The empty-state secondary card and "Generate a profile" action are plain
+// links to generate-a-profile.html; they need no JS wiring here.
 
 if (restoreDraftButton) {
   restoreDraftButton.addEventListener("click", restorePendingDraft);
