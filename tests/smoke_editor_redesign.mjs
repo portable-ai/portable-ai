@@ -109,18 +109,43 @@ try {
     "Clear button hidden when editor is empty",
   );
 
-  // Hero copy
+  // Hero copy (PR A3: rewritten)
   assert(
-    (await page.textContent("#site-title")).includes("Every AI asks you to start over"),
-    "Hero H1 preserved",
+    (await page.textContent("#site-title")).includes("Every AI needs you to start over"),
+    "Hero H1 reads 'Every AI needs you to start over' (was 'asks')",
   );
   assert(
     (await page.textContent(".tagline")).includes("take your profile anywhere"),
-    "Hero tagline uses 'profile' (was 'context')",
+    "Hero tagline preserved",
   );
   assert(
-    (await page.textContent("#open-context-overlay")).trim() === "Ask an AI to draft one",
-    "Hero primary CTA is 'Ask an AI to draft one'",
+    (await page.locator(".tagline .link").count()) === 1,
+    "Hero tagline includes a 'Learn more' link",
+  );
+  assert(
+    (await page.locator("#open-context-overlay").count()) === 0,
+    "Hero CTAs removed (Ask an AI / Open the editor no longer in hero)",
+  );
+  assert(
+    (await page.locator(".privacy-note").count()) === 0,
+    "Privacy-and-trust box removed",
+  );
+  assert(
+    (await page.locator("#editor-title").count()) === 0,
+    "'Edit your profile' h2 removed",
+  );
+  assert(
+    (await page.textContent(".editor-blurb")).toLowerCase().includes("never stored on portableai"),
+    "Editor blurb mentions non-storage",
+  );
+  assert(
+    (await page.locator(".editor-blurb .link").count()) === 1,
+    "Editor blurb includes a 'Read more' link",
+  );
+  const h1Size = await page.$eval("#site-title", (el) => parseFloat(getComputedStyle(el).fontSize));
+  assert(
+    h1Size < 40,
+    `Hero H1 is small now (${h1Size}px, expected < 40px)`,
   );
 
   // No tabs / no Form remnants
@@ -264,8 +289,8 @@ try {
     "No banner on reload after clearing localStorage",
   );
 
-  // --- Case 7: 'Ask an AI to draft one' overlay opens from hero and empty-state ---
-  await page.click("#open-context-overlay");
+  // --- Case 7: 'Ask an AI to draft one' overlay opens from empty-state ---
+  await page.click("#empty-show-full");
   await page.waitForSelector("#context-overlay", { state: "visible" });
   assert(
     (await page.textContent("#context-overlay-title")).trim() === "Ask an AI to draft one",
@@ -288,11 +313,61 @@ try {
     promptText.includes("load it into another AI, or open it in PortableAI to review or edit"),
     "Prompt includes closing instructions to the user",
   );
+  assert(
+    (await page.textContent("#context-overlay-description")).includes("open on PortableAI.org"),
+    "Overlay intro says 'open on PortableAI.org'",
+  );
+  assert(
+    await page.isVisible("#copy-context-prompt"),
+    "Copy prompt button visible above textarea in overlay",
+  );
+  assert(
+    await page.isVisible("#toggle-prompt-length"),
+    "Show full prompt toggle visible in overlay",
+  );
+  const promptClassesBefore = await page.getAttribute("#context-export-prompt", "class");
+  assert(
+    promptClassesBefore.includes("prompt-textarea--collapsed"),
+    "Overlay prompt starts collapsed",
+  );
+  await page.click("#toggle-prompt-length");
+  const promptClassesAfter = await page.getAttribute("#context-export-prompt", "class");
+  assert(
+    !promptClassesAfter.includes("prompt-textarea--collapsed"),
+    "Toggle expands the overlay prompt",
+  );
   await page.click("#close-context-overlay");
   await page.waitForSelector("#context-overlay", { state: "hidden" });
   assert(
     !(await page.isVisible("#context-overlay")),
     "Overlay closes on Close button",
+  );
+
+  // --- Case 8: /learn.html loads and links back ---
+  await page.goto(url + "/learn.html");
+  await page.waitForSelector("#learn-title");
+  assert(
+    (await page.textContent("#learn-title")).toLowerCase().includes("learn more"),
+    "/learn.html has 'Learn more' heading",
+  );
+  assert(
+    (await page.locator(".learn-nav .link").count()) === 1,
+    "/learn.html has a back-to-editor link",
+  );
+
+  // --- Case 9: footer has repo/license line and neutral one-liner ---
+  await page.goto(url);
+  assert(
+    (await page.locator(".site-footer .footer-meta").count()) === 1,
+    "Footer has meta line (repo/license/version)",
+  );
+  assert(
+    (await page.textContent(".site-footer .footer-meta")).toLowerCase().includes("mit"),
+    "Footer meta mentions MIT license",
+  );
+  assert(
+    (await page.locator(".site-footer .footer-tagline").count()) === 0,
+    "Old 'People should own their context' tagline removed",
   );
 } finally {
   await browser.close();
