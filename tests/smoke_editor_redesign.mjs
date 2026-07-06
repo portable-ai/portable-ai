@@ -89,8 +89,14 @@ try {
     "Primary action is 'Load a sample'",
   );
   assert(
-    (await page.textContent("#open-file")).trim() === "Open a file",
-    "Secondary action is 'Open a file'",
+    (await page.textContent("#open-profile")).trim() === "Open a profile",
+    "Open-file action is labeled 'Open a profile' (#86)",
+  );
+  // #86: empty-state primary actions in order: Generate a profile · Open a profile · Load a sample.
+  const emptyActionLabels = await page.locator(".empty-state-actions .link").allTextContents();
+  assert(
+    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample",
+    `Empty-state actions are ordered Generate/Open/Load (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
   );
   assert(
     (await page.textContent(".empty-state-secondary-title")).trim() === "Ask an AI to draft one",
@@ -119,8 +125,8 @@ try {
     "Hero tagline preserved",
   );
   assert(
-    (await page.locator(".tagline .link").count()) === 1,
-    "Hero tagline includes a 'Learn more' link",
+    (await page.locator(".tagline .link").count()) === 0,
+    "Hero tagline no longer has an in-body 'Learn more' link (#86 — header nav covers it)",
   );
   assert(
     (await page.locator("#open-context-overlay").count()) === 0,
@@ -139,8 +145,8 @@ try {
     "Editor blurb mentions non-storage",
   );
   assert(
-    (await page.locator(".editor-blurb .link").count()) === 1,
-    "Editor blurb includes a 'Read more' link",
+    (await page.locator(".editor-blurb .link").count()) === 0,
+    "Editor blurb no longer has an in-body 'Read more' link (#86 — header nav covers it)",
   );
   const h1Size = await page.$eval("#site-title", (el) => parseFloat(getComputedStyle(el).fontSize));
   assert(
@@ -289,7 +295,7 @@ try {
     "No banner on reload after clearing localStorage",
   );
 
-  // --- Case 7 (#75): overlay is GONE; Get a Prompt is a dedicated page ---
+  // --- Case 7 (#75): overlay is GONE; "Generate a profile" is a dedicated page ---
   await page.reload();
   await page.waitForSelector("#empty-state", { state: "visible" });
   assert(
@@ -300,26 +306,36 @@ try {
     (await page.locator("#context-export-prompt").count()) === 0,
     "Overlay prompt textarea removed",
   );
-  // Empty-state now links to the page: a third primary action + the secondary link.
+  // Empty-state links to the page via the 'Generate a profile' primary action.
   assert(
-    (await page.getAttribute("#empty-generate-new", "href")) === "get-a-prompt.html",
-    "Empty-state 'Generate a new one' links to get-a-prompt.html",
+    (await page.getAttribute("#empty-generate-profile", "href")) === "generate-a-profile.html",
+    "Empty-state 'Generate a profile' links to generate-a-profile.html",
   );
   assert(
-    (await page.textContent("#empty-generate-new")).trim() === "Generate a new one",
-    "Third empty-state action reads 'Generate a new one'",
+    (await page.textContent("#empty-generate-profile")).trim() === "Generate a profile",
+    "First empty-state action reads 'Generate a profile'",
+  );
+  // #86: the standalone secondary 'Get a prompt' link is removed; the block
+  // now just points the user at 'Generate a profile'.
+  assert(
+    (await page.locator("#empty-get-a-prompt").count()) === 0,
+    "Standalone secondary prompt link removed from empty state (#86)",
   );
   assert(
-    (await page.getAttribute("#empty-get-a-prompt", "href")) === "get-a-prompt.html",
-    "Empty-state secondary 'Get a prompt' links to the page",
+    (await page.textContent(".empty-state-secondary-hint")).includes('Click “Generate a profile” to build one from any AI'),
+    "Secondary block hint points to 'Generate a profile' (#86)",
+  );
+  assert(
+    (await page.textContent(".empty-state-secondary-title")).trim() === "Ask an AI to draft one",
+    "Secondary block keeps its 'Ask an AI to draft one' heading (#86)",
   );
 
-  // The Get a Prompt page itself.
-  await page.goto(url + "/get-a-prompt.html");
+  // The "Generate a profile" page itself.
+  await page.goto(url + "/generate-a-profile.html");
   await page.waitForSelector("#prompt-readout-body");
   assert(
-    (await page.textContent("#prompt-title")).trim().toLowerCase().includes("get a prompt"),
-    "Get a Prompt page has 'Get a prompt' heading",
+    (await page.textContent("#prompt-title")).trim() === "Generate a profile",
+    "Generate-a-profile page has 'Generate a profile' heading",
   );
   // Type selector: two options, Persona default.
   const typeOptions = page.locator("#type-options [data-type]");
@@ -422,7 +438,7 @@ try {
   const RGB_TEXT = "rgb(17, 17, 17)";
   const RGB_ACCENT = "rgb(59, 91, 255)";
 
-  for (const pagePath of ["/", "/learn.html", "/get-a-prompt.html"]) {
+  for (const pagePath of ["/", "/learn.html", "/generate-a-profile.html"]) {
     await page.goto(url + pagePath);
     await page.waitForSelector(".site-header");
     assert(
@@ -443,9 +459,9 @@ try {
       `Header has exactly three nav links on ${pagePath}`,
     );
     assert(
-      (await navLinks.nth(0).textContent()).trim() === "Get a Prompt" &&
-        (await navLinks.nth(0).getAttribute("href")) === "get-a-prompt.html",
-      `First nav link on ${pagePath} is 'Get a Prompt' → get-a-prompt.html`,
+      (await navLinks.nth(0).textContent()).trim() === "Generate a profile" &&
+        (await navLinks.nth(0).getAttribute("href")) === "generate-a-profile.html",
+      `First nav link on ${pagePath} is 'Generate a profile' → generate-a-profile.html`,
     );
     assert(
       (await navLinks.nth(1).textContent()).trim() === "Learn more" &&
@@ -453,9 +469,9 @@ try {
       `Second nav link on ${pagePath} is 'Learn more' → learn.html`,
     );
     assert(
-      (await navLinks.nth(2).textContent()).trim() === "Project" &&
+      (await navLinks.nth(2).textContent()).trim() === "GitHub" &&
         (await navLinks.nth(2).getAttribute("href")) === "https://github.com/refineryllc/portable-ai-working",
-      `Third nav link on ${pagePath} is 'Project' → GitHub repo`,
+      `Third nav link on ${pagePath} is 'GitHub' → GitHub repo`,
     );
     const headerPos = await page.$eval(".site-header", (el) => getComputedStyle(el).position);
     assert(
@@ -477,11 +493,15 @@ try {
     assert(color === RGB_TEXT, `${sel} color is #111 (got ${color})`);
   }
 
-  // --- Case 12 (PR A4 + #75): links accent-blue site-wide; overlay deleted, no muted links ---
-  const heroLink = await page.$eval(".tagline .link", (el) => getComputedStyle(el).color);
-  assert(heroLink === RGB_ACCENT, `Hero 'Learn more' link is accent-blue (got ${heroLink})`);
-  const blurbLink = await page.$eval(".editor-blurb .link", (el) => getComputedStyle(el).color);
-  assert(blurbLink === RGB_ACCENT, `Editor blurb link is accent-blue (got ${blurbLink})`);
+  // --- Case 12 (PR A4 + #75 + #86): links accent-blue site-wide; overlay deleted, no muted links ---
+  // (overlay assertions below verify the removed AI-draft overlay stays gone)
+  // In-body hero/blurb links were removed in #86, so verify the accent color on
+  // an empty-state action link (still a site-wide `.link`) instead.
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.waitForSelector("#empty-state", { state: "visible" });
+  const emptyActionLink = await page.$eval("#empty-generate-profile", (el) => getComputedStyle(el).color);
+  assert(emptyActionLink === RGB_ACCENT, `Empty-state action link is accent-blue (got ${emptyActionLink})`);
   // Overlay is deleted; no muted links should exist anywhere.
   const mutedCount = await page.locator(".link.muted").count();
   assert(mutedCount === 0, `No .link.muted remain after overlay deletion; got ${mutedCount}`);

@@ -16,9 +16,9 @@
         <span class="nav-toggle-bar" aria-hidden="true"></span>
       </button>
       <nav class="site-nav" id="site-nav" aria-label="Primary">
-        <a class="site-nav-link" href="get-a-prompt.html">Get a Prompt</a>
-        <a class="site-nav-link" href="learn.html">Learn more</a>
-        <a class="site-nav-link" href="https://github.com/refineryllc/portable-ai-working">Project</a>
+        <a class="site-nav-link" href="generate-a-profile.html" id="nav-generate-profile">Generate a profile</a>
+        <a class="site-nav-link" href="learn.html" id="nav-learn">Learn more</a>
+        <a class="site-nav-link" href="https://github.com/refineryllc/portable-ai-working" id="nav-github">GitHub</a>
       </nav>
     </div>
   </header>
@@ -28,7 +28,6 @@
       <h1 id="site-title">Every AI needs you to start over.</h1>
       <p class="tagline">
         PortableAI is an open standard that lets you take your profile anywhere.
-        <a class="link" href="learn.html">Learn more</a>
       </p>
     </section>
 
@@ -36,7 +35,7 @@
       <div class="editor-heading">
         <p class="editor-blurb">
           Your profile is a Markdown file you own. Edit it here, then download and take it anywhere.
-          Your profile is never stored on PortableAI. <a class="link" href="learn.html">Read more</a>
+          Your profile is never stored on PortableAI.
         </p>
         <div class="editor-toolbar" aria-label="Editor toolbar">
           <button class="link" type="button" id="download-markdown" hidden>Download</button>
@@ -60,20 +59,17 @@
             <h3 class="empty-state-title">Nothing loaded yet</h3>
             <p class="empty-state-hint">Load a profile or create a new one.</p>
             <div class="empty-state-actions">
+              <a class="link" href="generate-a-profile.html" id="empty-generate-profile">Generate a profile</a>
+              <span class="sep" aria-hidden="true">·</span>
+              <button class="link" type="button" id="open-profile">Open a profile</button>
+              <span class="sep" aria-hidden="true">·</span>
               <button class="link" type="button" id="load-sample">Load a sample</button>
-              <span class="sep" aria-hidden="true">·</span>
-              <button class="link" type="button" id="open-file">Open a file</button>
-              <span class="sep" aria-hidden="true">·</span>
-              <a class="link" href="get-a-prompt.html" id="empty-generate-new">Generate a new one</a>
             </div>
           </div>
 
           <div class="empty-state-secondary">
             <h4 class="empty-state-secondary-title">Ask an AI to draft one</h4>
-            <p class="empty-state-secondary-hint">Get a prompt to send to any AI you already use. It replies with Markdown you can paste back here.</p>
-            <div class="empty-state-secondary-actions">
-              <a class="link" href="get-a-prompt.html" id="empty-get-a-prompt">Get a prompt</a>
-            </div>
+            <p class="empty-state-secondary-hint">Click “Generate a profile” to build one from any AI.</p>
           </div>
         </div>
 
