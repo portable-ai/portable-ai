@@ -23,7 +23,8 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
 - Website footer contact links to `hello@portableai.org` and `security@portableai.org`
 - Reference editor now renders full GitHub-Flavored Markdown in the live preview via vendored `marked.js` v14.1.4 — headings, lists, tables, fenced code with language classes, task lists, and inline formatting all render correctly. Raw HTML in the source is escaped, so the preview is safe for Markdown from untrusted authors (#53).
 - `THIRD_PARTY_NOTICES.md` — attribution for vendored third-party code (currently `marked.js`, MIT)
-- **Tabbed reference editor**: the editor is now organized into three tabs — **Form**, **Markdown**, and **Preview** — that all edit the same underlying Markdown document. The Form tab renders structured inputs for the five well-known front-matter fields and for each well-known section from the [Registry v1](spec/registry/well-known-sections-v1.md), including "+ Add" buttons for well-known sections not yet in the document. The Preview tab renders the parsed front-matter as a compact metadata card at the top of the preview instead of leaking raw YAML into the Markdown body.
+- **Tabbed reference editor**: the editor is now organized into three tabs — **Form**, **Markdown**, and **Preview** — that all edit the same underlying Markdown document. The Form tab renders structured inputs for each well-known section from the [Registry v1](spec/registry/well-known-sections-v1.md), including "+ Add" buttons for well-known sections not yet in the document. The Preview tab renders the parsed front-matter as a compact metadata card at the top of the preview instead of leaking raw YAML into the Markdown body.
+- Persona template now ships with placeholder `e.g.` bullets under every well-known section so first-time users see what belongs in each section. Users replace or delete them (#22).
 
 ### Changed
 
@@ -35,6 +36,8 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
 - Renamed "Specification" to "Spec" in prose across `README.md`, `ROADMAP.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CHANGELOG.md`, `adr/0000-project-inception.md`, `ai/codex-bootstrap.md`, and `ai/project-bootstrap.md` (#44). The frozen v0.2 spec file is unchanged.
 - Reference editor preview: replaced the hand-rolled Markdown-subset renderer (headings + lists + inline bold/italic/code only) with vendored `marked.js` for full GFM support (#53)
 - Reference editor: canonical Markdown remains the single source of truth (ADR-0001); all three tabs read from and write to the same in-memory string. Front-matter is no longer visible in the Preview — it appears as a metadata card instead. Guarded `localStorage` access so the editor no longer crashes when opened from an opaque origin (e.g. bare `file://`) or when storage is disabled by policy.
+- Form tab now renders document metadata as a read-only card (matching the Preview) instead of editable text inputs. Front-matter values are still editable on the Markdown tab, keeping the canonical Markdown as the single source of truth.
+- Persona template bumped from `standard_version: 0.2` to `0.3` to match the shipped Core Spec draft; added the missing `# Notes` section; removed the placeholder `# Custom Sections` heading (custom sections belong under real reverse-DNS keyed headings).
 - `SECURITY.md` now uses the real `security@portableai.org` address (removed the earlier placeholder note)
 
 ### Deprecated
