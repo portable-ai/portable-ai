@@ -1,13 +1,5 @@
 const STORAGE_KEY = "portableAiPersonaDraft";
 
-// Prompt sent to another AI to draft a PortableAI profile.
-//
-// The prompt text now lives in js/prompt.js (window.PORTABLE_AI_PROMPTS), the
-// single source of truth shared with the Get a Prompt page. The editor only
-// needs the Persona prompt for its empty-state "Copy prompt" shortcut.
-const contextExportPrompt =
-  (window.PORTABLE_AI_PROMPTS && window.PORTABLE_AI_PROMPTS.persona) || "";
-
 // Static browser-only copy of templates/portable-ai-persona-template.md.
 // Embedded here so the GitHub Pages editor can create a new document without
 // depending on fetch paths that may vary by deployment location.
@@ -163,15 +155,15 @@ const status = document.querySelector("#save-status");
 const copyButton = document.querySelector("#copy-markdown");
 const downloadButton = document.querySelector("#download-markdown");
 const clearButton = document.querySelector("#clear-draft");
-// The AI-draft overlay was removed in favor of the dedicated Get a Prompt page
-// (get-a-prompt.html). The empty-state "Copy prompt" shortcut and its link to
-// the page are all that remain in the editor.
+// The in-app AI-draft flow was removed in favor of the dedicated
+// "Generate a profile" page (generate-a-profile.html). The empty-state link to
+// that page is all that remains in the editor.
 
 const emptyState = document.querySelector("#empty-state");
 const editorSurface = document.querySelector("#editor-surface");
 const loadSampleButton = document.querySelector("#load-sample");
-const openFileButton = document.querySelector("#open-file");
-// The empty-state secondary card links straight to get-a-prompt.html; no JS.
+const openProfileButton = document.querySelector("#open-profile");
+// The empty-state secondary card links straight to generate-a-profile.html; no JS.
 
 const restoreBanner = document.querySelector("#restore-banner");
 const restoreDraftButton = document.querySelector("#restore-draft");
@@ -190,13 +182,6 @@ fileInput.id = "markdown-file";
 fileInput.accept = ".md,.markdown,text/markdown,text/plain";
 fileInput.style.display = "none";
 document.body.appendChild(fileInput);
-
-// Show the first two lines of the prompt as a preview on the empty state
-// card. Users can expand via "Show full instructions" (opens the overlay).
-if (false) {
-  // (empty-state prompt preview removed in PR A3 — secondary card is copy-only)
-  const previewLines = "";
-}
 
 // Markdown preview rendering.
 //
@@ -593,11 +578,11 @@ editor.addEventListener("input", () => {
 copyButton.addEventListener("click", copyMarkdown);
 downloadButton.addEventListener("click", downloadMarkdown);
 loadSampleButton.addEventListener("click", loadSampleTemplate);
-openFileButton.addEventListener("click", () => fileInput.click());
+openProfileButton.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", () => loadMarkdownFile(fileInput.files[0]));
 
-// The empty-state secondary card and "Generate a new one" action are plain
-// links to get-a-prompt.html; they need no JS wiring here.
+// The empty-state secondary card and "Generate a profile" action are plain
+// links to generate-a-profile.html; they need no JS wiring here.
 
 if (restoreDraftButton) {
   restoreDraftButton.addEventListener("click", restorePendingDraft);

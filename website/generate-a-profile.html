@@ -16,9 +16,9 @@
         <span class="nav-toggle-bar" aria-hidden="true"></span>
       </button>
       <nav class="site-nav" id="site-nav" aria-label="Primary">
-        <a class="site-nav-link" href="get-a-prompt.html" aria-current="page">Generate a profile</a>
-        <a class="site-nav-link" href="learn.html">Learn more</a>
-        <a class="site-nav-link" href="https://github.com/refineryllc/portable-ai-working">Project</a>
+        <a class="site-nav-link" href="generate-a-profile.html" id="nav-generate-profile" aria-current="page">Generate a profile</a>
+        <a class="site-nav-link" href="learn.html" id="nav-learn">Learn more</a>
+        <a class="site-nav-link" href="https://github.com/refineryllc/portable-ai-working" id="nav-github">GitHub</a>
       </nav>
     </div>
   </header>
@@ -36,11 +36,11 @@
       <h2 id="prompt-page-heading" class="visually-hidden">Choose a profile type and copy its prompt</h2>
 
       <!-- Profile-type selector. Extensible to N types; options rendered from
-           window.PORTABLE_AI_PROMPTS by get-a-prompt.js. -->
+           window.PORTABLE_AI_PROMPTS by generate-a-profile.js. -->
       <div class="type-selector">
         <p class="type-selector-label" id="type-selector-label">What type of profile do you want to extract?</p>
         <div class="type-options" role="radiogroup" aria-labelledby="type-selector-label" id="type-options">
-          <!-- Populated by get-a-prompt.js -->
+          <!-- Populated by generate-a-profile.js -->
         </div>
         <p class="type-selector-hint" id="type-selector-hint"></p>
       </div>
@@ -94,7 +94,7 @@
     </p>
   </footer>
   <script src="js/prompt.js"></script>
-  <script src="js/get-a-prompt.js"></script>
+  <script src="js/generate-a-profile.js"></script>
   <script src="js/header.js"></script>
 </body>
 </html>

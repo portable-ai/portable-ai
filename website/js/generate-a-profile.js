@@ -1,4 +1,4 @@
-// Get a Prompt page controller.
+// "Generate a profile" page controller.
 //
 // Reads window.PORTABLE_AI_PROMPTS (js/prompt.js) — the single source of truth
 // for every extraction prompt — and drives:
@@ -112,7 +112,7 @@
   if (copyTop) copyTop.addEventListener("click", copyActive);
   if (copyBottom) copyBottom.addEventListener("click", copyActive);
 
-  // Support deep-linking a type: get-a-prompt.html#software-project
+  // Support deep-linking a type: generate-a-profile.html#software-project
   const hashType = (window.location.hash || "").replace(/^#/, "");
   if (hashType && prompts.map[hashType]) {
     activeType = hashType;

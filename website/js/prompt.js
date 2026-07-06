@@ -1,7 +1,7 @@
 // Extraction prompts, keyed by profile document_type.
 //
 // SINGLE SOURCE OF TRUTH for every "ask an AI to draft my profile" prompt on
-// the site. Both the editor (app.js) and the Get a Prompt page read from here,
+// the site. Both the editor (app.js) and the "Generate a profile" page read from here,
 // so prompt wording is edited in exactly one place.
 //
 // Design intent:
