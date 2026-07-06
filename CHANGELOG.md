@@ -16,6 +16,7 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
 - `ai/codex-bootstrap.md` — moved from repo root (was `portable-ai.md`) for clarity
 - **Core spec v0.3 (DRAFT)** — `spec/portable-ai-core-spec-v0.3.md` — shared envelope for all PortableAI documents: canonical format, front-matter identity, sections, integrity block, Non-Storage Principle, versioning (#45, #46, #48, #49)
 - **Persona spec v0.3 (DRAFT)** — `spec/portable-ai-persona-spec-v0.3.md` — Persona-specific layer on top of Core (#45)
+- **Software Project spec v0.3 (DRAFT)** — `spec/portable-ai-software-project-spec-v0.3.md` — a second profile type derived from Core, capturing durable software-project knowledge (overview, architecture, tech stack, conventions, domain glossary, key decisions, constraints, environments, dependencies) so it can be handed to any AI without re-briefing. Reserves `document_type: software-project` in the Core spec (§4.3) and adds Software Project document keys to the Well-Known Section Registry (§4.2, additive within v1) (#73, #74)
 - **Well-Known Section Registry v1 (DRAFT)** — `spec/registry/well-known-sections-v1.md` — centrally assigned `snake_case` section keys, additive within v1 (#47)
 - Skeleton drafts of `spec/portable-ai-core-spec-v0.3.md` and `spec/portable-ai-persona-spec-v0.3.md` (Core + Persona split)
 - Project email identity at `portableai.org`: `inbox@` mailbox with aliases `security@`, `hello@`, `maintainers@`

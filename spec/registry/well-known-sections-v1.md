@@ -49,7 +49,21 @@ Each entry specifies the key, its recommended title, its scope (which document t
 | `communication_style` | Communication Style | Preferred communication modes and conventions. |
 | `ai_collaboration` | AI Collaboration | Preferences and instructions for working with AI assistants. |
 
-### 4.2 Cross-document keys
+### 4.2 Software Project document keys
+
+| Key | Recommended title | Description |
+|---|---|---|
+| `overview` | Overview | What the project is, its purpose, and the problem it solves. |
+| `architecture` | Architecture | High-level structure: components, services, data flow, boundaries. |
+| `tech_stack` | Tech Stack | Languages, frameworks, key libraries, datastores, and infrastructure. |
+| `conventions` | Conventions | Coding standards, naming, formatting, testing, and review practices. |
+| `domain_glossary` | Domain Glossary | Domain terms, entities, and business concepts and their meanings. |
+| `key_decisions` | Key Decisions | Significant technical decisions and their rationale (ADR-style pointers). |
+| `constraints` | Constraints & Non-Goals | Hard constraints, explicit non-goals, and things intentionally out of scope. |
+| `environments` | Environments & Ops | Environments, build/deploy/release process, and operational notes. |
+| `dependencies` | Dependencies & Integrations | External services, APIs, and systems the project depends on or integrates with. |
+
+### 4.3 Cross-document keys
 
 Keys usable in any document type.
 
@@ -73,9 +87,11 @@ New well-known keys are proposed through the governance process defined in [`GOV
 
 ## 7. Changelog
 
+- **v1 (2026-07-06, DRAFT)** — added Software Project document keys (§4.2): `overview`, `architecture`, `tech_stack`, `conventions`, `domain_glossary`, `key_decisions`, `constraints`, `environments`, `dependencies` (#74). Additive within v1.
 - **v1 (2026-07-04, DRAFT)** — initial published registry alongside spec v0.3.
 
 ## 8. Related documents
 
 - [PortableAI Core Spec v0.3](../portable-ai-core-spec-v0.3.md)
 - [PortableAI Persona Spec v0.3](../portable-ai-persona-spec-v0.3.md)
+- [PortableAI Software Project Spec v0.3](../portable-ai-software-project-spec-v0.3.md)
