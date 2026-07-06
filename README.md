@@ -28,11 +28,14 @@ A PortableAI Persona is intended to be:
 ├── CONTRIBUTING.md
 ├── GOVERNANCE.md
 ├── ROADMAP.md
-├── adr/
-├── examples/
-├── spec/
-├── templates/
-└── website/
+├── SECURITY.md
+├── CHANGELOG.md
+├── adr/               Architecture Decision Records
+├── ai/                Bootstrap prompts for AI coding assistants
+├── examples/          Example PortableAI documents
+├── spec/              PortableAI specs (Core + Persona)
+├── templates/         Starter templates
+└── website/           PortableAI.org site and reference editor
 ```
 
 ## Canonical format
@@ -49,7 +52,18 @@ Version 1 intentionally uses plain HTML, CSS, and JavaScript with no framework, 
 
 ## Project status
 
-This project is in early draft status. The current specification is **v0.2 Draft**.
+This project is in early draft status. The current published spec is **v0.2**. Work toward **v0.3** (First Public Draft) is tracked in the [v1.0 milestone](../../milestone/1).
+
+The v0.3 spec is being split into two documents:
+
+- `spec/portable-ai-core-spec-v0.3.md` — the shared PortableAI Document envelope
+- `spec/portable-ai-persona-spec-v0.3.md` — Persona-specific sections
+
+## Contact
+
+- General: **hello@portableai.org**
+- Security: **security@portableai.org** (see [SECURITY.md](SECURITY.md))
+- Maintainers: **maintainers@portableai.org** (see [GOVERNANCE.md](GOVERNANCE.md))
 
 ## License
 

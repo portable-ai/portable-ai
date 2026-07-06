@@ -36,7 +36,7 @@ The standard is the primary product. The reference editor demonstrates the stand
 
 - `README.md` — project overview
 - `WHY.md` — rationale and motivation
-- `spec/` — PortableAI specifications
+- `spec/` — PortableAI specs
 - `templates/` — canonical templates
 - `examples/` — example profiles
 - `website/` — static reference editor and public site
@@ -141,7 +141,7 @@ Create these five Epic issues.
 
 ### EPIC: Standard
 
-Define the PortableAI standard, specification, governance, canonical Markdown format, and core messaging.
+Define the PortableAI standard, spec, governance, canonical Markdown format, and core messaging.
 
 Labels: `epic`, `standard`, `P0`
 
@@ -304,7 +304,7 @@ Acceptance Criteria:
 - [ ] Includes prompt for giving the profile to another AI
 - [ ] Includes copy button for the prompt
 
-### Feature: Specification v0.2 Completion
+### Feature: Spec v0.2 Completion
 
 Area: Standard
 Priority: P0
@@ -417,7 +417,7 @@ The First Public Draft includes:
 - Load template with examples
 - Custom sections
 - Download profile workflow
-- v0.2 specification cleanup
+- v0.2 spec cleanup
 - Consistent documentation
 
 Future releases may include:
