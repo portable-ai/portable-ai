@@ -24,6 +24,7 @@
         <div>
           <p class="eyebrow">Browser-only reference editor</p>
           <h2 id="editor-title">Draft your PortableAI Persona</h2>
+          <p class="help-text">Switch between a guided <strong>Form</strong>, the canonical <strong>Markdown</strong>, and a rendered <strong>Preview</strong>. All three views edit the same underlying document.</p>
         </div>
         <div class="editor-toolbar" aria-label="Editor toolbar">
           <button class="button primary" type="button" id="download-markdown">Download Markdown</button>
@@ -37,17 +38,30 @@
       </section>
 
       <div class="canonical-editor">
-        <div class="field-group markdown-field">
-          <label for="persona-editor">Canonical Markdown document</label>
-          <p id="editor-help" class="help-text">The raw Markdown below is the only source of truth. Keep editing the full PortableAI Document directly here.</p>
-          <textarea id="persona-editor" spellcheck="true" aria-describedby="editor-help"></textarea>
+        <div class="tabs" role="tablist" aria-label="Editor views">
+          <button class="tab" role="tab" type="button" id="tab-form" aria-controls="panel-form" aria-selected="true" tabindex="0">Form</button>
+          <button class="tab" role="tab" type="button" id="tab-markdown" aria-controls="panel-markdown" aria-selected="false" tabindex="-1">Markdown</button>
+          <button class="tab" role="tab" type="button" id="tab-preview" aria-controls="panel-preview" aria-selected="false" tabindex="-1">Preview</button>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" id="panel-form" aria-labelledby="tab-form">
+          <p class="help-text">Fill in the structured fields below. Everything you enter is saved to the same underlying Markdown document, which you can inspect on the Markdown tab.</p>
+          <div id="form-fields" class="form-fields"></div>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" id="panel-markdown" aria-labelledby="tab-markdown" hidden>
+          <div class="field-group markdown-field">
+            <label for="persona-editor">Canonical Markdown document</label>
+            <p id="editor-help" class="help-text">The raw Markdown below is the only source of truth. All tabs read from and write to this text.</p>
+            <textarea id="persona-editor" spellcheck="true" aria-describedby="editor-help"></textarea>
+          </div>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" id="panel-preview" aria-labelledby="tab-preview" hidden>
+          <div id="persona-metadata" class="metadata-card" hidden aria-label="Document metadata"></div>
+          <div id="persona-preview" class="preview-content"></div>
         </div>
       </div>
-
-      <aside class="preview-card" aria-labelledby="preview-title">
-        <h3 id="preview-title">Markdown preview</h3>
-        <div id="persona-preview" class="preview-content"></div>
-      </aside>
 
       <div class="editor-actions" aria-label="Editor actions">
         <button class="button secondary" type="button" id="copy-markdown">Copy Markdown</button>

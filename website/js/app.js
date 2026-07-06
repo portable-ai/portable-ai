@@ -143,10 +143,15 @@ Add any additional sections that are useful for your own context.
 `;
 
 // The editor state is intentionally just Markdown text. The Markdown document
-// is the only canonical source; previews and any future AI-specific exports must
-// be generated from this text rather than stored as separate primary artifacts.
+// is the only canonical source; previews, the Form tab, and any future
+// AI-specific exports must be generated from this text rather than stored as
+// separate primary artifacts.
 const editor = document.querySelector("#persona-editor");
 const preview = document.querySelector("#persona-preview");
+const formFields = document.querySelector("#form-fields");
+const metadataCard = document.querySelector("#persona-metadata");
+const tabButtons = Array.from(document.querySelectorAll(".tab[role='tab']"));
+const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
 const status = document.querySelector("#save-status");
 const copyButton = document.querySelector("#copy-markdown");
 const downloadButton = document.querySelector("#download-markdown");
@@ -248,19 +253,71 @@ const setContextOverlayStatus = (message) => {
   contextOverlayStatus.textContent = message;
 };
 
-const saveDraft = () => {
-  localStorage.setItem(STORAGE_KEY, editor.value);
-  setStatus("Draft saved locally in this browser.");
+// Guarded localStorage access. Browsers throw SecurityError when the page is
+// opened from an opaque origin (e.g. a bare `file://` URL in some browsers)
+// or when storage is disabled by policy. Per ADR-0004 the editor must work
+// with no login and no server, so a storage failure is non-fatal — the user
+// simply loses the auto-save-on-refresh convenience.
+const safeLocalStorage = {
+  get(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  set(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  remove(key) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch {
+      /* ignore */
+    }
+  },
 };
 
+const saveDraft = () => {
+  const ok = safeLocalStorage.set(STORAGE_KEY, editor.value);
+  setStatus(
+    ok
+      ? "Draft saved locally in this browser."
+      : "Editing locally. Browser storage is unavailable, so this draft will not persist across refreshes.",
+  );
+};
+
+// updatePreview is the public entry point used by early callers
+// (setEditorValue, the restore-from-localStorage path). It defers to
+// renderPreview once that is defined further down. Using a `var` binding
+// avoids the temporal-dead-zone hazard of referencing a `const` before
+// initialization.
+// eslint-disable-next-line no-var
+var renderPreview;
 const updatePreview = () => {
-  preview.innerHTML = renderMarkdown(editor.value);
+  if (typeof renderPreview === "function") {
+    renderPreview();
+  } else {
+    // Fallback for the brief window before renderPreview is assigned; still
+    // safe because renderMarkdown escapes raw HTML.
+    preview.innerHTML = renderMarkdown(editor.value);
+  }
 };
 
 const setEditorValue = (value) => {
   editor.value = value;
   saveDraft();
   updatePreview();
+  // renderForm is defined later in the file; guard with typeof so calls
+  // during module-init order don't throw.
+  if (typeof renderForm === "function") {
+    renderForm();
+  }
 };
 
 const hasEditorContent = () => editor.value.trim().length > 0;
@@ -359,18 +416,537 @@ const loadMarkdownFile = async (file) => {
   }
 };
 
-const restoredDraft = localStorage.getItem(STORAGE_KEY);
+const restoredDraft = safeLocalStorage.get(STORAGE_KEY);
 
 if (restoredDraft !== null) {
   editor.value = restoredDraft;
   setStatus("Restored a local draft from this browser.");
 }
 
-updatePreview();
+// ---------------------------------------------------------------------------
+// Document model: parse + serialize Markdown ↔ structured form data.
+//
+// The Markdown source in `editor.value` is canonical (ADR-0001). The Form tab
+// derives its inputs from the parsed model and writes changes back to Markdown
+// on every keystroke. This keeps all three tabs consistent without a separate
+// data store.
+// ---------------------------------------------------------------------------
+
+// Well-known section registry v1 (persona keys, cross-doc keys). Keep this in
+// sync with spec/registry/well-known-sections-v1.md.
+//
+// Each entry may include `titleAliases`, an array of human-readable H1
+// titles that should resolve to this registry key. This handles cases like
+// "Knowledge & Expertise" (published key: knowledge_expertise) or
+// "AI Collaboration Instructions" (published key: ai_collaboration) where the
+// naive mapping rule would produce a slightly different slug.
+const WELL_KNOWN_SECTIONS = [
+  { key: "profile", title: "Profile", help: "Identity, roles, location, timezone, long-term goals." },
+  { key: "preferences", title: "Preferences", help: "How you like to work, receive information, or interact." },
+  { key: "persona", title: "Persona", help: "Voice, tone, style, personality context." },
+  { key: "projects", title: "Projects", help: "Active or durable work worth persisting across sessions." },
+  { key: "interests", title: "Interests", help: "Topics you care about." },
+  {
+    key: "knowledge_expertise",
+    title: "Knowledge & Expertise",
+    titleAliases: ["Knowledge and Expertise", "Knowledge Expertise"],
+    help: "Domains where you have deep knowledge.",
+  },
+  { key: "decision_style", title: "Decision Style", help: "How you make decisions." },
+  { key: "communication_style", title: "Communication Style", help: "Preferred communication modes and conventions." },
+  {
+    key: "ai_collaboration",
+    title: "AI Collaboration",
+    titleAliases: ["AI Collaboration Instructions"],
+    help: "How AI assistants should work with you.",
+  },
+  { key: "notes", title: "Notes", help: "Freeform notes that don't fit elsewhere." },
+  { key: "changelog", title: "Changelog", help: "Human-readable summary of changes to this document." },
+];
+
+// Naive Title → key transform used as the default. The Core spec §5.1 rule:
+// lowercase, replace runs of whitespace with `_`, strip punctuation. `&` maps
+// to "and" to match how most editors slugify.
+const slugifyTitle = (title) =>
+  title
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9\s_]/g, " ")
+    .trim()
+    .replace(/\s+/g, "_");
+
+// Build a lookup from any recognized title (canonical or alias, after
+// slugification) to the registry's published key.
+const TITLE_ALIAS_TO_KEY = (() => {
+  const map = new Map();
+  for (const entry of WELL_KNOWN_SECTIONS) {
+    map.set(slugifyTitle(entry.title), entry.key);
+    for (const alias of entry.titleAliases || []) {
+      map.set(slugifyTitle(alias), entry.key);
+    }
+    // The registry key itself is also a valid slug (someone might use the
+    // snake_case form directly as a heading).
+    map.set(entry.key, entry.key);
+  }
+  return map;
+})();
+
+// Public title → registry key resolver. Falls back to the raw slug for
+// unknown titles (which is how custom / not-yet-registered sections work).
+const titleToKey = (title) => {
+  const slug = slugifyTitle(title);
+  return TITLE_ALIAS_TO_KEY.get(slug) || slug;
+};
+
+// The front-matter fields we expose as first-class inputs. Anything else in
+// the YAML block is preserved verbatim as an "other keys" text area so we
+// never silently drop a field.
+const FRONT_MATTER_FIELDS = [
+  { key: "standard", label: "Standard", placeholder: "PortableAI Persona" },
+  { key: "standard_version", label: "Standard version", placeholder: "0.3" },
+  { key: "profile_name", label: "Profile name", placeholder: "My PortableAI Persona" },
+  { key: "profile_version", label: "Profile version", placeholder: "1.0.0" },
+  { key: "last_updated", label: "Last updated", placeholder: "YYYY-MM-DD" },
+];
+
+// Minimal YAML parser. Front-matter in the Core spec is a flat map of scalar
+// key/value pairs (§4.2), so a full YAML library would be overkill. We accept
+// `key: value` per line, ignore blank lines and comment lines beginning `#`,
+// and preserve insertion order so round-tripping is stable.
+const parseFrontMatter = (yaml) => {
+  const entries = [];
+  const lines = yaml.split(/\r?\n/);
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+    if (!line || line.trim().startsWith("#")) {
+      continue;
+    }
+    const idx = line.indexOf(":");
+    if (idx === -1) {
+      continue;
+    }
+    const key = line.slice(0, idx).trim();
+    let value = line.slice(idx + 1).trim();
+    // Strip surrounding matching quotes if present. We do not attempt to
+    // interpret YAML flow scalars, block scalars, anchors, or nested maps —
+    // if a document uses those, the Form tab will just show the raw text on
+    // the "other keys" line and users can edit in the Markdown tab.
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    entries.push([key, value]);
+  }
+  return entries;
+};
+
+const serializeFrontMatter = (entries) => {
+  if (!entries.length) {
+    return "";
+  }
+  const body = entries
+    .filter(([key]) => key && key.trim())
+    .map(([key, value]) => `${key}: ${value ?? ""}`)
+    .join("\n");
+  return `---\n${body}\n---`;
+};
+
+// Split a document into { frontMatter, body } where body preserves the
+// original text after the closing `---`. Documents without front-matter are
+// treated as body-only.
+const FRONT_MATTER_RE = /^---\s*\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/;
+
+const splitFrontMatter = (source) => {
+  const match = source.match(FRONT_MATTER_RE);
+  if (!match) {
+    return { frontMatterRaw: "", frontMatterEntries: [], body: source };
+  }
+  return {
+    frontMatterRaw: match[1],
+    frontMatterEntries: parseFrontMatter(match[1]),
+    body: source.slice(match[0].length),
+  };
+};
+
+// Walk the Markdown body and return an ordered list of top-level (H1) sections.
+// Everything before the first H1 is captured as a synthetic "preamble" section
+// with key `__preamble__` so it round-trips exactly. Horizontal-rule
+// separators (`---`) between sections are preserved as part of the following
+// section's leading whitespace when we serialize.
+const H1_RE = /^# +(.+?)\s*$/;
+
+const parseSections = (body) => {
+  const lines = body.split(/\r?\n/);
+  const sections = [];
+  let current = { title: "", key: "__preamble__", contentLines: [] };
+
+  for (const line of lines) {
+    const match = line.match(H1_RE);
+    if (match) {
+      // Push the previous section (including preamble) before starting a new one.
+      sections.push(current);
+      const title = match[1].trim();
+      current = { title, key: titleToKey(title), contentLines: [] };
+    } else {
+      current.contentLines.push(line);
+    }
+  }
+  sections.push(current);
+
+  return sections.map((s) => ({
+    title: s.title,
+    key: s.key,
+    content: s.contentLines.join("\n").replace(/^\n+/, "").replace(/\s+$/, ""),
+  }));
+};
+
+const serializeSections = (sections) => {
+  const parts = [];
+  for (const s of sections) {
+    if (s.key === "__preamble__") {
+      if (s.content.trim()) {
+        parts.push(s.content);
+      }
+      continue;
+    }
+    const heading = `# ${s.title}`;
+    const body = s.content ? `\n\n${s.content}` : "";
+    parts.push(`${heading}${body}`);
+  }
+  // Join sections with a blank-line separator. We intentionally do not
+  // re-emit `---` horizontal-rule dividers between sections; the persona
+  // template's original dividers were decorative and Markdown renderers do
+  // not require them. If a user wants them back they can add them in the
+  // Markdown tab.
+  return parts.filter((p) => p.length > 0).join("\n\n") + "\n";
+};
+
+const parseDocument = (source) => {
+  const { frontMatterEntries, body } = splitFrontMatter(source);
+  return { frontMatter: frontMatterEntries, sections: parseSections(body) };
+};
+
+const serializeDocument = (model) => {
+  const fm = serializeFrontMatter(model.frontMatter);
+  const body = serializeSections(model.sections);
+  if (!fm) {
+    return body;
+  }
+  return `${fm}\n\n${body}`;
+};
+
+// ---------------------------------------------------------------------------
+// Form rendering. The Form tab is generated from the parsed model each time
+// the Markdown changes. To preserve user focus and typing, we do a *diff* of
+// existing field DOM against the desired field list — reusing input/textarea
+// elements when their id matches.
+// ---------------------------------------------------------------------------
+
+let suppressEditorInput = false;
+
+// Declared with `var` for the same TDZ-avoidance reason as `renderPreview`
+// above — setEditorValue references renderForm before its `const` declaration
+// would otherwise be initialized.
+// eslint-disable-next-line no-var
+var renderForm;
+
+const frontMatterFieldId = (key) => `fm-${key}`;
+const sectionFieldId = (key) => `section-${key}`;
+
+const getModelFromEditor = () => parseDocument(editor.value);
+
+const writeEditor = (model) => {
+  const nextValue = serializeDocument(model);
+  if (nextValue === editor.value) {
+    return;
+  }
+  suppressEditorInput = true;
+  editor.value = nextValue;
+  suppressEditorInput = false;
+  saveDraft();
+};
+
+const renderFormFrontMatter = (model, container) => {
+  const fmMap = new Map(model.frontMatter);
+
+  const wrapper = document.createElement("section");
+  wrapper.className = "form-section";
+  wrapper.innerHTML = `
+    <div class="form-section-header">
+      <h3 class="form-section-title">Document metadata</h3>
+      <span class="form-section-key">front-matter</span>
+    </div>
+    <p class="help-text">These fields become the YAML front-matter at the top of the document.</p>
+    <div class="form-front-matter"></div>
+  `;
+  const grid = wrapper.querySelector(".form-front-matter");
+
+  for (const field of FRONT_MATTER_FIELDS) {
+    const group = document.createElement("div");
+    group.className = "field-group";
+    const inputId = frontMatterFieldId(field.key);
+    const label = document.createElement("label");
+    label.htmlFor = inputId;
+    label.textContent = field.label;
+    const input = document.createElement("input");
+    input.type = "text";
+    input.id = inputId;
+    input.name = field.key;
+    input.placeholder = field.placeholder;
+    input.value = fmMap.get(field.key) ?? "";
+    input.addEventListener("input", () => {
+      const current = getModelFromEditor();
+      const entries = current.frontMatter.filter(([k]) => k !== field.key);
+      // Preserve original position when the key already existed; otherwise
+      // append at the end so the ordered spec fields stay in template order.
+      const originalIdx = current.frontMatter.findIndex(([k]) => k === field.key);
+      const nextEntry = [field.key, input.value];
+      if (originalIdx === -1) {
+        entries.push(nextEntry);
+      } else {
+        entries.splice(originalIdx, 0, nextEntry);
+      }
+      writeEditor({ ...current, frontMatter: entries });
+      updateMetadataCard();
+      updatePreview();
+    });
+    group.append(label, input);
+    grid.appendChild(group);
+  }
+
+  // Preserve any front-matter keys we don't render as first-class fields.
+  const wellKnown = new Set(FRONT_MATTER_FIELDS.map((f) => f.key));
+  const otherEntries = model.frontMatter.filter(([k]) => !wellKnown.has(k));
+  if (otherEntries.length) {
+    const other = document.createElement("div");
+    other.className = "field-group";
+    other.style.gridColumn = "1 / -1";
+    const label = document.createElement("label");
+    label.htmlFor = "fm-other";
+    label.textContent = "Other front-matter keys";
+    const help = document.createElement("p");
+    help.className = "help-text";
+    help.textContent = "Custom front-matter keys not covered above. One key: value per line.";
+    const textarea = document.createElement("textarea");
+    textarea.id = "fm-other";
+    textarea.value = otherEntries.map(([k, v]) => `${k}: ${v}`).join("\n");
+    textarea.addEventListener("input", () => {
+      const current = getModelFromEditor();
+      const preserved = current.frontMatter.filter(([k]) => wellKnown.has(k));
+      const extras = parseFrontMatter(textarea.value);
+      writeEditor({ ...current, frontMatter: [...preserved, ...extras] });
+      updateMetadataCard();
+      updatePreview();
+    });
+    other.append(label, help, textarea);
+    grid.appendChild(other);
+  }
+
+  container.appendChild(wrapper);
+};
+
+const renderFormSection = (section, container, { registryEntry }) => {
+  const wrapper = document.createElement("section");
+  wrapper.className = "form-section";
+  const inputId = sectionFieldId(section.key);
+  wrapper.innerHTML = `
+    <div class="form-section-header">
+      <h3 class="form-section-title">${escapeHtml(section.title || registryEntry?.title || section.key)}</h3>
+      <span class="form-section-key">${escapeHtml(section.key)}</span>
+    </div>
+    ${registryEntry ? `<p class="help-text">${escapeHtml(registryEntry.help)}</p>` : `<p class="help-text">Custom section. Edit its Markdown body below.</p>`}
+  `;
+  const textarea = document.createElement("textarea");
+  textarea.id = inputId;
+  textarea.spellcheck = true;
+  textarea.value = section.content;
+  textarea.addEventListener("input", () => {
+    const current = getModelFromEditor();
+    const nextSections = current.sections.map((s) =>
+      s.key === section.key ? { ...s, content: textarea.value } : s,
+    );
+    writeEditor({ ...current, sections: nextSections });
+    updatePreview();
+  });
+  wrapper.appendChild(textarea);
+  container.appendChild(wrapper);
+};
+
+renderForm = () => {
+  if (!formFields) return;
+  const model = getModelFromEditor();
+
+  // Snapshot the focused element and its selection so a re-render doesn't
+  // eject the user from the field they're typing in.
+  const active = document.activeElement;
+  const focusInfo =
+    active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA") && formFields.contains(active)
+      ? {
+          id: active.id,
+          start: active.selectionStart,
+          end: active.selectionEnd,
+        }
+      : null;
+
+  formFields.innerHTML = "";
+  renderFormFrontMatter(model, formFields);
+
+  const registryByKey = new Map(WELL_KNOWN_SECTIONS.map((s) => [s.key, s]));
+  const seenKeys = new Set();
+
+  // Render sections in the order they appear in the document, skipping the
+  // synthetic preamble (it's usually empty; if not, users see it as a
+  // "Preamble" section for round-trip safety).
+  for (const section of model.sections) {
+    if (section.key === "__preamble__") {
+      if (!section.content.trim()) continue;
+      renderFormSection({ ...section, title: "Preamble" }, formFields, { registryEntry: null });
+      continue;
+    }
+    seenKeys.add(section.key);
+    renderFormSection(section, formFields, { registryEntry: registryByKey.get(section.key) });
+  }
+
+  // Offer to add any well-known section that isn't yet present.
+  const missing = WELL_KNOWN_SECTIONS.filter((s) => !seenKeys.has(s.key));
+  if (missing.length) {
+    const addWrapper = document.createElement("section");
+    addWrapper.className = "form-section";
+    addWrapper.innerHTML = `
+      <div class="form-section-header">
+        <h3 class="form-section-title">Add a well-known section</h3>
+        <span class="form-section-key">registry v1</span>
+      </div>
+      <p class="help-text">Pick a well-known section to add to this document. Custom sections can be added by editing the Markdown tab and using a reverse-DNS heading key.</p>
+    `;
+    const buttons = document.createElement("div");
+    buttons.style.display = "flex";
+    buttons.style.flexWrap = "wrap";
+    buttons.style.gap = "0.5rem";
+    for (const entry of missing) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "button secondary";
+      btn.textContent = `+ ${entry.title}`;
+      btn.addEventListener("click", () => {
+        const current = getModelFromEditor();
+        writeEditor({
+          ...current,
+          sections: [...current.sections, { title: entry.title, key: entry.key, content: "-" }],
+        });
+        renderForm();
+        updatePreview();
+      });
+      buttons.appendChild(btn);
+    }
+    addWrapper.appendChild(buttons);
+    formFields.appendChild(addWrapper);
+  }
+
+  if (focusInfo) {
+    const el = document.getElementById(focusInfo.id);
+    if (el) {
+      el.focus();
+      try {
+        el.setSelectionRange(focusInfo.start, focusInfo.end);
+      } catch {
+        /* input types like `date` don't support setSelectionRange */
+      }
+    }
+  }
+};
+
+// ---------------------------------------------------------------------------
+// Preview metadata card. Renders parsed front-matter as a compact key/value
+// card above the rendered Markdown body. Raw YAML never leaks into preview.
+// ---------------------------------------------------------------------------
+
+const prettyFrontMatterLabel = (key) => {
+  const known = FRONT_MATTER_FIELDS.find((f) => f.key === key);
+  if (known) return known.label;
+  return key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+const updateMetadataCard = () => {
+  if (!metadataCard) return;
+  const { frontMatter } = parseDocument(editor.value);
+  if (!frontMatter.length) {
+    metadataCard.hidden = true;
+    metadataCard.innerHTML = "";
+    return;
+  }
+  const rows = frontMatter
+    .map(([k, v]) => `<dt>${escapeHtml(prettyFrontMatterLabel(k))}</dt><dd>${escapeHtml(v)}</dd>`)
+    .join("");
+  metadataCard.innerHTML = `<h3>Document metadata</h3><dl>${rows}</dl>`;
+  metadataCard.hidden = false;
+};
+
+// Assign the real renderPreview (declared with `var` earlier so `updatePreview`
+// can safely reference it). Strips front-matter and updates the metadata card.
+renderPreview = () => {
+  const { body } = splitFrontMatter(editor.value);
+  preview.innerHTML = renderMarkdown(body);
+  updateMetadataCard();
+};
+
+// ---------------------------------------------------------------------------
+// Tab switching. Uses aria-selected + hidden panels; keyboard-navigable per
+// the ARIA authoring practices tabs pattern.
+// ---------------------------------------------------------------------------
+
+const activateTab = (tabId) => {
+  for (const btn of tabButtons) {
+    const selected = btn.id === tabId;
+    btn.setAttribute("aria-selected", String(selected));
+    btn.tabIndex = selected ? 0 : -1;
+  }
+  for (const panel of tabPanels) {
+    const owner = panel.getAttribute("aria-labelledby");
+    panel.hidden = owner !== tabId;
+  }
+  // Re-render the tab we just switched to so it reflects the latest Markdown.
+  if (tabId === "tab-form") renderForm();
+  if (tabId === "tab-preview") renderPreview();
+};
+
+for (const btn of tabButtons) {
+  btn.addEventListener("click", () => activateTab(btn.id));
+  btn.addEventListener("keydown", (event) => {
+    const idx = tabButtons.indexOf(btn);
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      event.preventDefault();
+      const next = tabButtons[(idx + 1) % tabButtons.length];
+      next.focus();
+      activateTab(next.id);
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+      event.preventDefault();
+      const prev = tabButtons[(idx - 1 + tabButtons.length) % tabButtons.length];
+      prev.focus();
+      activateTab(prev.id);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      tabButtons[0].focus();
+      activateTab(tabButtons[0].id);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      const last = tabButtons[tabButtons.length - 1];
+      last.focus();
+      activateTab(last.id);
+    }
+  });
+}
+
+renderPreview();
+renderForm();
 
 editor.addEventListener("input", () => {
+  if (suppressEditorInput) return;
   saveDraft();
-  updatePreview();
+  renderPreview();
+  renderForm();
 });
 
 copyButton.addEventListener("click", copyMarkdown);
@@ -401,7 +977,7 @@ clearButton.addEventListener("click", () => {
   }
 
   editor.value = "";
-  localStorage.removeItem(STORAGE_KEY);
+  safeLocalStorage.remove(STORAGE_KEY);
   updatePreview();
   setStatus("Local draft cleared from this browser.");
 });
