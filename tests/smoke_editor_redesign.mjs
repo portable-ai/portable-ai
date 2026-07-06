@@ -92,10 +92,10 @@ try {
     (await page.textContent("#open-file")).trim() === "Open a profile",
     "Open-file action is labeled 'Open a profile' (#86)",
   );
-  // #86: empty-state primary actions in order: Generate a new one · Open a profile · Load a sample.
+  // #86: empty-state primary actions in order: Generate a profile · Open a profile · Load a sample.
   const emptyActionLabels = await page.locator(".empty-state-actions .link").allTextContents();
   assert(
-    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a new one | Open a profile | Load a sample",
+    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample",
     `Empty-state actions are ordered Generate/Open/Load (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
   );
   assert(
@@ -312,18 +312,18 @@ try {
     "Empty-state 'Generate a new one' links to get-a-prompt.html",
   );
   assert(
-    (await page.textContent("#empty-generate-new")).trim() === "Generate a new one",
-    "Third empty-state action reads 'Generate a new one'",
+    (await page.textContent("#empty-generate-new")).trim() === "Generate a profile",
+    "First empty-state action reads 'Generate a profile'",
   );
   // #86: the standalone secondary 'Get a prompt' link is removed; the block
-  // now just points the user at 'Generate a new one'.
+  // now just points the user at 'Generate a profile'.
   assert(
     (await page.locator("#empty-get-a-prompt").count()) === 0,
-    "Secondary 'Get a prompt' link removed from empty state (#86)",
+    "Standalone secondary prompt link removed from empty state (#86)",
   );
   assert(
-    (await page.textContent(".empty-state-secondary-hint")).includes('Click “Generate a new one” to build your profile from any AI'),
-    "Secondary block hint points to 'Generate a new one' (#86)",
+    (await page.textContent(".empty-state-secondary-hint")).includes('Click “Generate a profile” to build one from any AI'),
+    "Secondary block hint points to 'Generate a profile' (#86)",
   );
   assert(
     (await page.textContent(".empty-state-secondary-title")).trim() === "Ask an AI to draft one",
@@ -334,8 +334,8 @@ try {
   await page.goto(url + "/get-a-prompt.html");
   await page.waitForSelector("#prompt-readout-body");
   assert(
-    (await page.textContent("#prompt-title")).trim().toLowerCase().includes("get a prompt"),
-    "Get a Prompt page has 'Get a prompt' heading",
+    (await page.textContent("#prompt-title")).trim() === "Generate a profile",
+    "Generate-a-profile page has 'Generate a profile' heading",
   );
   // Type selector: two options, Persona default.
   const typeOptions = page.locator("#type-options [data-type]");
@@ -459,9 +459,9 @@ try {
       `Header has exactly three nav links on ${pagePath}`,
     );
     assert(
-      (await navLinks.nth(0).textContent()).trim() === "Get a Prompt" &&
+      (await navLinks.nth(0).textContent()).trim() === "Generate a profile" &&
         (await navLinks.nth(0).getAttribute("href")) === "get-a-prompt.html",
-      `First nav link on ${pagePath} is 'Get a Prompt' → get-a-prompt.html`,
+      `First nav link on ${pagePath} is 'Generate a profile' → get-a-prompt.html`,
     );
     assert(
       (await navLinks.nth(1).textContent()).trim() === "Learn more" &&
