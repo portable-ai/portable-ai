@@ -351,8 +351,8 @@ try {
     "/learn.html has 'Learn more' heading",
   );
   assert(
-    (await page.locator(".learn-nav .link").count()) === 1,
-    "/learn.html has a back-to-editor link",
+    (await page.locator(".learn-nav").count()) === 0,
+    "/learn.html back-to-editor nav removed (fixed header replaces it)",
   );
 
   // --- Case 9: footer has repo/license line and neutral one-liner ---
@@ -369,6 +369,120 @@ try {
     (await page.locator(".site-footer .footer-tagline").count()) === 0,
     "Old 'People should own their context' tagline removed",
   );
+
+  // --- Case 10 (PR A4): fixed header on both pages ---
+  const RGB_TEXT = "rgb(17, 17, 17)";
+  const RGB_ACCENT = "rgb(59, 91, 255)";
+
+  for (const pagePath of ["/", "/learn.html"]) {
+    await page.goto(url + pagePath);
+    await page.waitForSelector(".site-header");
+    assert(
+      (await page.locator(".site-header").count()) === 1,
+      `Fixed header present on ${pagePath}`,
+    );
+    assert(
+      (await page.getAttribute(".site-header .site-wordmark", "href")) === "index.html",
+      `Header wordmark on ${pagePath} links to home (index.html)`,
+    );
+    assert(
+      (await page.textContent(".site-header .site-wordmark")).trim() === "PortableAI",
+      `Header wordmark on ${pagePath} reads 'PortableAI'`,
+    );
+    const navLinks = page.locator(".site-header .site-nav .site-nav-link");
+    assert(
+      (await navLinks.count()) === 2,
+      `Header has exactly two nav links on ${pagePath}`,
+    );
+    assert(
+      (await navLinks.nth(0).textContent()).trim() === "Learn more" &&
+        (await navLinks.nth(0).getAttribute("href")) === "learn.html",
+      `First nav link on ${pagePath} is 'Learn more' → learn.html`,
+    );
+    assert(
+      (await navLinks.nth(1).textContent()).trim() === "Project" &&
+        (await navLinks.nth(1).getAttribute("href")) === "https://github.com/refineryllc/portable-ai-working",
+      `Second nav link on ${pagePath} is 'Project' → GitHub repo`,
+    );
+    const headerPos = await page.$eval(".site-header", (el) => getComputedStyle(el).position);
+    assert(
+      headerPos === "fixed",
+      `Header is position:fixed on ${pagePath} (got ${headerPos})`,
+    );
+  }
+
+  // --- Case 11 (PR A4): regular text flattened to 1rem #111 ---
+  await page.goto(url);
+  await page.waitForSelector(".tagline");
+  const flatTargets = [".tagline", ".editor-blurb", "#empty-state .empty-state-hint", ".site-footer .footer-meta", ".site-footer .footer-note", ".site-footer .footer-contact"];
+  for (const sel of flatTargets) {
+    const { size, color } = await page.$eval(sel, (el) => {
+      const s = getComputedStyle(el);
+      return { size: s.fontSize, color: s.color };
+    });
+    assert(size === "16px", `${sel} font-size is 1rem/16px (got ${size})`);
+    assert(color === RGB_TEXT, `${sel} color is #111 (got ${color})`);
+  }
+
+  // --- Case 12 (PR A4): links accent-blue site-wide, only overlay Close muted ---
+  const heroLink = await page.$eval(".tagline .link", (el) => getComputedStyle(el).color);
+  assert(heroLink === RGB_ACCENT, `Hero 'Learn more' link is accent-blue (got ${heroLink})`);
+  const blurbLink = await page.$eval(".editor-blurb .link", (el) => getComputedStyle(el).color);
+  assert(blurbLink === RGB_ACCENT, `Editor blurb link is accent-blue (got ${blurbLink})`);
+  // Open overlay and confirm Close is the only muted link, and it resolves muted.
+  await page.click("#empty-show-full");
+  await page.waitForSelector("#context-overlay", { state: "visible" });
+  assert(
+    (await page.getAttribute("#close-context-overlay", "class")).includes("muted"),
+    "Overlay Close still carries .link.muted",
+  );
+  const closeColor = await page.$eval("#close-context-overlay", (el) => getComputedStyle(el).color);
+  assert(closeColor !== RGB_ACCENT, `Overlay Close resolves to muted, not accent (got ${closeColor})`);
+  const overlayCopyColor = await page.$eval("#copy-context-prompt", (el) => getComputedStyle(el).color);
+  assert(overlayCopyColor === RGB_ACCENT, `Overlay 'Copy prompt' is accent-blue (got ${overlayCopyColor})`);
+  const toggleColor = await page.$eval("#toggle-prompt-length", (el) => getComputedStyle(el).color);
+  assert(toggleColor === RGB_ACCENT, `Overlay 'Show full prompt' toggle is accent-blue, no longer muted (got ${toggleColor})`);
+  await page.click("#close-context-overlay");
+  await page.waitForSelector("#context-overlay", { state: "hidden" });
+  // The only .link.muted anywhere should be the overlay Close.
+  const mutedCount = await page.locator(".link.muted").count();
+  assert(mutedCount === 1, `Exactly one .link.muted remains (overlay Close); got ${mutedCount}`);
+
+  // --- Case 13 (PR A4): footer left-aligned, flush with editor panel ---
+  const footerAlign = await page.$eval(".site-footer", (el) => getComputedStyle(el).textAlign);
+  assert(footerAlign === "left", `Footer text-align is left (got ${footerAlign})`);
+  const { footerLeft, panelLeft } = await page.evaluate(() => {
+    const f = document.querySelector(".footer-meta").getBoundingClientRect();
+    const p = document.querySelector(".editor-panel").getBoundingClientRect();
+    return { footerLeft: f.left, panelLeft: p.left };
+  });
+  assert(
+    Math.abs(footerLeft - panelLeft) <= 2,
+    `Footer left edge aligns with editor panel (footer ${footerLeft} vs panel ${panelLeft})`,
+  );
+
+  // --- Case 14 (PR A4): mobile hamburger toggles nav ---
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto(url);
+  await page.waitForSelector("#nav-toggle");
+  assert(
+    await page.isVisible("#nav-toggle"),
+    "Hamburger visible at 375px width",
+  );
+  assert(
+    !(await page.isVisible("#site-nav .site-nav-link")),
+    "Nav links hidden by default on mobile",
+  );
+  await page.click("#nav-toggle");
+  assert(
+    (await page.getAttribute("#nav-toggle", "aria-expanded")) === "true",
+    "Hamburger sets aria-expanded=true when opened",
+  );
+  assert(
+    await page.isVisible("#site-nav .site-nav-link"),
+    "Nav links visible after tapping hamburger",
+  );
+  await page.setViewportSize({ width: 1280, height: 900 });
 } finally {
   await browser.close();
   server.close();
