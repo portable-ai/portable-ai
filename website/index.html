@@ -9,25 +9,24 @@
 <body>
   <main class="page">
     <section class="hero" aria-labelledby="site-title">
-      <p class="eyebrow">PortableAI.org</p>
       <h1 id="site-title">Every AI asks you to start over.</h1>
       <p class="tagline">PortableAI is an open standard that lets you take your profile anywhere.</p>
       <p class="hero-summary">Keep durable preferences, projects, goals, and working style in a human-readable Markdown profile that you own.</p>
       <div class="actions" aria-label="Primary actions">
-        <button class="button primary" type="button" id="open-context-overlay">Ask an AI to draft one</button>
-        <a class="button secondary" href="#editor">Open the editor</a>
+        <button class="link" type="button" id="open-context-overlay">Ask an AI to draft one</button>
+        <span class="sep" aria-hidden="true">·</span>
+        <a class="link" href="#editor">Open the editor</a>
       </div>
     </section>
 
     <section class="editor-panel" id="editor" aria-labelledby="editor-title">
       <div class="editor-heading">
         <div>
-          <p class="eyebrow">Browser-only reference editor</p>
           <h2 id="editor-title">Edit your profile</h2>
           <p class="help-text">Your profile is a Markdown file you own. Edit it here, then download it and take it anywhere.</p>
         </div>
         <div class="editor-toolbar" aria-label="Editor toolbar">
-          <button class="button primary" type="button" id="download-markdown" hidden>Download</button>
+          <button class="link" type="button" id="download-markdown" hidden>Download</button>
         </div>
       </div>
 
@@ -41,8 +40,9 @@
         <div id="restore-banner" class="restore-banner" role="status" hidden>
           <p class="restore-banner-text">You have a draft from a previous session.</p>
           <div class="restore-banner-actions">
-            <button class="button primary" type="button" id="restore-draft">Restore</button>
-            <button class="button secondary" type="button" id="discard-draft">Clear</button>
+            <button class="link" type="button" id="restore-draft">Restore</button>
+            <span class="sep" aria-hidden="true">·</span>
+            <button class="link muted" type="button" id="discard-draft">Clear</button>
           </div>
         </div>
 
@@ -52,8 +52,9 @@
             <h3 class="empty-state-title">Nothing loaded yet</h3>
             <p class="empty-state-hint">Load a profile or create a new one.</p>
             <div class="empty-state-actions">
-              <button class="button primary" type="button" id="load-sample">Load a sample</button>
-              <button class="button secondary" type="button" id="open-file">Open a file</button>
+              <button class="link" type="button" id="load-sample">Load a sample</button>
+              <span class="sep" aria-hidden="true">·</span>
+              <button class="link" type="button" id="open-file">Open a file</button>
             </div>
           </div>
 
@@ -62,8 +63,9 @@
             <p class="empty-state-secondary-hint">Send this prompt to any AI you already use. It replies with Markdown you can paste back here.</p>
             <pre class="empty-state-prompt-preview" id="empty-state-prompt-preview" aria-hidden="true"></pre>
             <div class="empty-state-secondary-actions">
-              <button class="button secondary" type="button" id="empty-copy-prompt">Copy prompt</button>
-              <button class="button secondary" type="button" id="empty-show-full">Show full instructions</button>
+              <button class="link" type="button" id="empty-copy-prompt">Copy prompt</button>
+              <span class="sep" aria-hidden="true">·</span>
+              <button class="link muted" type="button" id="empty-show-full">Show full instructions</button>
             </div>
           </div>
         </div>
@@ -90,8 +92,8 @@
       </div>
 
       <div class="editor-actions" aria-label="Editor actions">
-        <button class="button secondary" type="button" id="copy-markdown" hidden>Copy Markdown</button>
-        <button class="button secondary" type="button" id="clear-draft" hidden>Clear</button>
+        <button class="link muted" type="button" id="copy-markdown" hidden>Copy Markdown</button>
+        <button class="link muted" type="button" id="clear-draft" hidden>Clear</button>
         <span id="save-status" class="save-status" role="status" aria-live="polite"></span>
       </div>
     </section>
@@ -101,11 +103,8 @@
     <div class="overlay-backdrop" data-close-context-overlay></div>
     <section class="overlay-panel">
       <div class="overlay-header">
-        <div>
-          <p class="eyebrow">Ask an AI to draft your profile</p>
-          <h2 id="context-overlay-title">Ask an AI to draft one</h2>
-        </div>
-        <button class="button secondary close-button" type="button" id="close-context-overlay" aria-label="Close overlay">Close</button>
+        <h2 id="context-overlay-title">Ask an AI to draft one</h2>
+        <button class="link muted close-button" type="button" id="close-context-overlay" aria-label="Close overlay">Close</button>
       </div>
 
       <p id="context-overlay-description" class="overlay-intro">
@@ -113,18 +112,17 @@
       </p>
 
       <ol class="workflow-list">
-        <li>Open an AI assistant that knows useful context about you.</li>
+        <li>Open an AI assistant you already use.</li>
         <li>Copy the prompt below and send it in that AI.</li>
-        <li>Save the AI's Markdown result as a file, or copy the text.</li>
-        <li>Come back here, click <strong>Open a file</strong> to load the file, or paste the Markdown into the editor.</li>
+        <li>Save the Markdown result as a file, or copy the text.</li>
+        <li>Come back to PortableAI.org to review or make changes, or load the Markdown into a new AI.</li>
       </ol>
 
       <div class="prompt-card">
-        <div class="prompt-card-heading">
-          <h3>Reusable draft prompt</h3>
-          <button class="button primary" type="button" id="copy-context-prompt">Copy prompt</button>
-        </div>
         <textarea id="context-export-prompt" class="prompt-textarea" readonly aria-label="Prompt for asking an AI to draft a PortableAI profile"></textarea>
+        <div class="prompt-card-actions">
+          <button class="link" type="button" id="copy-context-prompt">Copy prompt</button>
+        </div>
       </div>
 
       <p class="help-text">

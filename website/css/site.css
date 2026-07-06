@@ -1,12 +1,14 @@
 :root {
   color-scheme: light;
   --text: #111111;
-  --muted: #5f6368;
+  --muted: #6b7280;
+  --muted-2: #9ca3af;
   --background: #ffffff;
   --surface: #f6f7f8;
   --surface-strong: #eef2f7;
-  --border: #d9dee3;
-  --accent: #2447ff;
+  --border: #e2e5ea;
+  --accent: #3b5bff;
+  --accent-hover: #2d47db;
   --accent-soft: #edf0ff;
   --success: #176b3a;
 }
@@ -98,37 +100,54 @@ h3 {
 
 .actions,
 .editor-actions {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 2rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
 }
 
-.button {
+/* ==========================================================================
+   Link-style buttons (design tone: quiet, minimalist)
+   ========================================================================== */
+
+.link {
   display: inline-block;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--text);
-  border-radius: 0.5rem;
+  padding: 0.2rem 0;
+  background: transparent;
+  border: 0;
   font: inherit;
-  font-weight: 700;
-  text-decoration: none;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
   cursor: pointer;
 }
 
-.button:focus-visible,
-textarea:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
+.link:hover {
+  color: var(--accent-hover);
+  text-decoration-thickness: 2px;
 }
 
-.button.primary {
-  color: var(--background);
-  background: var(--text);
+.link.muted {
+  color: var(--muted);
 }
 
-.button.secondary {
+.link.muted:hover {
   color: var(--text);
-  background: var(--background);
+}
+
+.link:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.sep {
+  color: var(--muted-2);
+  font-size: 0.9rem;
+  user-select: none;
 }
 
 .editor-panel {
@@ -246,6 +265,7 @@ textarea {
 
 .editor-actions {
   align-items: center;
+  gap: 0.75rem;
 }
 
 .save-status {
@@ -284,10 +304,9 @@ textarea {
   box-shadow: 0 24px 80px rgba(17, 17, 17, 0.2);
 }
 
-.overlay-header,
-.prompt-card-heading {
+.overlay-header {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
 }
@@ -316,14 +335,17 @@ textarea {
   background: var(--surface);
 }
 
-.prompt-card-heading h3 {
-  margin-bottom: 0;
-}
-
 .prompt-textarea {
   min-height: 320px;
-  margin-top: 1rem;
+  margin-top: 0;
   background: var(--background);
+}
+
+.prompt-card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
 }
 
 .visually-hidden {
@@ -377,16 +399,8 @@ footer {
     font-size: 1.35rem;
   }
 
-  .actions .button,
-  .close-button,
-  .prompt-card-heading .button {
-    width: 100%;
-    text-align: center;
-  }
-
   .editor-heading,
-  .overlay-header,
-  .prompt-card-heading {
+  .overlay-header {
     display: block;
   }
 
@@ -395,9 +409,8 @@ footer {
     margin-top: 1rem;
   }
 
-  .overlay-header .button,
-  .prompt-card-heading .button {
-    margin-top: 1rem;
+  .overlay-header .link {
+    margin-top: 0.75rem;
   }
 
   textarea {
@@ -449,6 +462,10 @@ footer {
   background: var(--text);
 }
 
+.mode-button[aria-selected="true"]:hover {
+  color: var(--background);
+}
+
 .mode-panel[hidden] {
   display: none;
 }
@@ -496,8 +513,8 @@ footer {
 
 .empty-state {
   display: grid;
-  gap: 1.25rem;
-  padding: 2rem 1.25rem;
+  gap: 1rem;
+  padding: 1.75rem 1.25rem;
   border: 1px dashed var(--border);
   border-radius: 1rem;
   background: var(--background);
@@ -513,16 +530,17 @@ footer {
 }
 
 .empty-state-hint {
-  margin: 0.35rem 0 1rem;
+  margin: 0.35rem 0 0.85rem;
   color: var(--muted);
   font-size: 0.95rem;
 }
 
 .empty-state-actions {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .empty-state-secondary {
@@ -557,8 +575,9 @@ footer {
 }
 
 .empty-state-secondary-actions {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
 }
 
@@ -586,7 +605,8 @@ footer {
 }
 
 .restore-banner-actions {
-  display: flex;
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
@@ -604,9 +624,10 @@ footer {
 
 .metadata-card h3 {
   margin: 0 0 0.5rem;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--muted);
 }
 
@@ -623,8 +644,8 @@ footer {
   color: var(--muted);
 }
 
-.metadata-card dd {
+.metadata-card dd.metadata-value {
   margin: 0;
-  color: var(--text);
+  color: var(--muted);
   word-break: break-word;
 }

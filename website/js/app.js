@@ -582,7 +582,7 @@ const updateMetadataCard = () => {
     return;
   }
   const rows = frontMatterEntries
-    .map(([k, v]) => `<dt>${escapeHtml(prettyFrontMatterLabel(k))}</dt><dd>${escapeHtml(v)}</dd>`)
+    .map(([k, v]) => `<dt>${escapeHtml(prettyFrontMatterLabel(k))}</dt><dd class="metadata-value">${escapeHtml(v)}</dd>`)
     .join("");
   metadataCard.innerHTML = `<h3>Document metadata</h3><dl>${rows}</dl>`;
   metadataCard.hidden = false;
