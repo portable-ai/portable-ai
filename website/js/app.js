@@ -1,24 +1,29 @@
 const STORAGE_KEY = "portableAiPersonaDraft";
 
-const contextExportPrompt = `Please summarize and export the durable context you know about me as a PortableAI Document in Markdown.
+// Prompt sent to another AI to draft a PortableAI profile.
+//
+// Design intent (locked in PR A):
+// - Ask the AI to actively draft a profile — this is not just an export flow.
+// - Instruct Markdown first, since Markdown works in every AI.
+// - Ask for a downloadable .md file on a best-effort basis.
+// - Standard filename: portableai-profile-YYYY-MM-DD.md so profiles from
+//   different assistants line up predictably on disk.
+// - Do NOT ask the user's name. PortableAI never asks the user's name and
+//   never stores anything.
+// - Close with instructions the user can act on: load the file into another
+//   AI, or open it in PortableAI to review or edit.
+const contextExportPrompt = `Please draft a PortableAI profile for me based on the durable context you already know about me.
 
-Focus only on information that is likely to remain useful across future AI conversations, such as:
+A PortableAI profile is a human-readable Markdown document that captures the durable, cross-session context another AI would find useful — stable preferences, communication style, working style, long-term goals, durable projects, ongoing responsibilities, areas of expertise, and recurring constraints.
 
-- Stable preferences
-- Communication style
-- Working style
-- Long-term goals
-- Durable projects
-- Ongoing responsibilities
-- Areas of expertise
-- Recurring constraints
-- Important context I would want another AI assistant to know
+Please do the following, in order:
 
-Do not include sensitive personal details unless I have clearly treated them as useful long-term context. Do not include temporary details, one-off tasks, private speculation, or anything you are uncertain about.
+1. Output the full profile as Markdown, directly in this conversation, using clear H1 headings for top-level sections (# Profile, # Preferences, # Persona, # Projects, # Interests, # Knowledge & Expertise, # Decision Style, # Communication Style, # AI Collaboration Instructions, # Notes). Use concise bullet points under each section. If a section has no useful durable content, omit it rather than inventing.
+2. If you can attach or offer a downloadable file, also provide the same content as a downloadable .md file named exactly \`portableai-profile-YYYY-MM-DD.md\` (using today's date). If you cannot attach files, that's fine — the Markdown in the conversation is enough.
+3. Do not ask me for my name. Do not include a name field. Skip anything you're not confident is durable context.
+4. Do not include sensitive personal details unless I have clearly treated them as useful long-term context. Do not include one-off tasks or private speculation.
 
-Use clear Markdown headings and concise bullet points. Keep the result human-readable and easy for me to edit.
-
-Structure the output so I can paste it into a PortableAI Persona document. If a section has no useful durable information, omit it rather than inventing content.`;
+When you're done, close with a short note telling me: "You can take this file and load it into another AI, or open it in PortableAI to review or edit."`;
 
 // Static browser-only copy of templates/portable-ai-persona-template.md.
 // Embedded here so the GitHub Pages editor can create a new document without
@@ -26,7 +31,7 @@ Structure the output so I can paste it into a PortableAI Persona document. If a 
 const portableAiPersonaTemplate = `---
 standard: PortableAI Persona
 standard_version: 0.3
-profile_name: My PortableAI Persona
+profile_name: My PortableAI Profile
 profile_version: 1.0.0
 last_updated: YYYY-MM-DD
 ---
@@ -165,21 +170,16 @@ Freeform notes that don't fit elsewhere.
 `;
 
 // The editor state is intentionally just Markdown text. The Markdown document
-// is the only canonical source; previews, the Form tab, and any future
+// is the only canonical source; the Read-mode preview and any future
 // AI-specific exports must be generated from this text rather than stored as
 // separate primary artifacts.
 const editor = document.querySelector("#persona-editor");
 const preview = document.querySelector("#persona-preview");
-const formFields = document.querySelector("#form-fields");
 const metadataCard = document.querySelector("#persona-metadata");
-const tabButtons = Array.from(document.querySelectorAll(".tab[role='tab']"));
-const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
 const status = document.querySelector("#save-status");
 const copyButton = document.querySelector("#copy-markdown");
 const downloadButton = document.querySelector("#download-markdown");
 const clearButton = document.querySelector("#clear-draft");
-const newFromTemplateButton = document.querySelector("#new-from-template");
-const editorToolbar = document.querySelector(".editor-toolbar");
 const openContextOverlayButton = document.querySelector("#open-context-overlay");
 const contextOverlay = document.querySelector("#context-overlay");
 const closeContextOverlayButton = document.querySelector("#close-context-overlay");
@@ -187,32 +187,44 @@ const contextOverlayStatus = document.querySelector("#context-overlay-status");
 const contextExportPromptField = document.querySelector("#context-export-prompt");
 const copyContextPromptButton = document.querySelector("#copy-context-prompt");
 const contextOverlayCloseTargets = document.querySelectorAll("[data-close-context-overlay]");
+
+const emptyState = document.querySelector("#empty-state");
+const editorSurface = document.querySelector("#editor-surface");
+const loadSampleButton = document.querySelector("#load-sample");
+const openFileButton = document.querySelector("#open-file");
+const emptyCopyPromptButton = document.querySelector("#empty-copy-prompt");
+const emptyShowFullButton = document.querySelector("#empty-show-full");
+const emptyPromptPreview = document.querySelector("#empty-state-prompt-preview");
+
+const restoreBanner = document.querySelector("#restore-banner");
+const restoreDraftButton = document.querySelector("#restore-draft");
+const discardDraftButton = document.querySelector("#discard-draft");
+
+const modeEditButton = document.querySelector("#mode-edit");
+const modeReadButton = document.querySelector("#mode-read");
+const panelEdit = document.querySelector("#panel-edit");
+const panelRead = document.querySelector("#panel-read");
+const modeButtons = [modeEditButton, modeReadButton];
+
 let lastFocusedElement = null;
 
-const githubLink = document.querySelector("a[href='https://github.com/PortableAI/portable-ai']");
-if (githubLink) {
-  githubLink.href = "https://github.com/refineryllc/portable-ai-working";
-}
-
-const importButton = document.createElement("button");
-importButton.className = "button secondary";
-importButton.type = "button";
-importButton.id = "import-markdown";
-importButton.textContent = "Load Markdown";
-
+// Hidden file input, created programmatically so the HTML stays clean.
 const fileInput = document.createElement("input");
 fileInput.type = "file";
 fileInput.id = "markdown-file";
 fileInput.accept = ".md,.markdown,text/markdown,text/plain";
 fileInput.style.display = "none";
-
-if (editorToolbar) {
-  editorToolbar.appendChild(importButton);
-  editorToolbar.appendChild(fileInput);
-}
+document.body.appendChild(fileInput);
 
 if (contextExportPromptField) {
   contextExportPromptField.value = contextExportPrompt;
+}
+
+// Show the first two lines of the prompt as a preview on the empty state
+// card. Users can expand via "Show full instructions" (opens the overlay).
+if (emptyPromptPreview) {
+  const previewLines = contextExportPrompt.split("\n").slice(0, 2).join("\n");
+  emptyPromptPreview.textContent = previewLines + "\n…";
 }
 
 // Markdown preview rendering.
@@ -305,8 +317,28 @@ const safeLocalStorage = {
   },
 };
 
+const hasEditorContent = () => editor.value.trim().length > 0;
+
+// Show/hide the empty state vs editor surface based on whether the editor
+// currently has any content. Also toggles action buttons in the header/footer
+// so the empty state stays uncluttered.
+const updateSurfaceVisibility = () => {
+  const hasContent = hasEditorContent();
+  if (emptyState) emptyState.hidden = hasContent;
+  if (editorSurface) editorSurface.hidden = !hasContent;
+  if (downloadButton) downloadButton.hidden = !hasContent;
+  if (copyButton) copyButton.hidden = !hasContent;
+  if (clearButton) clearButton.hidden = !hasContent;
+};
+
 const saveDraft = () => {
   const ok = safeLocalStorage.set(STORAGE_KEY, editor.value);
+  if (!hasEditorContent()) {
+    // Don't proclaim "Draft saved" over an empty editor — the empty state
+    // is the story on the screen. Clear the status entirely.
+    setStatus("");
+    return;
+  }
   setStatus(
     ok
       ? "Draft saved locally in this browser."
@@ -325,8 +357,6 @@ const updatePreview = () => {
   if (typeof renderPreview === "function") {
     renderPreview();
   } else {
-    // Fallback for the brief window before renderPreview is assigned; still
-    // safe because renderMarkdown escapes raw HTML.
     preview.innerHTML = renderMarkdown(editor.value);
   }
 };
@@ -335,26 +365,31 @@ const setEditorValue = (value) => {
   editor.value = value;
   saveDraft();
   updatePreview();
-  // renderForm is defined later in the file; guard with typeof so calls
-  // during module-init order don't throw.
-  if (typeof renderForm === "function") {
-    renderForm();
-  }
+  updateSurfaceVisibility();
 };
 
-const hasEditorContent = () => editor.value.trim().length > 0;
-
-const createNewFromTemplate = () => {
+const loadSampleTemplate = () => {
   if (
     hasEditorContent() &&
-    !window.confirm("Replace the current Markdown draft with a new PortableAI Persona template?")
+    !window.confirm("Replace the current Markdown draft with a new PortableAI profile sample?")
   ) {
     setStatus("Kept the current draft.");
     return;
   }
 
   setEditorValue(portableAiPersonaTemplate);
-  setStatus("New PortableAI Persona template loaded. Edit the Markdown directly.");
+  setStatus("Sample profile loaded. Edit the Markdown directly.");
+};
+
+// Compose the download filename: portableai-profile-YYYY-MM-DD.md.
+// Locked in PR A — one predictable filename regardless of profile_name in
+// front-matter, so profiles from different sessions line up on disk.
+const buildDownloadFilename = () => {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `portableai-profile-${yyyy}-${mm}-${dd}.md`;
 };
 
 const downloadMarkdown = () => {
@@ -365,27 +400,27 @@ const downloadMarkdown = () => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = "portable-ai-persona.md";
+  link.download = buildDownloadFilename();
   document.body.appendChild(link);
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-  setStatus("Markdown downloaded as the canonical PortableAI Document. Your draft remains local to this browser.");
+  setStatus("Markdown downloaded. Your draft remains local to this browser.");
 };
 
 const copyTextToClipboard = async (text, fallbackField) => {
   try {
     await navigator.clipboard.writeText(text);
   } catch {
-    fallbackField.focus();
-    fallbackField.select();
-    document.execCommand("copy");
+    if (fallbackField) {
+      fallbackField.focus();
+      fallbackField.select();
+      document.execCommand("copy");
+    }
   }
 };
 
 const copyMarkdown = async () => {
-  // Copy the same canonical Markdown text used by preview and download flows.
-  // Do not maintain hand-authored provider-specific source alongside it.
   await copyTextToClipboard(editor.value, editor);
   setStatus("Markdown copied to clipboard.");
 };
@@ -413,6 +448,11 @@ const copyContextPrompt = async () => {
   setContextOverlayStatus("Prompt copied to clipboard.");
 };
 
+const copyContextPromptFromEmptyState = async () => {
+  await copyTextToClipboard(contextExportPrompt, null);
+  setStatus("Prompt copied. Send it to an AI you already use.");
+};
+
 const loadMarkdownFile = async (file) => {
   if (!file) {
     return;
@@ -438,103 +478,57 @@ const loadMarkdownFile = async (file) => {
   }
 };
 
-const restoredDraft = safeLocalStorage.get(STORAGE_KEY);
-
-if (restoredDraft !== null) {
-  editor.value = restoredDraft;
-  setStatus("Restored a local draft from this browser.");
-}
-
 // ---------------------------------------------------------------------------
-// Document model: parse + serialize Markdown ↔ structured form data.
+// Restore-or-clear banner
 //
-// The Markdown source in `editor.value` is canonical (ADR-0001). The Form tab
-// derives its inputs from the parsed model and writes changes back to Markdown
-// on every keystroke. This keeps all three tabs consistent without a separate
-// data store.
+// On page load, if a draft exists in localStorage we show a banner instead of
+// silently restoring. This makes it obvious there's prior state and gives the
+// user a one-click path to clear it. If they Restore, we hydrate the editor
+// and switch to the editor surface. If they Clear, we drop the storage key
+// and stay on the empty state.
 // ---------------------------------------------------------------------------
 
-// Well-known section registry v1 (persona keys, cross-doc keys). Keep this in
-// sync with spec/registry/well-known-sections-v1.md.
-//
-// Each entry may include `titleAliases`, an array of human-readable H1
-// titles that should resolve to this registry key. This handles cases like
-// "Knowledge & Expertise" (published key: knowledge_expertise) or
-// "AI Collaboration Instructions" (published key: ai_collaboration) where the
-// naive mapping rule would produce a slightly different slug.
-const WELL_KNOWN_SECTIONS = [
-  { key: "profile", title: "Profile", help: "Identity, roles, location, timezone, long-term goals." },
-  { key: "preferences", title: "Preferences", help: "How you like to work, receive information, or interact." },
-  { key: "persona", title: "Persona", help: "Voice, tone, style, personality context." },
-  { key: "projects", title: "Projects", help: "Active or durable work worth persisting across sessions." },
-  { key: "interests", title: "Interests", help: "Topics you care about." },
-  {
-    key: "knowledge_expertise",
-    title: "Knowledge & Expertise",
-    titleAliases: ["Knowledge and Expertise", "Knowledge Expertise"],
-    help: "Domains where you have deep knowledge.",
-  },
-  { key: "decision_style", title: "Decision Style", help: "How you make decisions." },
-  { key: "communication_style", title: "Communication Style", help: "Preferred communication modes and conventions." },
-  {
-    key: "ai_collaboration",
-    title: "AI Collaboration",
-    titleAliases: ["AI Collaboration Instructions"],
-    help: "How AI assistants should work with you.",
-  },
-  { key: "notes", title: "Notes", help: "Freeform notes that don't fit elsewhere." },
-  { key: "changelog", title: "Changelog", help: "Human-readable summary of changes to this document." },
-];
+const pendingDraft = safeLocalStorage.get(STORAGE_KEY);
+const hasPendingDraft =
+  pendingDraft !== null && pendingDraft.trim().length > 0;
 
-// Naive Title → key transform used as the default. The Core spec §5.1 rule:
-// lowercase, replace runs of whitespace with `_`, strip punctuation. `&` maps
-// to "and" to match how most editors slugify.
-const slugifyTitle = (title) =>
-  title
-    .toLowerCase()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9\s_]/g, " ")
-    .trim()
-    .replace(/\s+/g, "_");
-
-// Build a lookup from any recognized title (canonical or alias, after
-// slugification) to the registry's published key.
-const TITLE_ALIAS_TO_KEY = (() => {
-  const map = new Map();
-  for (const entry of WELL_KNOWN_SECTIONS) {
-    map.set(slugifyTitle(entry.title), entry.key);
-    for (const alias of entry.titleAliases || []) {
-      map.set(slugifyTitle(alias), entry.key);
-    }
-    // The registry key itself is also a valid slug (someone might use the
-    // snake_case form directly as a heading).
-    map.set(entry.key, entry.key);
+const applyRestoreBannerState = () => {
+  if (!restoreBanner) return;
+  if (hasPendingDraft && !hasEditorContent()) {
+    restoreBanner.hidden = false;
+  } else {
+    restoreBanner.hidden = true;
   }
-  return map;
-})();
-
-// Public title → registry key resolver. Falls back to the raw slug for
-// unknown titles (which is how custom / not-yet-registered sections work).
-const titleToKey = (title) => {
-  const slug = slugifyTitle(title);
-  return TITLE_ALIAS_TO_KEY.get(slug) || slug;
 };
 
-// The front-matter fields we expose as first-class inputs. Anything else in
-// the YAML block is preserved verbatim as an "other keys" text area so we
-// never silently drop a field.
+const restorePendingDraft = () => {
+  if (pendingDraft !== null) {
+    setEditorValue(pendingDraft);
+    setStatus("Restored a local draft from this browser.");
+  }
+  if (restoreBanner) restoreBanner.hidden = true;
+};
+
+const discardPendingDraft = () => {
+  safeLocalStorage.remove(STORAGE_KEY);
+  if (restoreBanner) restoreBanner.hidden = true;
+  setStatus("");
+  updateSurfaceVisibility();
+};
+
+// ---------------------------------------------------------------------------
+// Document model: parse Markdown into { frontMatter, body } so the Read-mode
+// metadata card can render front-matter separately without leaking raw YAML.
+// ---------------------------------------------------------------------------
+
 const FRONT_MATTER_FIELDS = [
-  { key: "standard", label: "Standard", placeholder: "PortableAI Persona" },
-  { key: "standard_version", label: "Standard version", placeholder: "0.3" },
-  { key: "profile_name", label: "Profile name", placeholder: "My PortableAI Persona" },
-  { key: "profile_version", label: "Profile version", placeholder: "1.0.0" },
-  { key: "last_updated", label: "Last updated", placeholder: "YYYY-MM-DD" },
+  { key: "standard", label: "Standard" },
+  { key: "standard_version", label: "Standard version" },
+  { key: "profile_name", label: "Profile name" },
+  { key: "profile_version", label: "Profile version" },
+  { key: "last_updated", label: "Last updated" },
 ];
 
-// Minimal YAML parser. Front-matter in the Core spec is a flat map of scalar
-// key/value pairs (§4.2), so a full YAML library would be overkill. We accept
-// `key: value` per line, ignore blank lines and comment lines beginning `#`,
-// and preserve insertion order so round-tripping is stable.
 const parseFrontMatter = (yaml) => {
   const entries = [];
   const lines = yaml.split(/\r?\n/);
@@ -549,10 +543,6 @@ const parseFrontMatter = (yaml) => {
     }
     const key = line.slice(0, idx).trim();
     let value = line.slice(idx + 1).trim();
-    // Strip surrounding matching quotes if present. We do not attempt to
-    // interpret YAML flow scalars, block scalars, anchors, or nested maps —
-    // if a document uses those, the Form tab will just show the raw text on
-    // the "other keys" line and users can edit in the Markdown tab.
     if (
       (value.startsWith('"') && value.endsWith('"')) ||
       (value.startsWith("'") && value.endsWith("'"))
@@ -564,273 +554,18 @@ const parseFrontMatter = (yaml) => {
   return entries;
 };
 
-const serializeFrontMatter = (entries) => {
-  if (!entries.length) {
-    return "";
-  }
-  const body = entries
-    .filter(([key]) => key && key.trim())
-    .map(([key, value]) => `${key}: ${value ?? ""}`)
-    .join("\n");
-  return `---\n${body}\n---`;
-};
-
-// Split a document into { frontMatter, body } where body preserves the
-// original text after the closing `---`. Documents without front-matter are
-// treated as body-only.
 const FRONT_MATTER_RE = /^---\s*\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/;
 
 const splitFrontMatter = (source) => {
   const match = source.match(FRONT_MATTER_RE);
   if (!match) {
-    return { frontMatterRaw: "", frontMatterEntries: [], body: source };
+    return { frontMatterEntries: [], body: source };
   }
   return {
-    frontMatterRaw: match[1],
     frontMatterEntries: parseFrontMatter(match[1]),
     body: source.slice(match[0].length),
   };
 };
-
-// Walk the Markdown body and return an ordered list of top-level (H1) sections.
-// Everything before the first H1 is captured as a synthetic "preamble" section
-// with key `__preamble__` so it round-trips exactly. Horizontal-rule
-// separators (`---`) between sections are preserved as part of the following
-// section's leading whitespace when we serialize.
-const H1_RE = /^# +(.+?)\s*$/;
-
-const parseSections = (body) => {
-  const lines = body.split(/\r?\n/);
-  const sections = [];
-  let current = { title: "", key: "__preamble__", contentLines: [] };
-
-  for (const line of lines) {
-    const match = line.match(H1_RE);
-    if (match) {
-      // Push the previous section (including preamble) before starting a new one.
-      sections.push(current);
-      const title = match[1].trim();
-      current = { title, key: titleToKey(title), contentLines: [] };
-    } else {
-      current.contentLines.push(line);
-    }
-  }
-  sections.push(current);
-
-  return sections.map((s) => ({
-    title: s.title,
-    key: s.key,
-    content: s.contentLines.join("\n").replace(/^\n+/, "").replace(/\s+$/, ""),
-  }));
-};
-
-const serializeSections = (sections) => {
-  const parts = [];
-  for (const s of sections) {
-    if (s.key === "__preamble__") {
-      if (s.content.trim()) {
-        parts.push(s.content);
-      }
-      continue;
-    }
-    const heading = `# ${s.title}`;
-    const body = s.content ? `\n\n${s.content}` : "";
-    parts.push(`${heading}${body}`);
-  }
-  // Join sections with a blank-line separator. We intentionally do not
-  // re-emit `---` horizontal-rule dividers between sections; the persona
-  // template's original dividers were decorative and Markdown renderers do
-  // not require them. If a user wants them back they can add them in the
-  // Markdown tab.
-  return parts.filter((p) => p.length > 0).join("\n\n") + "\n";
-};
-
-const parseDocument = (source) => {
-  const { frontMatterEntries, body } = splitFrontMatter(source);
-  return { frontMatter: frontMatterEntries, sections: parseSections(body) };
-};
-
-const serializeDocument = (model) => {
-  const fm = serializeFrontMatter(model.frontMatter);
-  const body = serializeSections(model.sections);
-  if (!fm) {
-    return body;
-  }
-  return `${fm}\n\n${body}`;
-};
-
-// ---------------------------------------------------------------------------
-// Form rendering. The Form tab is generated from the parsed model each time
-// the Markdown changes. To preserve user focus and typing, we do a *diff* of
-// existing field DOM against the desired field list — reusing input/textarea
-// elements when their id matches.
-// ---------------------------------------------------------------------------
-
-let suppressEditorInput = false;
-
-// Declared with `var` for the same TDZ-avoidance reason as `renderPreview`
-// above — setEditorValue references renderForm before its `const` declaration
-// would otherwise be initialized.
-// eslint-disable-next-line no-var
-var renderForm;
-
-const sectionFieldId = (key) => `section-${key}`;
-
-const getModelFromEditor = () => parseDocument(editor.value);
-
-const writeEditor = (model) => {
-  const nextValue = serializeDocument(model);
-  if (nextValue === editor.value) {
-    return;
-  }
-  suppressEditorInput = true;
-  editor.value = nextValue;
-  suppressEditorInput = false;
-  saveDraft();
-};
-
-// The Form tab shows front-matter as a read-only card (matching Preview) so
-// users don't mistake informational metadata for something they should edit
-// in a form field. Front-matter can still be edited on the Markdown tab; the
-// canonical Markdown text is the single source of truth (ADR-0001).
-const renderFormFrontMatter = (model, container) => {
-  if (!model.frontMatter.length) {
-    return;
-  }
-
-  const card = document.createElement("div");
-  card.className = "metadata-card metadata-card--form";
-  card.setAttribute("aria-label", "Document metadata");
-
-  const rows = model.frontMatter
-    .map(
-      ([k, v]) =>
-        `<dt>${escapeHtml(prettyFrontMatterLabel(k))}</dt><dd>${escapeHtml(v)}</dd>`,
-    )
-    .join("");
-  card.innerHTML =
-    `<h3>Document metadata</h3>` +
-    `<dl>${rows}</dl>` +
-    `<p class="metadata-card-hint">Edit these fields on the Markdown tab. The canonical Markdown is the source of truth.</p>`;
-
-  container.appendChild(card);
-};
-
-const renderFormSection = (section, container, { registryEntry }) => {
-  const wrapper = document.createElement("section");
-  wrapper.className = "form-section";
-  const inputId = sectionFieldId(section.key);
-  wrapper.innerHTML = `
-    <div class="form-section-header">
-      <h3 class="form-section-title">${escapeHtml(section.title || registryEntry?.title || section.key)}</h3>
-      <span class="form-section-key">${escapeHtml(section.key)}</span>
-    </div>
-    ${registryEntry ? `<p class="help-text">${escapeHtml(registryEntry.help)}</p>` : `<p class="help-text">Custom section. Edit its Markdown body below.</p>`}
-  `;
-  const textarea = document.createElement("textarea");
-  textarea.id = inputId;
-  textarea.spellcheck = true;
-  textarea.value = section.content;
-  textarea.addEventListener("input", () => {
-    const current = getModelFromEditor();
-    const nextSections = current.sections.map((s) =>
-      s.key === section.key ? { ...s, content: textarea.value } : s,
-    );
-    writeEditor({ ...current, sections: nextSections });
-    updatePreview();
-  });
-  wrapper.appendChild(textarea);
-  container.appendChild(wrapper);
-};
-
-renderForm = () => {
-  if (!formFields) return;
-  const model = getModelFromEditor();
-
-  // Snapshot the focused element and its selection so a re-render doesn't
-  // eject the user from the field they're typing in.
-  const active = document.activeElement;
-  const focusInfo =
-    active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA") && formFields.contains(active)
-      ? {
-          id: active.id,
-          start: active.selectionStart,
-          end: active.selectionEnd,
-        }
-      : null;
-
-  formFields.innerHTML = "";
-  renderFormFrontMatter(model, formFields);
-
-  const registryByKey = new Map(WELL_KNOWN_SECTIONS.map((s) => [s.key, s]));
-  const seenKeys = new Set();
-
-  // Render sections in the order they appear in the document, skipping the
-  // synthetic preamble (it's usually empty; if not, users see it as a
-  // "Preamble" section for round-trip safety).
-  for (const section of model.sections) {
-    if (section.key === "__preamble__") {
-      if (!section.content.trim()) continue;
-      renderFormSection({ ...section, title: "Preamble" }, formFields, { registryEntry: null });
-      continue;
-    }
-    seenKeys.add(section.key);
-    renderFormSection(section, formFields, { registryEntry: registryByKey.get(section.key) });
-  }
-
-  // Offer to add any well-known section that isn't yet present.
-  const missing = WELL_KNOWN_SECTIONS.filter((s) => !seenKeys.has(s.key));
-  if (missing.length) {
-    const addWrapper = document.createElement("section");
-    addWrapper.className = "form-section";
-    addWrapper.innerHTML = `
-      <div class="form-section-header">
-        <h3 class="form-section-title">Add a well-known section</h3>
-        <span class="form-section-key">registry v1</span>
-      </div>
-      <p class="help-text">Pick a well-known section to add to this document. Custom sections can be added by editing the Markdown tab and using a reverse-DNS heading key.</p>
-    `;
-    const buttons = document.createElement("div");
-    buttons.style.display = "flex";
-    buttons.style.flexWrap = "wrap";
-    buttons.style.gap = "0.5rem";
-    for (const entry of missing) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "button secondary";
-      btn.textContent = `+ ${entry.title}`;
-      btn.addEventListener("click", () => {
-        const current = getModelFromEditor();
-        writeEditor({
-          ...current,
-          sections: [...current.sections, { title: entry.title, key: entry.key, content: "-" }],
-        });
-        renderForm();
-        updatePreview();
-      });
-      buttons.appendChild(btn);
-    }
-    addWrapper.appendChild(buttons);
-    formFields.appendChild(addWrapper);
-  }
-
-  if (focusInfo) {
-    const el = document.getElementById(focusInfo.id);
-    if (el) {
-      el.focus();
-      try {
-        el.setSelectionRange(focusInfo.start, focusInfo.end);
-      } catch {
-        /* input types like `date` don't support setSelectionRange */
-      }
-    }
-  }
-};
-
-// ---------------------------------------------------------------------------
-// Preview metadata card. Renders parsed front-matter as a compact key/value
-// card above the rendered Markdown body. Raw YAML never leaks into preview.
-// ---------------------------------------------------------------------------
 
 const prettyFrontMatterLabel = (key) => {
   const known = FRONT_MATTER_FIELDS.find((f) => f.key === key);
@@ -840,21 +575,19 @@ const prettyFrontMatterLabel = (key) => {
 
 const updateMetadataCard = () => {
   if (!metadataCard) return;
-  const { frontMatter } = parseDocument(editor.value);
-  if (!frontMatter.length) {
+  const { frontMatterEntries } = splitFrontMatter(editor.value);
+  if (!frontMatterEntries.length) {
     metadataCard.hidden = true;
     metadataCard.innerHTML = "";
     return;
   }
-  const rows = frontMatter
-    .map(([k, v]) => `<dt>${escapeHtml(prettyFrontMatterLabel(k))}</dt><dd>${escapeHtml(v)}</dd>`)
+  const rows = frontMatterEntries
+    .map(([k, v]) => `<dt>${escapeHtml(prettyFrontMatterLabel(k))}</dt><dd class="metadata-value">${escapeHtml(v)}</dd>`)
     .join("");
   metadataCard.innerHTML = `<h3>Document metadata</h3><dl>${rows}</dl>`;
   metadataCard.hidden = false;
 };
 
-// Assign the real renderPreview (declared with `var` earlier so `updatePreview`
-// can safely reference it). Strips front-matter and updates the metadata card.
 renderPreview = () => {
   const { body } = splitFrontMatter(editor.value);
   preview.innerHTML = renderMarkdown(body);
@@ -862,67 +595,71 @@ renderPreview = () => {
 };
 
 // ---------------------------------------------------------------------------
-// Tab switching. Uses aria-selected + hidden panels; keyboard-navigable per
-// the ARIA authoring practices tabs pattern.
+// Mode switching: Edit / Read
 // ---------------------------------------------------------------------------
 
-const activateTab = (tabId) => {
-  for (const btn of tabButtons) {
-    const selected = btn.id === tabId;
+const activateMode = (modeId) => {
+  for (const btn of modeButtons) {
+    if (!btn) continue;
+    const selected = btn.id === modeId;
     btn.setAttribute("aria-selected", String(selected));
     btn.tabIndex = selected ? 0 : -1;
   }
-  for (const panel of tabPanels) {
-    const owner = panel.getAttribute("aria-labelledby");
-    panel.hidden = owner !== tabId;
+  if (panelEdit) panelEdit.hidden = modeId !== "mode-edit";
+  if (panelRead) panelRead.hidden = modeId !== "mode-read";
+  if (modeId === "mode-read") {
+    renderPreview();
   }
-  // Re-render the tab we just switched to so it reflects the latest Markdown.
-  if (tabId === "tab-form") renderForm();
-  if (tabId === "tab-preview") renderPreview();
 };
 
-for (const btn of tabButtons) {
-  btn.addEventListener("click", () => activateTab(btn.id));
+for (const btn of modeButtons) {
+  if (!btn) continue;
+  btn.addEventListener("click", () => activateMode(btn.id));
   btn.addEventListener("keydown", (event) => {
-    const idx = tabButtons.indexOf(btn);
+    const idx = modeButtons.indexOf(btn);
     if (event.key === "ArrowRight" || event.key === "ArrowDown") {
       event.preventDefault();
-      const next = tabButtons[(idx + 1) % tabButtons.length];
+      const next = modeButtons[(idx + 1) % modeButtons.length];
       next.focus();
-      activateTab(next.id);
+      activateMode(next.id);
     } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
       event.preventDefault();
-      const prev = tabButtons[(idx - 1 + tabButtons.length) % tabButtons.length];
+      const prev = modeButtons[(idx - 1 + modeButtons.length) % modeButtons.length];
       prev.focus();
-      activateTab(prev.id);
+      activateMode(prev.id);
     } else if (event.key === "Home") {
       event.preventDefault();
-      tabButtons[0].focus();
-      activateTab(tabButtons[0].id);
+      modeButtons[0].focus();
+      activateMode(modeButtons[0].id);
     } else if (event.key === "End") {
       event.preventDefault();
-      const last = tabButtons[tabButtons.length - 1];
+      const last = modeButtons[modeButtons.length - 1];
       last.focus();
-      activateTab(last.id);
+      activateMode(last.id);
     }
   });
 }
 
-renderPreview();
-renderForm();
+// ---------------------------------------------------------------------------
+// Wiring
+// ---------------------------------------------------------------------------
 
 editor.addEventListener("input", () => {
-  if (suppressEditorInput) return;
   saveDraft();
-  renderPreview();
-  renderForm();
+  updateSurfaceVisibility();
+  // Read-mode preview refreshes lazily when the user switches modes; no need
+  // to re-render on every keystroke while they're in Edit mode.
 });
 
 copyButton.addEventListener("click", copyMarkdown);
 downloadButton.addEventListener("click", downloadMarkdown);
-newFromTemplateButton.addEventListener("click", createNewFromTemplate);
-importButton.addEventListener("click", () => fileInput.click());
+loadSampleButton.addEventListener("click", loadSampleTemplate);
+openFileButton.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", () => loadMarkdownFile(fileInput.files[0]));
+
+emptyCopyPromptButton.addEventListener("click", copyContextPromptFromEmptyState);
+emptyShowFullButton.addEventListener("click", openContextOverlay);
+
 openContextOverlayButton.addEventListener("click", openContextOverlay);
 closeContextOverlayButton.addEventListener("click", closeContextOverlay);
 copyContextPromptButton.addEventListener("click", copyContextPrompt);
@@ -936,6 +673,13 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+if (restoreDraftButton) {
+  restoreDraftButton.addEventListener("click", restorePendingDraft);
+}
+if (discardDraftButton) {
+  discardDraftButton.addEventListener("click", discardPendingDraft);
+}
+
 clearButton.addEventListener("click", () => {
   if (
     hasEditorContent() &&
@@ -948,5 +692,11 @@ clearButton.addEventListener("click", () => {
   editor.value = "";
   safeLocalStorage.remove(STORAGE_KEY);
   updatePreview();
-  setStatus("Local draft cleared from this browser.");
+  updateSurfaceVisibility();
+  setStatus("");
 });
+
+// Initial paint.
+updateSurfaceVisibility();
+applyRestoreBannerState();
+updatePreview();

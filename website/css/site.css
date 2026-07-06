@@ -1,18 +1,27 @@
 :root {
   color-scheme: light;
   --text: #111111;
-  --muted: #5f6368;
+  --muted: #6b7280;
+  --muted-2: #9ca3af;
   --background: #ffffff;
   --surface: #f6f7f8;
   --surface-strong: #eef2f7;
-  --border: #d9dee3;
-  --accent: #2447ff;
+  --border: #e2e5ea;
+  --accent: #3b5bff;
+  --accent-hover: #2d47db;
   --accent-soft: #edf0ff;
   --success: #176b3a;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* The `hidden` attribute must always win, even against later component rules
+   that set an explicit display value (e.g. .empty-state uses display: grid,
+   which would otherwise override the UA `[hidden] { display: none }`). */
+[hidden] {
+  display: none !important;
 }
 
 html {
@@ -91,37 +100,54 @@ h3 {
 
 .actions,
 .editor-actions {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 2rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
 }
 
-.button {
+/* ==========================================================================
+   Link-style buttons (design tone: quiet, minimalist)
+   ========================================================================== */
+
+.link {
   display: inline-block;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--text);
-  border-radius: 0.5rem;
+  padding: 0.2rem 0;
+  background: transparent;
+  border: 0;
   font: inherit;
-  font-weight: 700;
-  text-decoration: none;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
   cursor: pointer;
 }
 
-.button:focus-visible,
-textarea:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
+.link:hover {
+  color: var(--accent-hover);
+  text-decoration-thickness: 2px;
 }
 
-.button.primary {
-  color: var(--background);
-  background: var(--text);
+.link.muted {
+  color: var(--muted);
 }
 
-.button.secondary {
+.link.muted:hover {
   color: var(--text);
-  background: var(--background);
+}
+
+.link:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.sep {
+  color: var(--muted-2);
+  font-size: 0.9rem;
+  user-select: none;
 }
 
 .editor-panel {
@@ -239,6 +265,7 @@ textarea {
 
 .editor-actions {
   align-items: center;
+  gap: 0.75rem;
 }
 
 .save-status {
@@ -277,10 +304,9 @@ textarea {
   box-shadow: 0 24px 80px rgba(17, 17, 17, 0.2);
 }
 
-.overlay-header,
-.prompt-card-heading {
+.overlay-header {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
 }
@@ -309,14 +335,17 @@ textarea {
   background: var(--surface);
 }
 
-.prompt-card-heading h3 {
-  margin-bottom: 0;
-}
-
 .prompt-textarea {
   min-height: 320px;
-  margin-top: 1rem;
+  margin-top: 0;
   background: var(--background);
+}
+
+.prompt-card-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
 }
 
 .visually-hidden {
@@ -370,16 +399,8 @@ footer {
     font-size: 1.35rem;
   }
 
-  .actions .button,
-  .close-button,
-  .prompt-card-heading .button {
-    width: 100%;
-    text-align: center;
-  }
-
   .editor-heading,
-  .overlay-header,
-  .prompt-card-heading {
+  .overlay-header {
     display: block;
   }
 
@@ -388,9 +409,8 @@ footer {
     margin-top: 1rem;
   }
 
-  .overlay-header .button,
-  .prompt-card-heading .button {
-    margin-top: 1rem;
+  .overlay-header .link {
+    margin-top: 0.75rem;
   }
 
   textarea {
@@ -403,87 +423,191 @@ footer {
 }
 
 /* ==========================================================================
-   Tabbed editor: Form | Markdown | Preview
+   Editor surface: Edit / Read mode toggle
    ========================================================================== */
 
-.tabs {
-  display: flex;
-  gap: 0.25rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 1.25rem;
+.mode-toggle {
+  display: inline-flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--background);
+  padding: 0.15rem;
 }
 
-.tab {
+.mode-button {
   appearance: none;
   background: transparent;
   border: 1px solid transparent;
-  border-bottom: none;
-  border-radius: 0.6rem 0.6rem 0 0;
-  padding: 0.65rem 1.1rem;
+  border-radius: 0.45rem;
+  padding: 0.4rem 0.9rem;
   font: inherit;
   font-weight: 700;
   color: var(--muted);
   cursor: pointer;
-  margin-bottom: -1px;
 }
 
-.tab:hover {
+.mode-button:hover {
   color: var(--text);
 }
 
-.tab:focus-visible {
-  outline: 2px solid var(--accent, #4a5cff);
+.mode-button:focus-visible {
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.tab[aria-selected="true"] {
-  color: var(--text);
-  background: var(--background);
-  border-color: var(--border);
-  border-bottom-color: var(--background);
+.mode-button[aria-selected="true"] {
+  color: var(--background);
+  background: var(--text);
 }
 
-.tab-panel[hidden] {
+.mode-button[aria-selected="true"]:hover {
+  color: var(--background);
+}
+
+.mode-panel[hidden] {
   display: none;
 }
 
-.form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+/* Read-mode type ramp
+   Deliberately tight in PR A: the goal is a document that reads at a glance,
+   not a splash page. Body sits at 0.95rem so headings only nudge up slightly. */
+.preview-content {
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-.form-section {
-  padding: 1rem 1.1rem 1.1rem;
-  border: 1px solid var(--border);
-  border-radius: 0.85rem;
+.preview-content h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  max-width: none;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.preview-content h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 1rem 0 0.4rem;
+}
+
+.preview-content h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0.85rem 0 0.35rem;
+}
+
+.preview-content p {
+  margin: 0.5rem 0;
+}
+
+.preview-content ul,
+.preview-content ol {
+  margin: 0.4rem 0;
+}
+
+/* ==========================================================================
+   Empty state
+   ========================================================================== */
+
+.empty-state {
+  display: grid;
+  gap: 1rem;
+  padding: 1.75rem 1.25rem;
+  border: 1px dashed var(--border);
+  border-radius: 1rem;
   background: var(--background);
 }
 
-.form-section-header {
+.empty-state-primary {
+  text-align: center;
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.empty-state-hint {
+  margin: 0.35rem 0 0.85rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.empty-state-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.empty-state-secondary {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--surface);
+}
+
+.empty-state-secondary-title {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.empty-state-secondary-hint {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.empty-state-prompt-preview {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--background);
+  color: var(--muted);
+  font: 0.85rem/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  white-space: pre-wrap;
+  max-height: 5.5rem;
+  overflow: hidden;
+}
+
+.empty-state-secondary-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ==========================================================================
+   Restore-or-clear banner
+   ========================================================================== */
+
+.restore-banner {
   display: flex;
-  align-items: baseline;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 0.35rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #c9d4ff;
+  border-radius: 0.75rem;
+  background: var(--accent-soft);
+  color: #18223f;
 }
 
-.form-section-title {
+.restore-banner-text {
   margin: 0;
-  font-size: 1.05rem;
+  font-weight: 600;
 }
 
-.form-section-key {
-  font: 0.8rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  color: var(--muted);
-}
-
-.form-section .help-text {
-  margin: 0 0 0.75rem;
-}
-
-.form-section textarea {
-  min-height: 8rem;
+.restore-banner-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .metadata-card {
@@ -494,27 +618,16 @@ footer {
   background: var(--surface, #f7f8fb);
 }
 
-/* Slightly lighter surface in the Form tab so the read-only card reads as
-   informational without competing with the editable section cards below. */
-.metadata-card--form {
-  background: #fafbfe;
-}
-
-.metadata-card-hint {
-  margin: 0.6rem 0 0;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
 .metadata-card[hidden] {
   display: none;
 }
 
 .metadata-card h3 {
   margin: 0 0 0.5rem;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   color: var(--muted);
 }
 
@@ -531,8 +644,8 @@ footer {
   color: var(--muted);
 }
 
-.metadata-card dd {
+.metadata-card dd.metadata-value {
   margin: 0;
-  color: var(--text);
+  color: var(--muted);
   word-break: break-word;
 }
