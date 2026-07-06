@@ -68,6 +68,16 @@ await page.goto(url + "/learn.html");
 await page.waitForSelector("#learn-title");
 await page.screenshot({ path: path.join(OUT, "06_learn_page.png"), fullPage: true });
 
+// 7) Mobile header with hamburger menu open (PR A4)
+const mobile = await browser.newContext({ viewport: { width: 375, height: 812 } });
+const mpage = await mobile.newPage();
+await mpage.goto(url);
+await mpage.waitForSelector("#nav-toggle", { state: "visible" });
+await mpage.click("#nav-toggle");
+await mpage.waitForSelector("#site-nav .site-nav-link", { state: "visible" });
+await mpage.screenshot({ path: path.join(OUT, "07_header_mobile.png"), fullPage: false });
+await mobile.close();
+
 await browser.close();
 server.close();
 console.log("Screenshots written to", OUT);

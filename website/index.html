@@ -7,6 +7,21 @@
   <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-wordmark" href="index.html">PortableAI</a>
+      <button class="nav-toggle" type="button" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a class="site-nav-link" href="learn.html">Learn more</a>
+        <a class="site-nav-link" href="https://github.com/refineryllc/portable-ai-working">Project</a>
+      </nav>
+    </div>
+  </header>
+
   <main class="page">
     <section class="hero" aria-labelledby="site-title">
       <h1 id="site-title">Every AI needs you to start over.</h1>
@@ -34,7 +49,7 @@
           <div class="restore-banner-actions">
             <button class="link" type="button" id="restore-draft">Restore</button>
             <span class="sep" aria-hidden="true">·</span>
-            <button class="link muted" type="button" id="discard-draft">Clear</button>
+            <button class="link" type="button" id="discard-draft">Clear</button>
           </div>
         </div>
 
@@ -56,7 +71,7 @@
             <div class="empty-state-secondary-actions">
               <button class="link" type="button" id="empty-copy-prompt">Copy prompt</button>
               <span class="sep" aria-hidden="true">·</span>
-              <button class="link muted" type="button" id="empty-show-full">Show full instructions</button>
+              <button class="link" type="button" id="empty-show-full">Show full instructions</button>
             </div>
           </div>
         </div>
@@ -83,8 +98,8 @@
       </div>
 
       <div class="editor-actions" aria-label="Editor actions">
-        <button class="link muted" type="button" id="copy-markdown" hidden>Copy Markdown</button>
-        <button class="link muted" type="button" id="clear-draft" hidden>Clear</button>
+        <button class="link" type="button" id="copy-markdown" hidden>Copy Markdown</button>
+        <button class="link" type="button" id="clear-draft" hidden>Clear</button>
         <span id="save-status" class="save-status" role="status" aria-live="polite"></span>
       </div>
     </section>
@@ -112,7 +127,7 @@
       <div class="prompt-card">
         <div class="prompt-card-top">
           <button class="link" type="button" id="copy-context-prompt">Copy prompt</button>
-          <button class="link muted" type="button" id="toggle-prompt-length" aria-expanded="false" aria-controls="context-export-prompt">Show full prompt</button>
+          <button class="link" type="button" id="toggle-prompt-length" aria-expanded="false" aria-controls="context-export-prompt">Show full prompt</button>
         </div>
         <textarea id="context-export-prompt" class="prompt-textarea prompt-textarea--collapsed" readonly aria-label="Prompt for asking an AI to draft a PortableAI profile"></textarea>
       </div>
@@ -145,5 +160,6 @@
   </footer>
   <script src="js/vendor/marked.min.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/header.js"></script>
 </body>
 </html>

@@ -7,11 +7,22 @@
   <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
-  <main class="page">
-    <nav class="learn-nav" aria-label="Site">
-      <a class="link muted" href="index.html">← Back to the editor</a>
-    </nav>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a class="site-wordmark" href="index.html">PortableAI</a>
+      <button class="nav-toggle" type="button" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+      </button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary">
+        <a class="site-nav-link" href="learn.html">Learn more</a>
+        <a class="site-nav-link" href="https://github.com/refineryllc/portable-ai-working">Project</a>
+      </nav>
+    </div>
+  </header>
 
+  <main class="page">
     <section class="hero" aria-labelledby="learn-title">
       <h1 id="learn-title">Learn more about PortableAI</h1>
       <p class="tagline">
@@ -99,6 +110,7 @@
       </p>
     </article>
   </main>
+  <script src="js/header.js"></script>
 
   <footer class="site-footer">
     <p class="footer-meta">
