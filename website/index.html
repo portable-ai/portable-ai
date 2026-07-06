@@ -9,64 +9,92 @@
 <body>
   <main class="page">
     <section class="hero" aria-labelledby="site-title">
-      <p class="eyebrow">PortableAI.org</p>
       <h1 id="site-title">Every AI asks you to start over.</h1>
-      <p class="tagline">PortableAI is an open standard that lets you take your context anywhere.</p>
-      <p class="hero-summary">Keep durable preferences, projects, goals, and working style in a human-readable Markdown PortableAI Document that you own.</p>
+      <p class="tagline">PortableAI is an open standard that lets you take your profile anywhere.</p>
+      <p class="hero-summary">Keep durable preferences, projects, goals, and working style in a human-readable Markdown profile that you own.</p>
       <div class="actions" aria-label="Primary actions">
-        <button class="button primary" type="button" id="open-context-overlay">Download your context</button>
-        <a class="button secondary" href="#editor">Create a new profile</a>
+        <button class="link" type="button" id="open-context-overlay">Ask an AI to draft one</button>
+        <span class="sep" aria-hidden="true">·</span>
+        <a class="link" href="#editor">Open the editor</a>
       </div>
     </section>
 
     <section class="editor-panel" id="editor" aria-labelledby="editor-title">
       <div class="editor-heading">
         <div>
-          <p class="eyebrow">Browser-only reference editor</p>
-          <h2 id="editor-title">Draft your PortableAI Persona</h2>
-          <p class="help-text">Switch between a guided <strong>Form</strong>, the canonical <strong>Markdown</strong>, and a rendered <strong>Preview</strong>. All three views edit the same underlying document.</p>
+          <h2 id="editor-title">Edit your profile</h2>
+          <p class="help-text">Your profile is a Markdown file you own. Edit it here, then download it and take it anywhere.</p>
         </div>
         <div class="editor-toolbar" aria-label="Editor toolbar">
-          <button class="button primary" type="button" id="download-markdown">Download Markdown</button>
-          <button class="button secondary" type="button" id="new-from-template">New from Template</button>
+          <button class="link" type="button" id="download-markdown" hidden>Download</button>
         </div>
       </div>
 
       <section class="privacy-note" aria-labelledby="privacy-title">
         <h3 id="privacy-title">Privacy and trust</h3>
-        <p>The reference editor runs in your browser. Download the canonical Markdown PortableAI Document and keep it wherever you choose.</p>
+        <p>The reference editor runs in your browser. Download the canonical Markdown profile and keep it wherever you choose.</p>
       </section>
 
       <div class="canonical-editor">
-        <div class="tabs" role="tablist" aria-label="Editor views">
-          <button class="tab" role="tab" type="button" id="tab-form" aria-controls="panel-form" aria-selected="true" tabindex="0">Form</button>
-          <button class="tab" role="tab" type="button" id="tab-markdown" aria-controls="panel-markdown" aria-selected="false" tabindex="-1">Markdown</button>
-          <button class="tab" role="tab" type="button" id="tab-preview" aria-controls="panel-preview" aria-selected="false" tabindex="-1">Preview</button>
-        </div>
-
-        <div class="tab-panel" role="tabpanel" id="panel-form" aria-labelledby="tab-form">
-          <p class="help-text">Fill in the structured fields below. Everything you enter is saved to the same underlying Markdown document, which you can inspect on the Markdown tab.</p>
-          <div id="form-fields" class="form-fields"></div>
-        </div>
-
-        <div class="tab-panel" role="tabpanel" id="panel-markdown" aria-labelledby="tab-markdown" hidden>
-          <div class="field-group markdown-field">
-            <label for="persona-editor">Canonical Markdown document</label>
-            <p id="editor-help" class="help-text">The raw Markdown below is the only source of truth. All tabs read from and write to this text.</p>
-            <textarea id="persona-editor" spellcheck="true" aria-describedby="editor-help"></textarea>
+        <!-- Restore-or-clear banner shown when a draft exists in localStorage on load. -->
+        <div id="restore-banner" class="restore-banner" role="status" hidden>
+          <p class="restore-banner-text">You have a draft from a previous session.</p>
+          <div class="restore-banner-actions">
+            <button class="link" type="button" id="restore-draft">Restore</button>
+            <span class="sep" aria-hidden="true">·</span>
+            <button class="link muted" type="button" id="discard-draft">Clear</button>
           </div>
         </div>
 
-        <div class="tab-panel" role="tabpanel" id="panel-preview" aria-labelledby="tab-preview" hidden>
-          <div id="persona-metadata" class="metadata-card" hidden aria-label="Document metadata"></div>
-          <div id="persona-preview" class="preview-content"></div>
+        <!-- Empty state: shown when the editor has no content. -->
+        <div id="empty-state" class="empty-state" hidden>
+          <div class="empty-state-primary">
+            <h3 class="empty-state-title">Nothing loaded yet</h3>
+            <p class="empty-state-hint">Load a profile or create a new one.</p>
+            <div class="empty-state-actions">
+              <button class="link" type="button" id="load-sample">Load a sample</button>
+              <span class="sep" aria-hidden="true">·</span>
+              <button class="link" type="button" id="open-file">Open a file</button>
+            </div>
+          </div>
+
+          <div class="empty-state-secondary">
+            <h4 class="empty-state-secondary-title">Ask an AI to draft one</h4>
+            <p class="empty-state-secondary-hint">Send this prompt to any AI you already use. It replies with Markdown you can paste back here.</p>
+            <pre class="empty-state-prompt-preview" id="empty-state-prompt-preview" aria-hidden="true"></pre>
+            <div class="empty-state-secondary-actions">
+              <button class="link" type="button" id="empty-copy-prompt">Copy prompt</button>
+              <span class="sep" aria-hidden="true">·</span>
+              <button class="link muted" type="button" id="empty-show-full">Show full instructions</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Editor surface: hidden while empty-state is visible. -->
+        <div id="editor-surface" class="editor-surface" hidden>
+          <div class="mode-toggle" role="tablist" aria-label="Editor mode">
+            <button class="mode-button" role="tab" type="button" id="mode-edit" aria-selected="true" aria-controls="panel-edit" tabindex="0">Edit</button>
+            <button class="mode-button" role="tab" type="button" id="mode-read" aria-selected="false" aria-controls="panel-read" tabindex="-1">Read</button>
+          </div>
+
+          <div class="mode-panel" role="tabpanel" id="panel-edit" aria-labelledby="mode-edit">
+            <div class="field-group markdown-field">
+              <label for="persona-editor" class="visually-hidden">Markdown profile</label>
+              <textarea id="persona-editor" spellcheck="true" aria-label="Markdown profile"></textarea>
+            </div>
+          </div>
+
+          <div class="mode-panel" role="tabpanel" id="panel-read" aria-labelledby="mode-read" hidden>
+            <div id="persona-metadata" class="metadata-card" hidden aria-label="Document metadata"></div>
+            <div id="persona-preview" class="preview-content"></div>
+          </div>
         </div>
       </div>
 
       <div class="editor-actions" aria-label="Editor actions">
-        <button class="button secondary" type="button" id="copy-markdown">Copy Markdown</button>
-        <button class="button secondary" type="button" id="clear-draft">Clear local draft</button>
-        <span id="save-status" class="save-status" role="status" aria-live="polite">Draft saved locally in this browser.</span>
+        <button class="link muted" type="button" id="copy-markdown" hidden>Copy Markdown</button>
+        <button class="link muted" type="button" id="clear-draft" hidden>Clear</button>
+        <span id="save-status" class="save-status" role="status" aria-live="polite"></span>
       </div>
     </section>
   </main>
@@ -75,31 +103,26 @@
     <div class="overlay-backdrop" data-close-context-overlay></div>
     <section class="overlay-panel">
       <div class="overlay-header">
-        <div>
-          <p class="eyebrow">Bring existing AI context into PortableAI</p>
-          <h2 id="context-overlay-title">Download your context</h2>
-        </div>
-        <button class="button secondary close-button" type="button" id="close-context-overlay" aria-label="Close download your context overlay">Close</button>
+        <h2 id="context-overlay-title">Ask an AI to draft one</h2>
+        <button class="link muted close-button" type="button" id="close-context-overlay" aria-label="Close overlay">Close</button>
       </div>
 
       <p id="context-overlay-description" class="overlay-intro">
-        Use this browser-only workflow to ask an AI assistant you already use to summarize the durable context it knows about you. Then paste or load that result into the PortableAI reference editor.
+        Send the prompt below to any AI assistant you already use. It will reply with a Markdown profile you can paste back into the editor, or save as a file and open here.
       </p>
 
       <ol class="workflow-list">
-        <li>Open the AI assistant that already has useful context about you.</li>
+        <li>Open an AI assistant you already use.</li>
         <li>Copy the prompt below and send it in that AI.</li>
-        <li>Review the AI's Markdown result and remove anything you do not want to keep.</li>
-        <li>Paste the cleaned result into the editor below, or save it as a Markdown file and use <strong>Load Markdown</strong>.</li>
-        <li>Use <strong>Download Markdown</strong> to keep your PortableAI Document wherever you choose.</li>
+        <li>Save the Markdown result as a file, or copy the text.</li>
+        <li>Come back to PortableAI.org to review or make changes, or load the Markdown into a new AI.</li>
       </ol>
 
       <div class="prompt-card">
-        <div class="prompt-card-heading">
-          <h3>Reusable export prompt</h3>
-          <button class="button primary" type="button" id="copy-context-prompt">Copy prompt</button>
+        <textarea id="context-export-prompt" class="prompt-textarea" readonly aria-label="Prompt for asking an AI to draft a PortableAI profile"></textarea>
+        <div class="prompt-card-actions">
+          <button class="link" type="button" id="copy-context-prompt">Copy prompt</button>
         </div>
-        <textarea id="context-export-prompt" class="prompt-textarea" readonly aria-label="Prompt for asking an AI to summarize durable user context"></textarea>
       </div>
 
       <p class="help-text">
