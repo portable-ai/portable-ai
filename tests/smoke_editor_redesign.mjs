@@ -89,8 +89,14 @@ try {
     "Primary action is 'Load a sample'",
   );
   assert(
-    (await page.textContent("#open-file")).trim() === "Open a file",
-    "Secondary action is 'Open a file'",
+    (await page.textContent("#open-file")).trim() === "Open a profile",
+    "Open-file action is labeled 'Open a profile' (#86)",
+  );
+  // #86: empty-state primary actions in order: Generate a new one · Open a profile · Load a sample.
+  const emptyActionLabels = await page.locator(".empty-state-actions .link").allTextContents();
+  assert(
+    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a new one | Open a profile | Load a sample",
+    `Empty-state actions are ordered Generate/Open/Load (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
   );
   assert(
     (await page.textContent(".empty-state-secondary-title")).trim() === "Ask an AI to draft one",

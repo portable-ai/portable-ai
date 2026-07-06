@@ -34,7 +34,7 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
 
 ### Changed
 
-- **Editor home copy tidy (#86).** Removed the in-body "Learn more" (hero tagline) and "Read more" (editor blurb) links, since the header nav already links to the Learn page. In the empty state's "Ask an AI to draft one" block, removed the standalone "Get a prompt" link and replaced the hint with `Click "Generate a new one" to build your profile from any AI.` (the "Generate a new one" action still opens the Get a Prompt page). The block heading is unchanged.
+- **Editor home copy tidy (#86).** Removed the in-body "Learn more" (hero tagline) and "Read more" (editor blurb) links, since the header nav already links to the Learn page. In the empty state's "Ask an AI to draft one" block, removed the standalone "Get a prompt" link and replaced the hint with `Click "Generate a new one" to build your profile from any AI.` (the "Generate a new one" action still opens the Get a Prompt page). The block heading is unchanged. Reordered the empty-state primary actions to **Generate a new one · Open a profile · Load a sample** and renamed "Open a file" to "Open a profile".
 
 - **Spec finalization (Group 1 — #44).** Renamed the last remaining "specification" in the live Core spec to "Spec" (the `document_type: spec` description now reads "a PortableAI Spec document"). The frozen v0.2 monolithic persona spec is intentionally left unchanged as a migration reference (retired later under #27), and the one remaining occurrence in `learn.html` is kept as ordinary prose. Verified #51 (content filenames already kebab-case) and #52 (`document_type: patch` already reserved in the Core spec) require no further changes.
 
