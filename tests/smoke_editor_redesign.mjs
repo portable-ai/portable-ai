@@ -119,8 +119,8 @@ try {
     "Hero tagline preserved",
   );
   assert(
-    (await page.locator(".tagline .link").count()) === 1,
-    "Hero tagline includes a 'Learn more' link",
+    (await page.locator(".tagline .link").count()) === 0,
+    "Hero tagline no longer has an in-body 'Learn more' link (#86 — header nav covers it)",
   );
   assert(
     (await page.locator("#open-context-overlay").count()) === 0,
@@ -139,8 +139,8 @@ try {
     "Editor blurb mentions non-storage",
   );
   assert(
-    (await page.locator(".editor-blurb .link").count()) === 1,
-    "Editor blurb includes a 'Read more' link",
+    (await page.locator(".editor-blurb .link").count()) === 0,
+    "Editor blurb no longer has an in-body 'Read more' link (#86 — header nav covers it)",
   );
   const h1Size = await page.$eval("#site-title", (el) => parseFloat(getComputedStyle(el).fontSize));
   assert(
@@ -300,7 +300,7 @@ try {
     (await page.locator("#context-export-prompt").count()) === 0,
     "Overlay prompt textarea removed",
   );
-  // Empty-state now links to the page: a third primary action + the secondary link.
+  // Empty-state links to the page via the 'Generate a new one' primary action.
   assert(
     (await page.getAttribute("#empty-generate-new", "href")) === "get-a-prompt.html",
     "Empty-state 'Generate a new one' links to get-a-prompt.html",
@@ -309,9 +309,19 @@ try {
     (await page.textContent("#empty-generate-new")).trim() === "Generate a new one",
     "Third empty-state action reads 'Generate a new one'",
   );
+  // #86: the standalone secondary 'Get a prompt' link is removed; the block
+  // now just points the user at 'Generate a new one'.
   assert(
-    (await page.getAttribute("#empty-get-a-prompt", "href")) === "get-a-prompt.html",
-    "Empty-state secondary 'Get a prompt' links to the page",
+    (await page.locator("#empty-get-a-prompt").count()) === 0,
+    "Secondary 'Get a prompt' link removed from empty state (#86)",
+  );
+  assert(
+    (await page.textContent(".empty-state-secondary-hint")).includes('Click “Generate a new one” to build your profile from any AI'),
+    "Secondary block hint points to 'Generate a new one' (#86)",
+  );
+  assert(
+    (await page.textContent(".empty-state-secondary-title")).trim() === "Ask an AI to draft one",
+    "Secondary block keeps its 'Ask an AI to draft one' heading (#86)",
   );
 
   // The Get a Prompt page itself.
@@ -477,11 +487,14 @@ try {
     assert(color === RGB_TEXT, `${sel} color is #111 (got ${color})`);
   }
 
-  // --- Case 12 (PR A4 + #75): links accent-blue site-wide; overlay deleted, no muted links ---
-  const heroLink = await page.$eval(".tagline .link", (el) => getComputedStyle(el).color);
-  assert(heroLink === RGB_ACCENT, `Hero 'Learn more' link is accent-blue (got ${heroLink})`);
-  const blurbLink = await page.$eval(".editor-blurb .link", (el) => getComputedStyle(el).color);
-  assert(blurbLink === RGB_ACCENT, `Editor blurb link is accent-blue (got ${blurbLink})`);
+  // --- Case 12 (PR A4 + #75 + #86): links accent-blue site-wide; overlay deleted, no muted links ---
+  // In-body hero/blurb links were removed in #86, so verify the accent color on
+  // an empty-state action link (still a site-wide `.link`) instead.
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.waitForSelector("#empty-state", { state: "visible" });
+  const emptyActionLink = await page.$eval("#empty-generate-new", (el) => getComputedStyle(el).color);
+  assert(emptyActionLink === RGB_ACCENT, `Empty-state action link is accent-blue (got ${emptyActionLink})`);
   // Overlay is deleted; no muted links should exist anywhere.
   const mutedCount = await page.locator(".link.muted").count();
   assert(mutedCount === 0, `No .link.muted remain after overlay deletion; got ${mutedCount}`);
