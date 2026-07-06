@@ -289,58 +289,106 @@ try {
     "No banner on reload after clearing localStorage",
   );
 
-  // --- Case 7: 'Ask an AI to draft one' overlay opens from empty-state ---
-  await page.click("#empty-show-full");
-  await page.waitForSelector("#context-overlay", { state: "visible" });
+  // --- Case 7 (#75): overlay is GONE; Get a Prompt is a dedicated page ---
+  await page.reload();
+  await page.waitForSelector("#empty-state", { state: "visible" });
   assert(
-    (await page.textContent("#context-overlay-title")).trim() === "Ask an AI to draft one",
-    "Overlay heading reads 'Ask an AI to draft one'",
-  );
-  const promptText = await page.$eval("#context-export-prompt", (el) => el.value);
-  assert(
-    promptText.includes("portableai-profile-YYYY-MM-DD.md"),
-    "Prompt tells AI to use standard filename",
+    (await page.locator("#context-overlay").count()) === 0,
+    "AI-draft overlay removed from index.html",
   );
   assert(
-    promptText.toLowerCase().includes("markdown"),
-    "Prompt asks for Markdown output",
+    (await page.locator("#context-export-prompt").count()) === 0,
+    "Overlay prompt textarea removed",
+  );
+  // Empty-state now links to the page: a third primary action + the secondary link.
+  assert(
+    (await page.getAttribute("#empty-generate-new", "href")) === "get-a-prompt.html",
+    "Empty-state 'Generate a new one' links to get-a-prompt.html",
   );
   assert(
-    !/what\s+(is\s+)?(your|my)\s+name/i.test(promptText),
-    "Prompt never asks the user's name",
+    (await page.textContent("#empty-generate-new")).trim() === "Generate a new one",
+    "Third empty-state action reads 'Generate a new one'",
   );
   assert(
-    promptText.includes("load it into another AI, or open it in PortableAI to review or edit"),
-    "Prompt includes closing instructions to the user",
+    (await page.getAttribute("#empty-get-a-prompt", "href")) === "get-a-prompt.html",
+    "Empty-state secondary 'Get a prompt' links to the page",
+  );
+
+  // The Get a Prompt page itself.
+  await page.goto(url + "/get-a-prompt.html");
+  await page.waitForSelector("#prompt-readout-body");
+  assert(
+    (await page.textContent("#prompt-title")).trim().toLowerCase().includes("get a prompt"),
+    "Get a Prompt page has 'Get a prompt' heading",
+  );
+  // Type selector: two options, Persona default.
+  const typeOptions = page.locator("#type-options [data-type]");
+  assert(
+    (await typeOptions.count()) === 2,
+    "Type selector renders two profile types",
   );
   assert(
-    (await page.textContent("#context-overlay-description")).includes("open on PortableAI.org"),
-    "Overlay intro says 'open on PortableAI.org'",
+    (await page.getAttribute('#type-options [data-type="persona"]', "aria-checked")) === "true",
+    "Persona is the default selected type",
+  );
+  // Full readout, not a scroll box: it is a <pre>, not a textarea.
+  assert(
+    (await page.locator("#prompt-readout-body").evaluate((el) => el.tagName)) === "PRE",
+    "Prompt readout is a full <pre>, not a scrolling textarea",
+  );
+  const personaText = await page.textContent("#prompt-readout-body");
+  assert(
+    personaText.includes("portableai-profile-YYYY-MM-DD.md"),
+    "Persona prompt tells AI to use standard filename",
   );
   assert(
-    await page.isVisible("#copy-context-prompt"),
-    "Copy prompt button visible above textarea in overlay",
+    personaText.toLowerCase().includes("markdown"),
+    "Persona prompt asks for Markdown output",
   );
   assert(
-    await page.isVisible("#toggle-prompt-length"),
-    "Show full prompt toggle visible in overlay",
+    !/what\s+(is\s+)?(your|my)\s+name/i.test(personaText),
+    "Persona prompt never asks the user's name",
   );
-  const promptClassesBefore = await page.getAttribute("#context-export-prompt", "class");
   assert(
-    promptClassesBefore.includes("prompt-textarea--collapsed"),
-    "Overlay prompt starts collapsed",
+    personaText.includes("load it into another AI, or open it in PortableAI to review or edit"),
+    "Persona prompt includes closing instructions to the user",
   );
-  await page.click("#toggle-prompt-length");
-  const promptClassesAfter = await page.getAttribute("#context-export-prompt", "class");
+  // Copy buttons at BOTH top and bottom.
   assert(
-    !promptClassesAfter.includes("prompt-textarea--collapsed"),
-    "Toggle expands the overlay prompt",
+    await page.isVisible("#copy-prompt-top"),
+    "Copy button visible at top of readout",
   );
-  await page.click("#close-context-overlay");
-  await page.waitForSelector("#context-overlay", { state: "hidden" });
   assert(
-    !(await page.isVisible("#context-overlay")),
-    "Overlay closes on Close button",
+    await page.isVisible("#copy-prompt-bottom"),
+    "Copy button visible at bottom of readout",
+  );
+  // Switching to Software Project swaps the prompt to the software-project one.
+  await page.click('#type-options [data-type="software-project"]');
+  assert(
+    (await page.getAttribute('#type-options [data-type="software-project"]', "aria-checked")) === "true",
+    "Software Project becomes selected after click",
+  );
+  const projectText = await page.textContent("#prompt-readout-body");
+  assert(
+    projectText.includes("document_type: software-project"),
+    "Software Project prompt outputs document_type: software-project",
+  );
+  assert(
+    projectText.includes("portableai-software-project-YYYY-MM-DD.md"),
+    "Software Project prompt uses the software-project filename",
+  );
+  assert(
+    /architecture/i.test(projectText) && /tech stack/i.test(projectText),
+    "Software Project prompt extracts architecture + tech stack",
+  );
+  assert(
+    projectText !== personaText,
+    "Prompt readout changes when profile type changes",
+  );
+  // Privacy line present.
+  assert(
+    (await page.textContent(".prompt-privacy")).toLowerCase().includes("does not connect to your ai accounts"),
+    "Page states the non-storage privacy guarantee",
   );
 
   // --- Case 8: /learn.html loads and links back ---
@@ -374,7 +422,7 @@ try {
   const RGB_TEXT = "rgb(17, 17, 17)";
   const RGB_ACCENT = "rgb(59, 91, 255)";
 
-  for (const pagePath of ["/", "/learn.html"]) {
+  for (const pagePath of ["/", "/learn.html", "/get-a-prompt.html"]) {
     await page.goto(url + pagePath);
     await page.waitForSelector(".site-header");
     assert(
@@ -391,18 +439,23 @@ try {
     );
     const navLinks = page.locator(".site-header .site-nav .site-nav-link");
     assert(
-      (await navLinks.count()) === 2,
-      `Header has exactly two nav links on ${pagePath}`,
+      (await navLinks.count()) === 3,
+      `Header has exactly three nav links on ${pagePath}`,
     );
     assert(
-      (await navLinks.nth(0).textContent()).trim() === "Learn more" &&
-        (await navLinks.nth(0).getAttribute("href")) === "learn.html",
-      `First nav link on ${pagePath} is 'Learn more' → learn.html`,
+      (await navLinks.nth(0).textContent()).trim() === "Get a Prompt" &&
+        (await navLinks.nth(0).getAttribute("href")) === "get-a-prompt.html",
+      `First nav link on ${pagePath} is 'Get a Prompt' → get-a-prompt.html`,
     );
     assert(
-      (await navLinks.nth(1).textContent()).trim() === "Project" &&
-        (await navLinks.nth(1).getAttribute("href")) === "https://github.com/refineryllc/portable-ai-working",
-      `Second nav link on ${pagePath} is 'Project' → GitHub repo`,
+      (await navLinks.nth(1).textContent()).trim() === "Learn more" &&
+        (await navLinks.nth(1).getAttribute("href")) === "learn.html",
+      `Second nav link on ${pagePath} is 'Learn more' → learn.html`,
+    );
+    assert(
+      (await navLinks.nth(2).textContent()).trim() === "Project" &&
+        (await navLinks.nth(2).getAttribute("href")) === "https://github.com/refineryllc/portable-ai-working",
+      `Third nav link on ${pagePath} is 'Project' → GitHub repo`,
     );
     const headerPos = await page.$eval(".site-header", (el) => getComputedStyle(el).position);
     assert(
@@ -424,29 +477,14 @@ try {
     assert(color === RGB_TEXT, `${sel} color is #111 (got ${color})`);
   }
 
-  // --- Case 12 (PR A4): links accent-blue site-wide, only overlay Close muted ---
+  // --- Case 12 (PR A4 + #75): links accent-blue site-wide; overlay deleted, no muted links ---
   const heroLink = await page.$eval(".tagline .link", (el) => getComputedStyle(el).color);
   assert(heroLink === RGB_ACCENT, `Hero 'Learn more' link is accent-blue (got ${heroLink})`);
   const blurbLink = await page.$eval(".editor-blurb .link", (el) => getComputedStyle(el).color);
   assert(blurbLink === RGB_ACCENT, `Editor blurb link is accent-blue (got ${blurbLink})`);
-  // Open overlay and confirm Close is the only muted link, and it resolves muted.
-  await page.click("#empty-show-full");
-  await page.waitForSelector("#context-overlay", { state: "visible" });
-  assert(
-    (await page.getAttribute("#close-context-overlay", "class")).includes("muted"),
-    "Overlay Close still carries .link.muted",
-  );
-  const closeColor = await page.$eval("#close-context-overlay", (el) => getComputedStyle(el).color);
-  assert(closeColor !== RGB_ACCENT, `Overlay Close resolves to muted, not accent (got ${closeColor})`);
-  const overlayCopyColor = await page.$eval("#copy-context-prompt", (el) => getComputedStyle(el).color);
-  assert(overlayCopyColor === RGB_ACCENT, `Overlay 'Copy prompt' is accent-blue (got ${overlayCopyColor})`);
-  const toggleColor = await page.$eval("#toggle-prompt-length", (el) => getComputedStyle(el).color);
-  assert(toggleColor === RGB_ACCENT, `Overlay 'Show full prompt' toggle is accent-blue, no longer muted (got ${toggleColor})`);
-  await page.click("#close-context-overlay");
-  await page.waitForSelector("#context-overlay", { state: "hidden" });
-  // The only .link.muted anywhere should be the overlay Close.
+  // Overlay is deleted; no muted links should exist anywhere.
   const mutedCount = await page.locator(".link.muted").count();
-  assert(mutedCount === 1, `Exactly one .link.muted remains (overlay Close); got ${mutedCount}`);
+  assert(mutedCount === 0, `No .link.muted remain after overlay deletion; got ${mutedCount}`);
 
   // --- Case 13 (PR A4): footer left-aligned, flush with editor panel ---
   const footerAlign = await page.$eval(".site-footer", (el) => getComputedStyle(el).textAlign);

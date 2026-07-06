@@ -55,13 +55,23 @@ await page.waitForSelector("#restore-banner", { state: "visible" });
 await page.locator("#editor").scrollIntoViewIfNeeded();
 await page.screenshot({ path: path.join(OUT, "04_restore_banner.png"), fullPage: true });
 
-// 5) AI draft overlay
+// 5) Get a Prompt page — Persona (default) selected, full readout + both Copy buttons (#75)
 await page.evaluate(() => localStorage.removeItem("portableAiPersonaDraft"));
-await page.reload();
-await page.waitForSelector("#empty-state", { state: "visible" });
-await page.click("#empty-show-full");
-await page.waitForSelector("#context-overlay", { state: "visible" });
-await page.screenshot({ path: path.join(OUT, "05_ai_draft_overlay.png"), fullPage: false });
+await page.goto(url + "/get-a-prompt.html");
+await page.waitForSelector("#prompt-readout-body");
+await page.waitForFunction(() => {
+  const el = document.querySelector("#prompt-readout-body");
+  return el && el.textContent.trim().length > 0;
+});
+await page.screenshot({ path: path.join(OUT, "05_get_a_prompt_persona.png"), fullPage: true });
+
+// 5b) Get a Prompt page — Software Project selected (selector swaps the readout)
+await page.click('#type-options [data-type="software-project"]');
+await page.waitForFunction(() => {
+  const el = document.querySelector("#prompt-readout-body");
+  return el && el.textContent.includes("document_type: software-project");
+});
+await page.screenshot({ path: path.join(OUT, "05b_get_a_prompt_software_project.png"), fullPage: true });
 
 // 6) Learn page
 await page.goto(url + "/learn.html");

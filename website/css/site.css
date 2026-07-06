@@ -36,10 +36,6 @@ body {
   line-height: 1.6;
 }
 
-body.overlay-open {
-  overflow: hidden;
-}
-
 .page {
   max-width: 880px;
   margin: 0 auto;
@@ -378,53 +374,6 @@ textarea {
   color: var(--success);
 }
 
-.overlay[hidden] {
-  display: none;
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-  overflow: auto;
-}
-
-.overlay-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(17, 17, 17, 0.55);
-}
-
-.overlay-panel {
-  position: relative;
-  z-index: 1;
-  width: min(760px, 100%);
-  max-height: min(92vh, 820px);
-  overflow: auto;
-  padding: 1.1rem 1.25rem 1.25rem;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  background: var(--background);
-  box-shadow: 0 24px 80px rgba(17, 17, 17, 0.2);
-}
-
-.overlay-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.overlay-intro {
-  max-width: 760px;
-  margin: 1rem 0;
-  color: var(--muted);
-  font-size: 1.05rem;
-}
-
 .workflow-list {
   margin: 0.75rem 0;
   padding-left: 1.4rem;
@@ -435,52 +384,131 @@ textarea {
   margin-bottom: 0.35rem;
 }
 
-.prompt-card {
-  margin: 0.75rem 0 0.5rem;
-  padding: 0.85rem;
-  border: 1px solid var(--border);
-  border-radius: 0.7rem;
-  background: var(--surface);
+/* -------------------------------------------------------------------------
+   Get a Prompt page (#75)
+   Profile-type selector + full read-only prompt readout with top & bottom
+   Copy buttons. Constrained to the same 880px content column as the editor.
+   ------------------------------------------------------------------------- */
+
+.prompt-page {
+  width: min(880px, 100%);
+  margin: 0 auto;
 }
 
-.prompt-textarea {
-  min-height: 320px;
-  margin-top: 0;
-  background: var(--background);
-  transition: min-height 0.15s ease;
+.type-selector {
+  margin: 0 0 1.25rem;
 }
 
-.prompt-textarea--collapsed {
-  min-height: 8.5rem;
-  max-height: 8.5rem;
-  overflow: auto;
+.type-selector-label {
+  margin: 0 0 0.6rem;
+  font-size: 1rem;
+  color: var(--text);
 }
 
-.prompt-card-top {
+.type-options {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 
-.prompt-card-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.85rem;
+.type-option {
+  padding: 0.45rem 0.9rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease, color 0.12s ease;
 }
 
-.overlay-privacy {
-  margin: 0.85rem 0 0;
+.type-option:hover {
+  border-color: var(--accent);
+}
+
+.type-option--active {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.type-option:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.type-selector-hint {
+  margin: 0.6rem 0 0;
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.5;
 }
 
-.overlay-intro {
-  max-width: 62ch;
+.prompt-readout {
+  margin: 0.5rem 0 0;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.prompt-readout-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--background);
+}
+
+.prompt-readout-bar--top {
+  border-bottom: 1px solid var(--border);
+}
+
+.prompt-readout-bar--bottom {
+  border-top: 1px solid var(--border);
+  justify-content: flex-end;
+}
+
+.prompt-readout-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Full readout — no scroll box. The entire prompt is visible; the page scrolls,
+   not the block. Monospace so it reads as a copyable artifact. */
+.prompt-readout-body {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.prompt-readout-body:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.prompt-status {
+  margin: 0.75rem 0 0;
+  min-height: 1.2em;
+}
+
+.prompt-privacy {
+  margin: 1rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .visually-hidden {
@@ -582,8 +610,7 @@ footer {
     font-size: 1rem;
   }
 
-  .editor-heading,
-  .overlay-header {
+  .editor-heading {
     display: block;
   }
 
@@ -592,16 +619,8 @@ footer {
     margin-top: 1rem;
   }
 
-  .overlay-header .link {
-    margin-top: 0.75rem;
-  }
-
   textarea {
     min-height: 560px;
-  }
-
-  .prompt-textarea {
-    min-height: 360px;
   }
 }
 
