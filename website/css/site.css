@@ -401,3 +401,157 @@ footer {
     min-height: 360px;
   }
 }
+
+/* ==========================================================================
+   Tabbed editor: Form | Markdown | Preview
+   ========================================================================== */
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+
+.tab {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 0.6rem 0.6rem 0 0;
+  padding: 0.65rem 1.1rem;
+  font: inherit;
+  font-weight: 700;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--accent, #4a5cff);
+  outline-offset: 2px;
+}
+
+.tab[aria-selected="true"] {
+  color: var(--text);
+  background: var(--background);
+  border-color: var(--border);
+  border-bottom-color: var(--background);
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-section {
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--background);
+}
+
+.form-section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.form-section-title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.form-section-key {
+  font: 0.8rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: var(--muted);
+}
+
+.form-section .help-text {
+  margin: 0 0 0.75rem;
+}
+
+.form-section textarea {
+  min-height: 8rem;
+}
+
+.form-front-matter {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem 1rem;
+}
+
+.form-front-matter .field-group {
+  min-width: 0;
+}
+
+.form-front-matter input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.55rem;
+  background: var(--background);
+  color: var(--text);
+  font: 0.95rem/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.form-front-matter input:focus-visible {
+  outline: 2px solid var(--accent, #4a5cff);
+  outline-offset: 2px;
+}
+
+@media (max-width: 620px) {
+  .form-front-matter {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metadata-card {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface, #f7f8fb);
+}
+
+.metadata-card[hidden] {
+  display: none;
+}
+
+.metadata-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.metadata-card dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 0.85rem;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.metadata-card dt {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.metadata-card dd {
+  margin: 0;
+  color: var(--text);
+  word-break: break-word;
+}
