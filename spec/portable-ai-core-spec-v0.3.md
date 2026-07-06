@@ -64,7 +64,8 @@ Every PortableAI Document MUST begin with a YAML front-matter block delimited by
 The following `document_type` values are reserved at v0.3:
 
 - `persona` — a PortableAI Persona document (see the Persona spec).
-- `spec` — a PortableAI specification document (used by this repo).
+- `software-project` — a PortableAI Software Project document (see the Software Project spec).
+- `spec` — a PortableAI Spec document (used by this repo).
 - `patch` — **reserved but not implemented in v0.3.** Documents MUST NOT declare `document_type: patch` at v0.3. Implementations MUST reject unknown document types with a warning (not an error) to preserve forward compatibility.
 
 Additional document types MAY be defined in future spec versions.
