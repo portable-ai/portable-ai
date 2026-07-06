@@ -15,6 +15,13 @@
   box-sizing: border-box;
 }
 
+/* The `hidden` attribute must always win, even against later component rules
+   that set an explicit display value (e.g. .empty-state uses display: grid,
+   which would otherwise override the UA `[hidden] { display: none }`). */
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -403,87 +410,184 @@ footer {
 }
 
 /* ==========================================================================
-   Tabbed editor: Form | Markdown | Preview
+   Editor surface: Edit / Read mode toggle
    ========================================================================== */
 
-.tabs {
-  display: flex;
-  gap: 0.25rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 1.25rem;
+.mode-toggle {
+  display: inline-flex;
+  gap: 0;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--background);
+  padding: 0.15rem;
 }
 
-.tab {
+.mode-button {
   appearance: none;
   background: transparent;
   border: 1px solid transparent;
-  border-bottom: none;
-  border-radius: 0.6rem 0.6rem 0 0;
-  padding: 0.65rem 1.1rem;
+  border-radius: 0.45rem;
+  padding: 0.4rem 0.9rem;
   font: inherit;
   font-weight: 700;
   color: var(--muted);
   cursor: pointer;
-  margin-bottom: -1px;
 }
 
-.tab:hover {
+.mode-button:hover {
   color: var(--text);
 }
 
-.tab:focus-visible {
-  outline: 2px solid var(--accent, #4a5cff);
+.mode-button:focus-visible {
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.tab[aria-selected="true"] {
-  color: var(--text);
-  background: var(--background);
-  border-color: var(--border);
-  border-bottom-color: var(--background);
+.mode-button[aria-selected="true"] {
+  color: var(--background);
+  background: var(--text);
 }
 
-.tab-panel[hidden] {
+.mode-panel[hidden] {
   display: none;
 }
 
-.form-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+/* Read-mode type ramp
+   Deliberately tight in PR A: the goal is a document that reads at a glance,
+   not a splash page. Body sits at 0.95rem so headings only nudge up slightly. */
+.preview-content {
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-.form-section {
-  padding: 1rem 1.1rem 1.1rem;
-  border: 1px solid var(--border);
-  border-radius: 0.85rem;
+.preview-content h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  max-width: none;
+  margin: 1.25rem 0 0.5rem;
+}
+
+.preview-content h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 1rem 0 0.4rem;
+}
+
+.preview-content h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0.85rem 0 0.35rem;
+}
+
+.preview-content p {
+  margin: 0.5rem 0;
+}
+
+.preview-content ul,
+.preview-content ol {
+  margin: 0.4rem 0;
+}
+
+/* ==========================================================================
+   Empty state
+   ========================================================================== */
+
+.empty-state {
+  display: grid;
+  gap: 1.25rem;
+  padding: 2rem 1.25rem;
+  border: 1px dashed var(--border);
+  border-radius: 1rem;
   background: var(--background);
 }
 
-.form-section-header {
+.empty-state-primary {
+  text-align: center;
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.empty-state-hint {
+  margin: 0.35rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.empty-state-actions {
   display: flex;
-  align-items: baseline;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.empty-state-secondary {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.85rem;
+  background: var(--surface);
+}
+
+.empty-state-secondary-title {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.empty-state-secondary-hint {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.empty-state-prompt-preview {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--background);
+  color: var(--muted);
+  font: 0.85rem/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  white-space: pre-wrap;
+  max-height: 5.5rem;
+  overflow: hidden;
+}
+
+.empty-state-secondary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ==========================================================================
+   Restore-or-clear banner
+   ========================================================================== */
+
+.restore-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 0.35rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #c9d4ff;
+  border-radius: 0.75rem;
+  background: var(--accent-soft);
+  color: #18223f;
 }
 
-.form-section-title {
+.restore-banner-text {
   margin: 0;
-  font-size: 1.05rem;
+  font-weight: 600;
 }
 
-.form-section-key {
-  font: 0.8rem/1 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  color: var(--muted);
-}
-
-.form-section .help-text {
-  margin: 0 0 0.75rem;
-}
-
-.form-section textarea {
-  min-height: 8rem;
+.restore-banner-actions {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .metadata-card {
@@ -492,18 +596,6 @@ footer {
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background: var(--surface, #f7f8fb);
-}
-
-/* Slightly lighter surface in the Form tab so the read-only card reads as
-   informational without competing with the editable section cards below. */
-.metadata-card--form {
-  background: #fafbfe;
-}
-
-.metadata-card-hint {
-  margin: 0.6rem 0 0;
-  font-size: 0.8rem;
-  color: var(--muted);
 }
 
 .metadata-card[hidden] {
