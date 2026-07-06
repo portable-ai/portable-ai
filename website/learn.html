@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learn more · PortableAI</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+  <main class="page">
+    <nav class="learn-nav" aria-label="Site">
+      <a class="link muted" href="index.html">← Back to the editor</a>
+    </nav>
+
+    <section class="hero" aria-labelledby="learn-title">
+      <h1 id="learn-title">Learn more about PortableAI</h1>
+      <p class="tagline">
+        An open standard for the durable context you want AI to know about you — kept in a Markdown file you own.
+      </p>
+    </section>
+
+    <article class="learn-body">
+      <h2>What it is</h2>
+      <p>
+        PortableAI is an open standard for a small, human-readable Markdown document — a <em>profile</em> —
+        that captures the durable context you want AI systems to know about you.
+        Stable preferences, projects, goals, working style, areas of expertise,
+        and the constraints that shape how you want to be helped.
+      </p>
+      <p>
+        You keep the file. You choose which AI reads it. Any AI that can read Markdown can read a PortableAI profile.
+      </p>
+
+      <h2>Why it exists</h2>
+      <p>
+        Every AI asks you to start over. Preferences you told one assistant last week
+        are invisible to the next one. Long-lived context has to be re-explained on every new tool,
+        every new session, every new provider. That's the problem PortableAI is designed to solve.
+      </p>
+
+      <h2>What's in a profile</h2>
+      <p>
+        A profile is a single Markdown file with a small YAML front-matter header
+        (identity, version, last-updated) followed by well-known sections you can add or remove:
+      </p>
+      <ul>
+        <li><strong>Profile</strong> — who you are and the durable context you want AI to know</li>
+        <li><strong>Preferences</strong> — stable preferences that should shape AI assistance</li>
+        <li><strong>Projects</strong>, <strong>Interests</strong>, <strong>Knowledge &amp; Expertise</strong></li>
+        <li><strong>Decision Style</strong>, <strong>Communication Style</strong></li>
+        <li><strong>AI Guidance</strong> — how you want AI to respond to you</li>
+      </ul>
+      <p>
+        The full list of well-known sections is maintained in the
+        <a class="link" href="https://github.com/refineryllc/portable-ai-working/blob/main/spec/registry/well-known-sections-v1.md">Well-Known Section Registry</a>.
+      </p>
+
+      <h2>How the reference editor works</h2>
+      <p>
+        The editor at PortableAI.org is a reference implementation.
+        It runs entirely in your browser, opens and edits your Markdown profile,
+        and lets you download the result. That's it.
+      </p>
+
+      <h2>Privacy — the Non-Storage Principle</h2>
+      <p>
+        <strong>PortableAI does not store your profile.</strong>
+        The reference editor keeps a working draft in your browser's local storage
+        so you don't lose work between sessions, and clears it when you clear the draft.
+        Nothing is sent to any server operated by PortableAI. No accounts. No sync.
+        No telemetry beyond what static hosting inherently sees (an IP address for the page request).
+      </p>
+      <p>
+        This is not a policy choice we could reverse — it's built into the standard.
+        The full <em>Non-Storage Principle</em> is documented in
+        <a class="link" href="https://github.com/refineryllc/portable-ai-working/blob/main/adr/ADR-0005-non-storage-principle.md">ADR-0005</a>.
+      </p>
+
+      <h2>How you use it</h2>
+      <ol>
+        <li>Draft a profile — either paste one in, load the sample, or ask an AI you already use to draft one for you.</li>
+        <li>Edit it here in the reference editor, or in any Markdown editor you already like.</li>
+        <li>Download the file. Keep it wherever you keep your important files.</li>
+        <li>When you talk to an AI, paste or attach the profile so it starts with your context.</li>
+      </ol>
+
+      <h2>Open source and open standard</h2>
+      <p>
+        The specification, the reference editor, and this site are all open source under the MIT license.
+        Issues, discussions, and contributions live on
+        <a class="link" href="https://github.com/refineryllc/portable-ai-working">GitHub</a>.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        <a class="link" href="mailto:hello@portableai.org">hello@portableai.org</a>
+        <span class="sep" aria-hidden="true">·</span>
+        <a class="link" href="mailto:security@portableai.org">security@portableai.org</a>
+      </p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-meta">
+      PortableAI
+      <span aria-hidden="true"> · </span>
+      open source (<a href="https://github.com/refineryllc/portable-ai-working/blob/main/LICENSE">MIT</a>)
+      <span aria-hidden="true"> · </span>
+      v0.3 draft
+      <span aria-hidden="true"> · </span>
+      <a href="https://github.com/refineryllc/portable-ai-working">GitHub</a>
+    </p>
+    <p class="footer-note">
+      PortableAI is an open standard. The reference editor runs in your browser.
+    </p>
+    <p class="footer-contact">
+      <a href="mailto:hello@portableai.org">hello@portableai.org</a>
+      <span aria-hidden="true"> · </span>
+      <a href="mailto:security@portableai.org">security@portableai.org</a>
+    </p>
+  </footer>
+</body>
+</html>

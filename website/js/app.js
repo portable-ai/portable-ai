@@ -194,7 +194,7 @@ const loadSampleButton = document.querySelector("#load-sample");
 const openFileButton = document.querySelector("#open-file");
 const emptyCopyPromptButton = document.querySelector("#empty-copy-prompt");
 const emptyShowFullButton = document.querySelector("#empty-show-full");
-const emptyPromptPreview = document.querySelector("#empty-state-prompt-preview");
+const togglePromptLengthButton = document.querySelector("#toggle-prompt-length");
 
 const restoreBanner = document.querySelector("#restore-banner");
 const restoreDraftButton = document.querySelector("#restore-draft");
@@ -222,9 +222,9 @@ if (contextExportPromptField) {
 
 // Show the first two lines of the prompt as a preview on the empty state
 // card. Users can expand via "Show full instructions" (opens the overlay).
-if (emptyPromptPreview) {
-  const previewLines = contextExportPrompt.split("\n").slice(0, 2).join("\n");
-  emptyPromptPreview.textContent = previewLines + "\n…";
+if (false) {
+  // (empty-state prompt preview removed in PR A3 — secondary card is copy-only)
+  const previewLines = "";
 }
 
 // Markdown preview rendering.
@@ -660,9 +660,21 @@ fileInput.addEventListener("change", () => loadMarkdownFile(fileInput.files[0]))
 emptyCopyPromptButton.addEventListener("click", copyContextPromptFromEmptyState);
 emptyShowFullButton.addEventListener("click", openContextOverlay);
 
-openContextOverlayButton.addEventListener("click", openContextOverlay);
+if (openContextOverlayButton) {
+  openContextOverlayButton.addEventListener("click", openContextOverlay);
+}
 closeContextOverlayButton.addEventListener("click", closeContextOverlay);
 copyContextPromptButton.addEventListener("click", copyContextPrompt);
+
+// PR A3: collapse the overlay prompt textarea by default so the whole overlay
+// fits on screen. "Show full prompt" expands it in place; "Show less" collapses.
+if (togglePromptLengthButton && contextExportPromptField) {
+  togglePromptLengthButton.addEventListener("click", () => {
+    const collapsed = contextExportPromptField.classList.toggle("prompt-textarea--collapsed");
+    togglePromptLengthButton.textContent = collapsed ? "Show full prompt" : "Show less";
+    togglePromptLengthButton.setAttribute("aria-expanded", String(!collapsed));
+  });
+}
 contextOverlayCloseTargets.forEach((target) => {
   target.addEventListener("click", closeContextOverlay);
 });

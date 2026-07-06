@@ -9,31 +9,23 @@
 <body>
   <main class="page">
     <section class="hero" aria-labelledby="site-title">
-      <h1 id="site-title">Every AI asks you to start over.</h1>
-      <p class="tagline">PortableAI is an open standard that lets you take your profile anywhere.</p>
-      <p class="hero-summary">Keep durable preferences, projects, goals, and working style in a human-readable Markdown profile that you own.</p>
-      <div class="actions" aria-label="Primary actions">
-        <button class="link" type="button" id="open-context-overlay">Ask an AI to draft one</button>
-        <span class="sep" aria-hidden="true">·</span>
-        <a class="link" href="#editor">Open the editor</a>
-      </div>
+      <h1 id="site-title">Every AI needs you to start over.</h1>
+      <p class="tagline">
+        PortableAI is an open standard that lets you take your profile anywhere.
+        <a class="link" href="learn.html">Learn more</a>
+      </p>
     </section>
 
-    <section class="editor-panel" id="editor" aria-labelledby="editor-title">
+    <section class="editor-panel" id="editor" aria-label="Reference editor">
       <div class="editor-heading">
-        <div>
-          <h2 id="editor-title">Edit your profile</h2>
-          <p class="help-text">Your profile is a Markdown file you own. Edit it here, then download it and take it anywhere.</p>
-        </div>
+        <p class="editor-blurb">
+          Your profile is a Markdown file you own. Edit it here, then download and take it anywhere.
+          Your profile is never stored on PortableAI. <a class="link" href="learn.html">Read more</a>
+        </p>
         <div class="editor-toolbar" aria-label="Editor toolbar">
           <button class="link" type="button" id="download-markdown" hidden>Download</button>
         </div>
       </div>
-
-      <section class="privacy-note" aria-labelledby="privacy-title">
-        <h3 id="privacy-title">Privacy and trust</h3>
-        <p>The reference editor runs in your browser. Download the canonical Markdown profile and keep it wherever you choose.</p>
-      </section>
 
       <div class="canonical-editor">
         <!-- Restore-or-clear banner shown when a draft exists in localStorage on load. -->
@@ -61,7 +53,6 @@
           <div class="empty-state-secondary">
             <h4 class="empty-state-secondary-title">Ask an AI to draft one</h4>
             <p class="empty-state-secondary-hint">Send this prompt to any AI you already use. It replies with Markdown you can paste back here.</p>
-            <pre class="empty-state-prompt-preview" id="empty-state-prompt-preview" aria-hidden="true"></pre>
             <div class="empty-state-secondary-actions">
               <button class="link" type="button" id="empty-copy-prompt">Copy prompt</button>
               <span class="sep" aria-hidden="true">·</span>
@@ -108,7 +99,7 @@
       </div>
 
       <p id="context-overlay-description" class="overlay-intro">
-        Send the prompt below to any AI assistant you already use. It will reply with a Markdown profile you can paste back into the editor, or save as a file and open here.
+        Send the prompt below to any AI assistant you already use. It will reply with a Markdown profile you can paste back into the editor, or save as a file and open on PortableAI.org.
       </p>
 
       <ol class="workflow-list">
@@ -119,13 +110,14 @@
       </ol>
 
       <div class="prompt-card">
-        <textarea id="context-export-prompt" class="prompt-textarea" readonly aria-label="Prompt for asking an AI to draft a PortableAI profile"></textarea>
-        <div class="prompt-card-actions">
+        <div class="prompt-card-top">
           <button class="link" type="button" id="copy-context-prompt">Copy prompt</button>
+          <button class="link muted" type="button" id="toggle-prompt-length" aria-expanded="false" aria-controls="context-export-prompt">Show full prompt</button>
         </div>
+        <textarea id="context-export-prompt" class="prompt-textarea prompt-textarea--collapsed" readonly aria-label="Prompt for asking an AI to draft a PortableAI profile"></textarea>
       </div>
 
-      <p class="help-text">
+      <p class="overlay-privacy">
         PortableAI does not connect to your AI accounts or send this prompt anywhere. Copying, reviewing, pasting, loading, and downloading all happen in your browser.
       </p>
       <p id="context-overlay-status" class="save-status" role="status" aria-live="polite"></p>
@@ -133,7 +125,18 @@
   </div>
 
   <footer class="site-footer">
-    <p class="footer-tagline">People should own their context.</p>
+    <p class="footer-meta">
+      PortableAI
+      <span aria-hidden="true"> · </span>
+      open source (<a href="https://github.com/refineryllc/portable-ai-working/blob/main/LICENSE">MIT</a>)
+      <span aria-hidden="true"> · </span>
+      v0.3 draft
+      <span aria-hidden="true"> · </span>
+      <a href="https://github.com/refineryllc/portable-ai-working">GitHub</a>
+    </p>
+    <p class="footer-note">
+      PortableAI is an open standard. The reference editor runs in your browser.
+    </p>
     <p class="footer-contact">
       <a href="mailto:hello@portableai.org">hello@portableai.org</a>
       <span aria-hidden="true"> · </span>
