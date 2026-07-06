@@ -63,6 +63,11 @@ await page.click("#empty-show-full");
 await page.waitForSelector("#context-overlay", { state: "visible" });
 await page.screenshot({ path: path.join(OUT, "05_ai_draft_overlay.png"), fullPage: false });
 
+// 6) Learn page
+await page.goto(url + "/learn.html");
+await page.waitForSelector("#learn-title");
+await page.screenshot({ path: path.join(OUT, "06_learn_page.png"), fullPage: true });
+
 await browser.close();
 server.close();
 console.log("Screenshots written to", OUT);
