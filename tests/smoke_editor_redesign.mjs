@@ -8,6 +8,7 @@
 import { chromium } from "playwright";
 import http from "node:http";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -85,17 +86,17 @@ try {
     "Empty state hint reads 'Load a profile or create a new one'",
   );
   assert(
-    (await page.textContent("#load-sample")).trim() === "Load a sample",
-    "Primary action is 'Load a sample'",
+    (await page.textContent("#load-sample")).trim() === "Load a sample profile",
+    "Primary action is 'Load a sample profile'",
   );
   assert(
     (await page.textContent("#open-profile")).trim() === "Open a profile",
     "Open-file action is labeled 'Open a profile' (#86)",
   );
-  // #86: empty-state primary actions in order: Generate a profile · Open a profile · Load a sample.
+  // #86: empty-state primary actions in order: Generate a profile · Open a profile · Load a sample profile.
   const emptyActionLabels = await page.locator(".empty-state-actions .link").allTextContents();
   assert(
-    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample",
+    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample profile",
     `Empty-state actions are ordered Generate/Open/Load (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
   );
   assert(
@@ -230,6 +231,17 @@ try {
   assert(
     await page.isVisible("#persona-metadata"),
     "Metadata card visible in Read mode",
+  );
+  // #110: the sample must ship with real-ish values — no literal YYYY-MM-DD
+  // placeholder rendered in the metadata card.
+  const metadataText = await page.textContent("#persona-metadata");
+  assert(
+    !metadataText.includes("YYYY-MM-DD"),
+    "Metadata card has no literal YYYY-MM-DD placeholder (#110)",
+  );
+  assert(
+    /\d{4}-\d{2}-\d{2}/.test(metadataText),
+    `Metadata card shows a real ISO date for the sample (#110); got "${metadataText.replace(/\s+/g, " ").trim()}"`,
   );
 
   // Read-mode H1 font size should be small (~1.15rem = 18.4px), not the huge hero size.
@@ -664,7 +676,7 @@ try {
   );
   await page.setViewportSize({ width: 1280, height: 900 });
 
-  // --- Case 16 (#43): footer version + build-date stamp ---
+  // --- Case 16 (#43, #109): footer version + release-date stamp ---
   for (const p of ["index.html", "learn.html", "generate-a-profile.html"]) {
     await page.goto(`${url}/${p}`);
     await page.waitForSelector("#footer-version");
@@ -676,8 +688,8 @@ try {
     const buildText = (await page.textContent("#footer-build")).trim();
     const buildDatetime = await page.getAttribute("#footer-build", "datetime");
     assert(
-      /^Updated /.test(buildText) && buildDatetime === "2026-07-06",
-      `${p}: footer build date stamped (got "${buildText}", datetime="${buildDatetime}")`,
+      /^Released /.test(buildText) && buildDatetime === "2026-07-06",
+      `${p}: footer release date stamped as "Released ..." (#109) (got "${buildText}", datetime="${buildDatetime}")`,
     );
   }
   await page.setViewportSize({ width: 1280, height: 900 });
@@ -753,6 +765,85 @@ try {
     downloadValue.includes("# New section"),
     "New section is preserved in the editor value used for download",
   );
+
+  // --- Case 18 (#105): loading a doc with an integrity block strips it ---
+  const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "pra-integrity-"));
+  const docWithBlock = [
+    "---",
+    "standard: PortableAI Persona",
+    "standard_version: 0.3",
+    "---",
+    "",
+    "# Profile",
+    "",
+    "Durable context about me.",
+    "",
+    "# Notes",
+    "",
+    "Some freeform notes.",
+    "",
+    "<!-- portable-ai:integrity",
+    "hash_algo: sha-256",
+    "hash_scope: body",
+    "hash: 3b1c9fdeadbeef0000e4a2",
+    "generated_at: 2026-07-04T12:34:56Z",
+    "generator: some-other-tool/1.0.0",
+    "-->",
+    "",
+  ].join("\n");
+  const fixturePath = path.join(fixtureDir, "with-integrity.md");
+  fs.writeFileSync(fixturePath, docWithBlock);
+
+  await page.goto(url);
+  await page.waitForSelector("#empty-state", { state: "visible" });
+  // The file input is a hidden, dynamically-created element (#markdown-file).
+  await page.setInputFiles("#markdown-file", fixturePath);
+  await page.waitForSelector("#editor-surface", { state: "visible" });
+
+  const loadedValue = await page.$eval("#persona-editor", (el) => el.value);
+  assert(
+    !loadedValue.includes("portable-ai:integrity"),
+    "Integrity block is stripped from the editor on load",
+  );
+  assert(
+    loadedValue.includes("# Profile") && loadedValue.includes("# Notes"),
+    "Document content is preserved after stripping the integrity block",
+  );
+  const statusText = (await page.textContent("#save-status")).trim();
+  assert(
+    /integrity block/i.test(statusText),
+    `Status explains the removed integrity block (got "${statusText}")`,
+  );
+
+  // The download output must not carry the stale block either.
+  const [dl] = await Promise.all([
+    page.waitForEvent("download"),
+    page.click("#download-markdown"),
+  ]);
+  const dlPath = await dl.path();
+  const dlContent = fs.readFileSync(dlPath, "utf8");
+  assert(
+    !dlContent.includes("portable-ai:integrity"),
+    "Downloaded document does not contain the stale integrity block",
+  );
+
+  // A document with no integrity block loads unchanged (no false positives).
+  const cleanPath = path.join(fixtureDir, "clean.md");
+  fs.writeFileSync(
+    cleanPath,
+    "---\nstandard: PortableAI Persona\n---\n\n# Profile\n\nJust content, no block.\n",
+  );
+  await page.goto(url);
+  await page.waitForSelector("#empty-state", { state: "visible" });
+  await page.setInputFiles("#markdown-file", cleanPath);
+  await page.waitForSelector("#editor-surface", { state: "visible" });
+  const cleanStatus = (await page.textContent("#save-status")).trim();
+  assert(
+    !/integrity block/i.test(cleanStatus),
+    `No integrity message for a document without a block (got "${cleanStatus}")`,
+  );
+
+  fs.rmSync(fixtureDir, { recursive: true, force: true });
 } finally {
   await browser.close();
   server.close();

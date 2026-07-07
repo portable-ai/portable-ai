@@ -41,20 +41,23 @@ function stampFooter() {
     versionEl.textContent = info.version;
   }
 
+  // Release date. Prefer `releaseDate`; fall back to the legacy `buildDate`
+  // field name so nothing breaks if version.js is momentarily out of sync.
+  const releaseDate = info.releaseDate || info.buildDate;
   const buildEl = document.querySelector("#footer-build");
-  if (buildEl && info.buildDate) {
+  if (buildEl && releaseDate) {
     // Render as a machine-readable <time> with a human-friendly label.
-    const d = new Date(info.buildDate + "T00:00:00Z");
+    const d = new Date(releaseDate + "T00:00:00Z");
     const label = Number.isNaN(d.getTime())
-      ? info.buildDate
+      ? releaseDate
       : d.toLocaleDateString(undefined, {
           year: "numeric",
           month: "short",
           day: "numeric",
           timeZone: "UTC",
         });
-    buildEl.setAttribute("datetime", info.buildDate);
-    buildEl.textContent = "Updated " + label;
+    buildEl.setAttribute("datetime", releaseDate);
+    buildEl.textContent = "Released " + label;
   }
 }
 
