@@ -696,13 +696,13 @@ try {
     await page.waitForSelector("#footer-version");
     const ver = (await page.textContent("#footer-version")).trim();
     assert(
-      ver === "v0.3.0-rc.1",
+      ver === "v0.3.0",
       `${p}: footer version stamped from version.js (got "${ver}")`,
     );
     const buildText = (await page.textContent("#footer-build")).trim();
     const buildDatetime = await page.getAttribute("#footer-build", "datetime");
     assert(
-      /^Released /.test(buildText) && buildDatetime === "2026-07-06",
+      /^Released /.test(buildText) && buildDatetime === "2026-07-07",
       `${p}: footer release date stamped as "Released ..." (#109) (got "${buildText}", datetime="${buildDatetime}")`,
     );
   }
