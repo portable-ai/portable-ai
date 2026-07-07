@@ -109,6 +109,15 @@ await page.waitForSelector("#footer-build");
 const footerEl = await page.$(".site-footer");
 await footerEl.screenshot({ path: path.join(OUT, "10_footer.png") });
 
+// 11) Add section (#23): appends an H1 section, lands in Edit at the new heading
+await page.goto(url);
+await page.click("#load-sample");
+await page.waitForSelector("#editor-surface", { state: "visible" });
+await page.click("#add-section");
+await page.waitForSelector("#panel-edit", { state: "visible" });
+await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+await page.screenshot({ path: path.join(OUT, "11_add_section.png"), fullPage: false });
+
 await browser.close();
 server.close();
 console.log("Screenshots written to", OUT);

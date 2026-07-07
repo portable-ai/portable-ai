@@ -155,6 +155,7 @@ const status = document.querySelector("#save-status");
 const copyButton = document.querySelector("#copy-markdown");
 const downloadButton = document.querySelector("#download-markdown");
 const clearButton = document.querySelector("#clear-draft");
+const addSectionButton = document.querySelector("#add-section");
 // The in-app AI-draft flow was removed in favor of the dedicated
 // "Generate a profile" page (generate-a-profile.html). The empty-state link to
 // that page is all that remains in the editor.
@@ -293,6 +294,7 @@ const updateSurfaceVisibility = () => {
   if (downloadButton) downloadButton.hidden = !hasContent;
   if (copyButton) copyButton.hidden = !hasContent;
   if (clearButton) clearButton.hidden = !hasContent;
+  if (addSectionButton) addSectionButton.hidden = !hasContent;
   autoGrowEditor();
   // Rebuild the teleport gutter for whatever just became visible (#83).
   if (typeof refreshGutters === "function") scheduleGutterRefresh();
@@ -390,6 +392,45 @@ const copyTextToClipboard = async (text, fallbackField) => {
 const copyMarkdown = async () => {
   await copyTextToClipboard(editor.value, editor);
   setStatus("Markdown copied to clipboard.");
+};
+
+// Append a new, empty section to the end of the document and drop the cursor on
+// the blank line beneath its heading, ready for typing (#23). Sections are H1
+// (`#`) to match every shipped document and template. We always append to the
+// end — predictable and position-agnostic — rather than guessing an insertion
+// point from the cursor or nearby content. The heading text is plain
+// "New section"; per ADR-0007 its key is just derived from whatever the author
+// renames it to, so there is nothing else to wire up here.
+const SECTION_HEADING_PLACEHOLDER = "New section";
+const addSection = () => {
+  // Make sure the editor surface is showing (an all-whitespace or empty editor
+  // sits behind the empty state); adding a section is a create action.
+  const base = editor.value.replace(/\s+$/, "");
+  const heading = `# ${SECTION_HEADING_PLACEHOLDER}`;
+  // One blank line between the previous content and the new heading, then a
+  // blank line under the heading where the cursor lands. When the editor is
+  // empty, skip the leading separator so we don't start the file with blanks.
+  const prefix = base.length ? `${base}\n\n` : "";
+  const nextValue = `${prefix}${heading}\n\n`;
+  editor.value = nextValue;
+
+  // Reveal the editor surface + action buttons and grow the textarea to fit.
+  updateSurfaceVisibility();
+  // Switch to Edit so the cursor is on a real, visible textarea.
+  activateMode("mode-edit");
+  autoGrowEditor();
+
+  // Place the caret on the blank line beneath the new heading, ready for input.
+  const caret = nextValue.length;
+  editor.focus();
+  editor.setSelectionRange(caret, caret);
+  // Keep the freshly added section in view.
+  if (typeof editor.scrollIntoView === "function") {
+    editor.scrollIntoView({ block: "end", behavior: "auto" });
+  }
+
+  saveDraft();
+  setStatus('New section added \u2014 type a heading name over "New section".');
 };
 
 const loadMarkdownFile = async (file) => {
@@ -871,6 +912,7 @@ editor.addEventListener("input", () => {
 
 copyButton.addEventListener("click", copyMarkdown);
 downloadButton.addEventListener("click", downloadMarkdown);
+if (addSectionButton) addSectionButton.addEventListener("click", addSection);
 loadSampleButton.addEventListener("click", loadSampleTemplate);
 openProfileButton.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", () => loadMarkdownFile(fileInput.files[0]));
