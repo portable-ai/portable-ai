@@ -26,7 +26,7 @@ These must be complete (or explicitly waived) before the public announcement.
 - [x] "Learn" page explains the standard
 - [x] Responsive header with mobile navigation
 - [ ] Website polish pass — typography, spacing, mobile layout, accessible controls (#35)
-- [ ] Informative footer with project origin, version, and build timestamp (#43)
+- [x] Informative footer with version and build date (#43) — place-of-origin line intentionally omitted to keep the footer quiet
 - [ ] Cross-page wording is consistent ("profile", "profile type", "Generate a profile")
 
 ### Reference editor (Epic #15)
