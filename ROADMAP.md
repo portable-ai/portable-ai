@@ -15,18 +15,18 @@
 - Clarify derived AI-specific exports.
 - Create a starter template and example PortableAI Document.
 
-## v0.3 — Reference Editor
+## v0.3 — First Public Draft (Reference Editor)
 
 - Build a static website for creating, loading, editing, and exporting PortableAI Documents.
 - Require no login for basic use.
 - Support custom sections.
 - Export canonical Markdown.
+- Deploy the site via GitHub Pages.
 
 ## Future
 
 - JSON export
 - AI-specific exports
 - Validation tooling
-- GitHub Pages deployment
 - Import helpers
 - Community extensions
