@@ -86,17 +86,17 @@ try {
     "Empty state hint reads 'Load a profile or create a new one'",
   );
   assert(
-    (await page.textContent("#load-sample")).trim() === "Load a sample",
-    "Primary action is 'Load a sample'",
+    (await page.textContent("#load-sample")).trim() === "Load a sample profile",
+    "Primary action is 'Load a sample profile'",
   );
   assert(
     (await page.textContent("#open-profile")).trim() === "Open a profile",
     "Open-file action is labeled 'Open a profile' (#86)",
   );
-  // #86: empty-state primary actions in order: Generate a profile · Open a profile · Load a sample.
+  // #86: empty-state primary actions in order: Generate a profile · Open a profile · Load a sample profile.
   const emptyActionLabels = await page.locator(".empty-state-actions .link").allTextContents();
   assert(
-    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample",
+    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample profile",
     `Empty-state actions are ordered Generate/Open/Load (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
   );
   assert(
