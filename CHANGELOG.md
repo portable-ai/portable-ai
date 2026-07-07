@@ -13,6 +13,7 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
 - `SECURITY.md` — security policy and vulnerability reporting process
 - `CHANGELOG.md` — this file
 - ADR-0005: Non-Storage Principle
+- `GOVERNANCE.md` **Spec Change Process** section (#55) — distinguishes non-breaking (issue → discuss → PR → merge) from breaking changes (version bump + ADR + 14-day discussion window), states when an ADR is required (any change to core principles), documents current single-maintainer merge authority honestly, and describes how new contributors and maintainers come in
 - ADR-0006: Every Profile Type Ships a Reference Sample — every supported profile type must ship at least one spec-valid sample under `examples/profiles/`. Supersedes the fixed "at least five samples" target with per-type coverage; the current Persona and Software Project samples satisfy it (#36, #78)
 - `ai/codex-bootstrap.md` — moved from repo root (was `portable-ai.md`) for clarity
 - **Core spec v0.3 (DRAFT)** — `spec/portable-ai-core-spec-v0.3.md` — shared envelope for all PortableAI documents: canonical format, front-matter identity, sections, integrity block, Non-Storage Principle, versioning (#45, #46, #48, #49)
