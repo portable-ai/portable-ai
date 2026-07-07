@@ -1,6 +1,6 @@
 # Code of Conduct
 
-Portable AI is intended to be a welcoming, constructive project.
+PortableAI is intended to be a welcoming, constructive project.
 
 Participants are expected to:
 

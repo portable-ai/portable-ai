@@ -103,6 +103,12 @@ await mpage.waitForSelector("#site-nav .site-nav-link", { state: "visible" });
 await mpage.screenshot({ path: path.join(OUT, "07_header_mobile.png"), fullPage: false });
 await mobile.close();
 
+// 10) Footer with version + build date (#43)
+await page.goto(url);
+await page.waitForSelector("#footer-build");
+const footerEl = await page.$(".site-footer");
+await footerEl.screenshot({ path: path.join(OUT, "10_footer.png") });
+
 await browser.close();
 server.close();
 console.log("Screenshots written to", OUT);
