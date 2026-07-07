@@ -49,6 +49,21 @@ await page.waitForSelector("#panel-read", { state: "visible" });
 await page.locator("#editor").scrollIntoViewIfNeeded();
 await page.screenshot({ path: path.join(OUT, "03_read_mode.png"), fullPage: true });
 
+// 8) Teleport gutter (#83) — Read view, a margin bar hovered/lit.
+await page.waitForSelector("#gutter-read .gutter-bar");
+await page.evaluate(() => window.scrollTo(0, 0));
+await page.hover('#gutter-read .gutter-bar[data-block-index="2"]');
+await page.waitForTimeout(120);
+await page.screenshot({ path: path.join(OUT, "08_gutter_read_hover.png"), fullPage: false });
+
+// 9) Teleport gutter (#83) — Edit view, a margin bar hovered/lit.
+await page.click("#mode-edit");
+await page.waitForSelector("#gutter-edit .gutter-bar");
+await page.evaluate(() => window.scrollTo(0, 0));
+await page.hover('#gutter-edit .gutter-bar[data-block-index="2"]');
+await page.waitForTimeout(120);
+await page.screenshot({ path: path.join(OUT, "09_gutter_edit_hover.png"), fullPage: false });
+
 // 4) Restore-or-clear banner
 await page.reload();
 await page.waitForSelector("#restore-banner", { state: "visible" });

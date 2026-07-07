@@ -274,6 +274,18 @@ const hasEditorContent = () => editor.value.trim().length > 0;
 // Show/hide the empty state vs editor surface based on whether the editor
 // currently has any content. Also toggles action buttons in the header/footer
 // so the empty state stays uncluttered.
+// Grow the Edit textarea to fit its content so it never scrolls internally —
+// the whole page scrolls instead. This keeps Edit and Read in one coordinate
+// space, which makes the teleport gutter (#83) simple and accurate. Called on
+// input, on programmatic value changes, and when Edit mode becomes visible
+// (a hidden textarea reports scrollHeight 0, so we must resize once shown).
+const autoGrowEditor = () => {
+  if (!editor) return;
+  if (editor.offsetParent === null && !editor.clientHeight) return; // hidden
+  editor.style.height = "auto";
+  editor.style.height = `${editor.scrollHeight}px`;
+};
+
 const updateSurfaceVisibility = () => {
   const hasContent = hasEditorContent();
   if (emptyState) emptyState.hidden = hasContent;
@@ -281,6 +293,9 @@ const updateSurfaceVisibility = () => {
   if (downloadButton) downloadButton.hidden = !hasContent;
   if (copyButton) copyButton.hidden = !hasContent;
   if (clearButton) clearButton.hidden = !hasContent;
+  autoGrowEditor();
+  // Rebuild the teleport gutter for whatever just became visible (#83).
+  if (typeof refreshGutters === "function") scheduleGutterRefresh();
 };
 
 const saveDraft = () => {
@@ -483,11 +498,15 @@ const FRONT_MATTER_RE = /^---\s*\r?\n([\s\S]*?)\r?\n---\s*(?:\r?\n|$)/;
 const splitFrontMatter = (source) => {
   const match = source.match(FRONT_MATTER_RE);
   if (!match) {
-    return { frontMatterEntries: [], body: source };
+    return { frontMatterEntries: [], body: source, frontMatterLineCount: 0 };
   }
+  // Count the lines the front-matter block (and its closing fence) consumed so
+  // the teleport gutter can map body block lines back to full-document lines.
+  const frontMatterLineCount = (match[0].match(/\n/g) || []).length;
   return {
     frontMatterEntries: parseFrontMatter(match[1]),
     body: source.slice(match[0].length),
+    frontMatterLineCount,
   };
 };
 
@@ -512,17 +531,286 @@ const updateMetadataCard = () => {
   metadataCard.hidden = false;
 };
 
+// Shared block map for the teleport gutter (#83). Each entry is one top-level
+// Markdown block: its index (shared between Edit and Read), the source line it
+// starts on (for the Edit-view textarea), and the count of source lines it
+// spans. Recomputed whenever the document changes.
+let blockMap = [];
+
+const computeBlockMap = (body) => {
+  blockMap = [];
+  if (!markedInstance || typeof markedInstance.lexer !== "function") return;
+  let tokens;
+  try {
+    tokens = markedInstance.lexer(body);
+  } catch {
+    return;
+  }
+  // Walk top-level tokens, tracking the char offset so we can map each block to
+  // the source line it begins on. `space` tokens are blank-line gaps between
+  // blocks and get no bar of their own.
+  let charOffset = 0;
+  let index = 0;
+  for (const token of tokens) {
+    if (token.type === "space") {
+      charOffset += token.raw.length;
+      continue;
+    }
+    const startLine = body.slice(0, charOffset).split("\n").length - 1;
+    const lineSpan = Math.max(1, (token.raw.match(/\n/g) || []).length);
+    blockMap.push({ index, startLine, lineSpan });
+    charOffset += token.raw.length;
+    index += 1;
+  }
+};
+
 renderPreview = () => {
   const { body } = splitFrontMatter(editor.value);
   preview.innerHTML = renderMarkdown(body);
+  // Tag each rendered top-level block with its shared block index so the Read
+  // gutter can line a bar up with it (#83).
+  computeBlockMap(body);
+  const children = Array.from(preview.children);
+  children.forEach((el, i) => {
+    el.setAttribute("data-block-index", String(i));
+  });
   updateMetadataCard();
 };
+
+// ---------------------------------------------------------------------------
+// Teleport gutter (#83)
+// A quiet left-margin affordance. Each top-level Markdown block gets an
+// invisible, focusable bar in the margin; hovering lights it, and clicking (or
+// Enter/Space) switches Edit<->Read and lands on the same block at roughly the
+// same on-screen position. Clicking the text/preview body never toggles mode.
+// ---------------------------------------------------------------------------
+
+const gutterEdit = document.querySelector("#gutter-edit");
+const gutterRead = document.querySelector("#gutter-read");
+
+// Measure the pixel geometry of each block in the currently visible view so we
+// can place a margin bar over it. Returns [{ index, top, height }] in the
+// panel's coordinate space (matching the absolutely-positioned gutter).
+const measureReadBlocks = () => {
+  if (!panelRead || panelRead.hidden) return [];
+  const panelBox = panelRead.getBoundingClientRect();
+  const rects = [];
+  for (const el of preview.querySelectorAll("[data-block-index]")) {
+    const idx = Number(el.getAttribute("data-block-index"));
+    const box = el.getBoundingClientRect();
+    rects.push({ index: idx, top: box.top - panelBox.top, height: box.height });
+  }
+  return rects;
+};
+
+// A hidden "mirror" div that replicates the textarea's box, font, padding, and
+// wrapping so we can measure exactly where each block starts and ends on screen
+// — accurately, even when long lines wrap to several visual rows. Line-height
+// math alone can't do this once text wraps. Created lazily.
+let editMirror = null;
+const syncMirrorStyle = () => {
+  if (!editMirror) {
+    editMirror = document.createElement("div");
+    editMirror.setAttribute("aria-hidden", "true");
+    // position:relative so child marker offsetTop is measured from the mirror's
+    // own padding box — matching where the textarea's text content begins.
+    editMirror.style.position = "absolute";
+    editMirror.style.visibility = "hidden";
+    editMirror.style.pointerEvents = "none";
+    editMirror.style.top = "0";
+    editMirror.style.left = "-99999px";
+    editMirror.style.whiteSpace = "pre-wrap";
+    editMirror.style.wordWrap = "break-word";
+    editMirror.style.overflow = "hidden";
+    document.body.appendChild(editMirror);
+  }
+  const cs = window.getComputedStyle(editor);
+  for (const prop of [
+    "boxSizing", "width", "paddingTop", "paddingRight", "paddingBottom",
+    "paddingLeft", "borderTopWidth", "borderRightWidth", "borderBottomWidth",
+    "borderLeftWidth", "fontFamily", "fontSize", "fontWeight", "lineHeight",
+    "letterSpacing", "textTransform", "tabSize",
+  ]) {
+    editMirror.style[prop] = cs[prop];
+  }
+  editMirror.style.width = `${editor.clientWidth}px`;
+};
+
+// For the Edit view, measure each block's real pixel span via the mirror.
+// The textarea is auto-height (autoGrowEditor) so it never scrolls internally
+// and shows all content — every block gets a bar, no viewport clipping, no
+// scrollTop math. Positions are panel-relative.
+const measureEditBlocks = () => {
+  if (!panelEdit || panelEdit.hidden) return [];
+  // Edit mode never calls renderPreview, so refresh the shared block map first.
+  computeBlockMap(splitFrontMatter(editor.value).body);
+  if (!blockMap.length) return [];
+  syncMirrorStyle();
+
+  const { frontMatterLineCount } = splitFrontMatter(editor.value);
+  const fmLines = frontMatterLineCount || 0;
+  const docLines = editor.value.split("\n");
+
+  // Rebuild the mirror as the FULL document text, verbatim, with zero-width
+  // marker <span>s inserted at each block's start line (and one at the end).
+  // Measuring markers by offsetTop avoids the inline-span wrap-boundary
+  // inaccuracies that caused cumulative drift: the marker sits exactly on the
+  // text row where the block begins, so its offsetTop is the block's true top.
+  const markerLines = blockMap.map((b) => fmLines + b.startLine);
+  const markerSet = new Map();
+  markerLines.forEach((docLine, i) => markerSet.set(docLine, blockMap[i].index));
+
+  let html = "";
+  for (let ln = 0; ln < docLines.length; ln += 1) {
+    if (markerSet.has(ln)) {
+      html += `<span class="mk" data-block="${markerSet.get(ln)}"></span>`;
+    }
+    html += escapeHtml(docLines[ln]);
+    if (ln < docLines.length - 1) html += "\n";
+  }
+  // Trailing marker so the last block gets a measurable bottom.
+  html += `<span class="mk" data-block="__end__"></span>`;
+  editMirror.innerHTML = html;
+
+  const panelBox = panelEdit.getBoundingClientRect();
+  const taBox = editor.getBoundingClientRect();
+  // Marker offsetTop is measured from the mirror's border-box top, and the
+  // mirror replicates the textarea's border+padding, so offsetTop already
+  // includes them. Aligning the mirror's border-box top with the textarea's
+  // border-box top in panel space is all that's needed (no scroll to subtract).
+  const contentTop = taBox.top - panelBox.top;
+
+  // Collect marker offsetTops (relative to the mirror's border box).
+  const markers = Array.from(editMirror.querySelectorAll("span.mk"));
+  const tops = new Map();
+  let endTop = 0;
+  for (const m of markers) {
+    const key = m.getAttribute("data-block");
+    if (key === "__end__") { endTop = m.offsetTop; continue; }
+    tops.set(Number(key), m.offsetTop);
+  }
+
+  const rects = [];
+  for (let i = 0; i < blockMap.length; i += 1) {
+    const idx = blockMap[i].index;
+    if (!tops.has(idx)) continue;
+    const startWithin = tops.get(idx);
+    const nextIdx = i + 1 < blockMap.length ? blockMap[i + 1].index : null;
+    const endWithin = nextIdx !== null && tops.has(nextIdx)
+      ? tops.get(nextIdx)
+      : endTop;
+    const top = contentTop + startWithin;
+    const height = Math.max(0, endWithin - startWithin);
+    if (height <= 1) continue;
+    rects.push({ index: idx, top, height });
+  }
+  return rects;
+};
+
+// Build the bars for one gutter from a rect list. Each bar is a real <button>
+// so it's keyboard-focusable and announces its purpose.
+const buildGutter = (gutterEl, rects, targetModeId) => {
+  if (!gutterEl) return;
+  gutterEl.innerHTML = "";
+  if (!rects.length) return;
+  const destLabel = targetModeId === "mode-read" ? "Read" : "Edit";
+  for (const r of rects) {
+    if (r.height <= 0) continue;
+    const bar = document.createElement("button");
+    bar.type = "button";
+    bar.className = "gutter-bar";
+    bar.style.top = `${r.top}px`;
+    bar.style.height = `${Math.max(2, r.height - 2)}px`;
+    bar.setAttribute("data-block-index", String(r.index));
+    bar.setAttribute("aria-label", `Jump to this section in ${destLabel} view`);
+    bar.tabIndex = 0;
+    const anchorFrom = (clientY) => {
+      const box = bar.getBoundingClientRect();
+      return typeof clientY === "number" ? clientY : box.top + box.height / 2;
+    };
+    bar.addEventListener("click", (event) => {
+      event.preventDefault();
+      activateMode(targetModeId, { blockIndex: r.index, anchorY: anchorFrom(event.clientY) });
+    });
+    gutterEl.appendChild(bar);
+  }
+};
+
+// Rebuild whichever gutter belongs to the visible view. The Edit gutter
+// teleports to Read; the Read gutter teleports to Edit.
+const refreshGutters = () => {
+  if (!editorSurface || editorSurface.hidden) return;
+  if (panelEdit && !panelEdit.hidden) {
+    buildGutter(gutterEdit, measureEditBlocks(), "mode-read");
+    if (gutterRead) gutterRead.innerHTML = "";
+  } else if (panelRead && !panelRead.hidden) {
+    buildGutter(gutterRead, measureReadBlocks(), "mode-edit");
+    if (gutterEdit) gutterEdit.innerHTML = "";
+  }
+};
+
+// After switching modes, scroll the destination so the target block sits at
+// roughly the same viewport Y the user clicked from.
+const teleportToBlock = (modeId, blockIndex, anchorY) => {
+  if (modeId === "mode-read") {
+    const el = preview.querySelector(`[data-block-index="${blockIndex}"]`);
+    if (!el) return;
+    const box = el.getBoundingClientRect();
+    const targetY = typeof anchorY === "number" ? anchorY : window.innerHeight * 0.3;
+    window.scrollBy({ top: box.top - targetY, behavior: "auto" });
+  } else {
+    // Edit view: place the caret at the block's start line, then scroll the
+    // PAGE so that block sits at roughly the same viewport Y the user clicked
+    // from. The textarea is auto-height and never scrolls internally, so the
+    // gutter bar's own position tells us exactly where the block is on screen.
+    const b = blockMap[blockIndex];
+    if (!b) return;
+    const lines = editor.value.split("\n");
+    // Account for stripped front matter: find the block's line within the full
+    // document by matching the body offset back onto the textarea text.
+    const { frontMatterLineCount } = splitFrontMatter(editor.value);
+    const docLine = (frontMatterLineCount || 0) + b.startLine;
+    const charIndex = lines.slice(0, docLine).join("\n").length + (docLine > 0 ? 1 : 0);
+    editor.focus();
+    try {
+      editor.setSelectionRange(charIndex, charIndex);
+    } catch {
+      /* selection may fail if the element isn't focusable yet; non-fatal */
+    }
+    // Rebuild the gutter so the Edit bar for this block exists, then align it.
+    refreshGutters();
+    const bar = gutterEdit
+      ? gutterEdit.querySelector(`.gutter-bar[data-block-index="${blockIndex}"]`)
+      : null;
+    const targetY = typeof anchorY === "number" ? anchorY : window.innerHeight * 0.3;
+    if (bar) {
+      const box = bar.getBoundingClientRect();
+      window.scrollBy({ top: box.top - targetY, behavior: "auto" });
+    }
+  }
+};
+
+// Reposition bars on scroll/resize (positions are relative to the panel).
+let gutterRaf = 0;
+const scheduleGutterRefresh = () => {
+  if (gutterRaf) return;
+  gutterRaf = window.requestAnimationFrame(() => {
+    gutterRaf = 0;
+    refreshGutters();
+  });
+};
+window.addEventListener("scroll", scheduleGutterRefresh, { passive: true });
+window.addEventListener("resize", scheduleGutterRefresh);
+if (editor) editor.addEventListener("scroll", scheduleGutterRefresh, { passive: true });
 
 // ---------------------------------------------------------------------------
 // Mode switching: Edit / Read
 // ---------------------------------------------------------------------------
 
-const activateMode = (modeId) => {
+// activateMode switches the visible panel. `teleport`, when provided, carries a
+// block index and the viewport Y the user clicked from, so the destination view
+// can scroll the same block to roughly the same on-screen position (#83).
+const activateMode = (modeId, teleport = null) => {
   for (const btn of modeButtons) {
     if (!btn) continue;
     const selected = btn.id === modeId;
@@ -533,6 +821,11 @@ const activateMode = (modeId) => {
   if (panelRead) panelRead.hidden = modeId !== "mode-read";
   if (modeId === "mode-read") {
     renderPreview();
+  }
+  // Rebuild both gutters for the newly visible layout, then teleport if asked.
+  refreshGutters();
+  if (teleport && typeof teleport.blockIndex === "number") {
+    teleportToBlock(modeId, teleport.blockIndex, teleport.anchorY);
   }
 };
 
@@ -570,6 +863,7 @@ for (const btn of modeButtons) {
 
 editor.addEventListener("input", () => {
   saveDraft();
+  autoGrowEditor();
   updateSurfaceVisibility();
   // Read-mode preview refreshes lazily when the user switches modes; no need
   // to re-render on every keystroke while they're in Edit mode.
