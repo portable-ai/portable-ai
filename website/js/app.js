@@ -330,12 +330,45 @@ const updatePreview = () => {
   }
 };
 
+// Detect and strip a PortableAI integrity block (Core Spec §7) from a loaded
+// document. The block is an HTML comment that opens with `<!-- portable-ai:integrity`
+// and, when present, is the last non-empty content in the document.
+//
+// This editor does not compute or verify hashes, so per Core Spec §10 it MUST
+// NOT leave a stale integrity block in a document it has edited ("remove the
+// block on save rather than leave a stale hash"). The block is derived content
+// (ADR-0003), so dropping it loses nothing semantic — it will be recomputed by
+// whatever tool produces a fresh export. Stripping on load also keeps every
+// edit safe by construction: there is never a block in the working document to
+// invalidate or to append past (e.g. via "Add section").
+//
+// We remove the trailing block and any whitespace between it and the preceding
+// content, then restore a single trailing newline. Matching is anchored to the
+// end of the document and is deliberately conservative: we only strip a block
+// that is the last non-empty content, matching the spec's placement rule.
+const INTEGRITY_BLOCK_AT_END = /\n*<!--\s*portable-ai:integrity[\s\S]*?-->\s*$/;
+const stripIntegrityBlock = (value) => {
+  if (!INTEGRITY_BLOCK_AT_END.test(value)) {
+    return { text: value, stripped: false };
+  }
+  const text = value.replace(INTEGRITY_BLOCK_AT_END, "").replace(/\s+$/, "") + "\n";
+  return { text, stripped: true };
+};
+
+// Sets the editor content for every load path (sample, file, restored draft).
+// Strips any stale integrity block first (see above) and reports whether it did
+// so, letting the caller surface a message. Returns { strippedIntegrity }.
 const setEditorValue = (value) => {
-  editor.value = value;
+  const { text, stripped } = stripIntegrityBlock(value);
+  editor.value = text;
   saveDraft();
   updatePreview();
   updateSurfaceVisibility();
+  return { strippedIntegrity: stripped };
 };
+
+const INTEGRITY_STRIPPED_NOTE =
+  "Removed a stale integrity block \u2014 this editor doesn't recompute hashes, so it'll be regenerated when you next export from a tool that does.";
 
 const loadSampleTemplate = () => {
   if (
@@ -449,8 +482,12 @@ const loadMarkdownFile = async (file) => {
 
   try {
     const text = await file.text();
-    setEditorValue(text);
-    setStatus(`Loaded ${file.name} into the editor. Draft saved locally in this browser.`);
+    const { strippedIntegrity } = setEditorValue(text);
+    setStatus(
+      strippedIntegrity
+        ? `Loaded ${file.name}. ${INTEGRITY_STRIPPED_NOTE}`
+        : `Loaded ${file.name} into the editor. Draft saved locally in this browser.`,
+    );
   } catch {
     setStatus("Could not load the selected Markdown file.");
   } finally {
@@ -483,8 +520,12 @@ const applyRestoreBannerState = () => {
 
 const restorePendingDraft = () => {
   if (pendingDraft !== null) {
-    setEditorValue(pendingDraft);
-    setStatus("Restored a local draft from this browser.");
+    const { strippedIntegrity } = setEditorValue(pendingDraft);
+    setStatus(
+      strippedIntegrity
+        ? `Restored a local draft. ${INTEGRITY_STRIPPED_NOTE}`
+        : "Restored a local draft from this browser.",
+    );
   }
   if (restoreBanner) restoreBanner.hidden = true;
 };

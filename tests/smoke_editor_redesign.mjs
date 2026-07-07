@@ -8,6 +8,7 @@
 import { chromium } from "playwright";
 import http from "node:http";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -753,6 +754,85 @@ try {
     downloadValue.includes("# New section"),
     "New section is preserved in the editor value used for download",
   );
+
+  // --- Case 18 (#105): loading a doc with an integrity block strips it ---
+  const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "pra-integrity-"));
+  const docWithBlock = [
+    "---",
+    "standard: PortableAI Persona",
+    "standard_version: 0.3",
+    "---",
+    "",
+    "# Profile",
+    "",
+    "Durable context about me.",
+    "",
+    "# Notes",
+    "",
+    "Some freeform notes.",
+    "",
+    "<!-- portable-ai:integrity",
+    "hash_algo: sha-256",
+    "hash_scope: body",
+    "hash: 3b1c9fdeadbeef0000e4a2",
+    "generated_at: 2026-07-04T12:34:56Z",
+    "generator: some-other-tool/1.0.0",
+    "-->",
+    "",
+  ].join("\n");
+  const fixturePath = path.join(fixtureDir, "with-integrity.md");
+  fs.writeFileSync(fixturePath, docWithBlock);
+
+  await page.goto(url);
+  await page.waitForSelector("#empty-state", { state: "visible" });
+  // The file input is a hidden, dynamically-created element (#markdown-file).
+  await page.setInputFiles("#markdown-file", fixturePath);
+  await page.waitForSelector("#editor-surface", { state: "visible" });
+
+  const loadedValue = await page.$eval("#persona-editor", (el) => el.value);
+  assert(
+    !loadedValue.includes("portable-ai:integrity"),
+    "Integrity block is stripped from the editor on load",
+  );
+  assert(
+    loadedValue.includes("# Profile") && loadedValue.includes("# Notes"),
+    "Document content is preserved after stripping the integrity block",
+  );
+  const statusText = (await page.textContent("#save-status")).trim();
+  assert(
+    /integrity block/i.test(statusText),
+    `Status explains the removed integrity block (got "${statusText}")`,
+  );
+
+  // The download output must not carry the stale block either.
+  const [dl] = await Promise.all([
+    page.waitForEvent("download"),
+    page.click("#download-markdown"),
+  ]);
+  const dlPath = await dl.path();
+  const dlContent = fs.readFileSync(dlPath, "utf8");
+  assert(
+    !dlContent.includes("portable-ai:integrity"),
+    "Downloaded document does not contain the stale integrity block",
+  );
+
+  // A document with no integrity block loads unchanged (no false positives).
+  const cleanPath = path.join(fixtureDir, "clean.md");
+  fs.writeFileSync(
+    cleanPath,
+    "---\nstandard: PortableAI Persona\n---\n\n# Profile\n\nJust content, no block.\n",
+  );
+  await page.goto(url);
+  await page.waitForSelector("#empty-state", { state: "visible" });
+  await page.setInputFiles("#markdown-file", cleanPath);
+  await page.waitForSelector("#editor-surface", { state: "visible" });
+  const cleanStatus = (await page.textContent("#save-status")).trim();
+  assert(
+    !/integrity block/i.test(cleanStatus),
+    `No integrity message for a document without a block (got "${cleanStatus}")`,
+  );
+
+  fs.rmSync(fixtureDir, { recursive: true, force: true });
 } finally {
   await browser.close();
   server.close();
