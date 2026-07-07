@@ -232,6 +232,17 @@ try {
     await page.isVisible("#persona-metadata"),
     "Metadata card visible in Read mode",
   );
+  // #110: the sample must ship with real-ish values — no literal YYYY-MM-DD
+  // placeholder rendered in the metadata card.
+  const metadataText = await page.textContent("#persona-metadata");
+  assert(
+    !metadataText.includes("YYYY-MM-DD"),
+    "Metadata card has no literal YYYY-MM-DD placeholder (#110)",
+  );
+  assert(
+    /\d{4}-\d{2}-\d{2}/.test(metadataText),
+    `Metadata card shows a real ISO date for the sample (#110); got "${metadataText.replace(/\s+/g, " ").trim()}"`,
+  );
 
   // Read-mode H1 font size should be small (~1.15rem = 18.4px), not the huge hero size.
   const h1FontSize = await page.$eval(
