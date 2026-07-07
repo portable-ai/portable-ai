@@ -8,7 +8,7 @@ standard: PortableAI Persona
 standard_version: 0.3
 profile_name: My PortableAI Profile
 profile_version: 1.0.0
-last_updated: YYYY-MM-DD
+last_updated: 2026-07-07
 ---
 
 # Profile
