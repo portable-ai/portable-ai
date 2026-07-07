@@ -481,6 +481,20 @@ textarea {
   line-height: 1.5;
 }
 
+/* Empty-state "Load a template" picker: a quiet label above a row of
+   profile-type pills (reusing .type-options / .type-option). */
+.template-loader {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.template-loader-label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .prompt-readout {
   margin: 0.5rem 0 0;
   border: 1px solid var(--border);

@@ -55,6 +55,17 @@ function assert(cond, label) {
   console.log(`${mark} ${label}`);
 }
 
+// Load the Persona template via the empty-state type picker and wait for the
+// fetched .md to populate the editor (templates are fetched, not embedded).
+async function loadPersonaTemplate(page) {
+  page.once("dialog", (d) => d.accept()); // in case a replace-confirm appears
+  await page.click('#template-options [data-type="persona"]');
+  await page.waitForFunction(
+    () => document.querySelector("#persona-editor").value.includes("standard: PortableAI Persona"),
+    { timeout: 5000 },
+  );
+}
+
 const { server, url } = await serve(SITE_ROOT);
 const browser = await chromium.launch();
 const context = await browser.newContext();
@@ -86,18 +97,31 @@ try {
     "Empty state hint reads 'Load a profile or create a new one'",
   );
   assert(
-    (await page.textContent("#load-sample")).trim() === "Load a sample",
-    "Primary action is 'Load a sample' (#123 — shortened from 'Load a sample profile')",
-  );
-  assert(
     (await page.textContent("#open-profile")).trim() === "Open a profile",
     "Open-file action is labeled 'Open a profile' (#86)",
   );
-  // #86: empty-state primary actions in order: Generate a profile · Open a profile · Load a sample profile.
+  // Empty-state link actions are now Generate + Open; templates load from the
+  // type picker below (Load a template).
   const emptyActionLabels = await page.locator(".empty-state-actions .link").allTextContents();
   assert(
-    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample",
-    `Empty-state actions are ordered Generate/Open/Load (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
+    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile",
+    `Empty-state actions are Generate/Open (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
+  );
+  // Template loader: a quiet 'Load a template' label + one pill per profile
+  // type, built data-driven from js/templates.js.
+  assert(
+    (await page.textContent("#template-loader-label")).trim() === "Load a template",
+    "Template loader is labeled 'Load a template'",
+  );
+  const templateTypeLabels = await page.locator("#template-options .type-option").allTextContents();
+  assert(
+    templateTypeLabels.map((t) => t.trim()).join(" | ") === "Persona | Software Project",
+    `Template picker offers Persona + Software Project (got ${templateTypeLabels.map((t) => t.trim()).join(" | ")})`,
+  );
+  assert(
+    (await page.locator('#template-options [data-type="persona"]').count()) === 1 &&
+      (await page.locator('#template-options [data-type="software-project"]').count()) === 1,
+    "Template picker exposes data-type for persona and software-project",
   );
   // #123: plain link buttons, no middot separators between entry actions.
   assert(
@@ -181,16 +205,18 @@ try {
     "Old form-fields container is gone",
   );
 
-  // --- Case 2: click 'Load a sample' → editor surface visible with Edit/Read ---
-  await page.click("#load-sample");
+  // --- Case 2: load the Persona template → editor surface visible with Edit/Read ---
+  // The template body is fetched from templates/*.md, so wait for the editor to
+  // populate rather than assuming a synchronous load.
+  await loadPersonaTemplate(page);
   await page.waitForSelector("#editor-surface", { state: "visible" });
   assert(
     await page.isVisible("#editor-surface"),
-    "Editor surface visible after loading sample",
+    "Editor surface visible after loading template",
   );
   assert(
     !(await page.isVisible("#empty-state")),
-    "Empty state hidden after loading sample",
+    "Empty state hidden after loading template",
   );
   assert(
     await page.isVisible("#mode-edit"),
@@ -216,8 +242,8 @@ try {
     "Editor contains sample front-matter",
   );
   assert(
-    editorValue.includes("My PortableAI Profile"),
-    "Sample uses 'My PortableAI Profile' (Persona→Profile rename)",
+    editorValue.includes("My PortableAI Persona"),
+    "Persona template uses placeholder profile_name 'My PortableAI Persona'",
   );
 
   // --- Case 3: switch to Read mode ---
@@ -551,7 +577,7 @@ try {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(url);
   await page.waitForSelector("#empty-state");
-  await page.click("#load-sample");
+  await loadPersonaTemplate(page);
   await page.waitForSelector("#editor-surface", { state: "visible" });
 
   // Edit is the default mode. The Edit gutter should have a bar per block.
@@ -717,8 +743,8 @@ try {
     "Add section is hidden on the empty state",
   );
 
-  // Load a sample so the editor has content, then Add section becomes available.
-  await page.click("#load-sample");
+  // Load a template so the editor has content, then Add section becomes available.
+  await loadPersonaTemplate(page);
   await page.waitForSelector("#editor-surface", { state: "visible" });
   assert(
     await page.isVisible("#add-section"),

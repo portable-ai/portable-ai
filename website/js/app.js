@@ -1,149 +1,9 @@
 const STORAGE_KEY = "portableAiPersonaDraft";
 
-// Static browser-only copy of templates/portable-ai-persona-template.md.
-// Embedded here so the GitHub Pages editor can create a new document without
-// depending on fetch paths that may vary by deployment location.
-const portableAiPersonaTemplate = `---
-standard: PortableAI Persona
-standard_version: 0.3
-profile_name: My PortableAI Profile
-profile_version: 1.0.0
-last_updated: 2026-07-07
----
-
-# Profile
-
-Briefly describe who you are and the durable context you want AI systems to know. The bullets below are placeholder examples — replace them with your own or delete lines you don't need.
-
-## Identity
-
-- e.g. Product manager based in Philadelphia
-- e.g. Parent of two, comfortable with weekend engineering work
-
-## Roles
-
-- e.g. Head of Product at a health-tech startup
-- e.g. Volunteer mentor at a local coding bootcamp
-
-## Long-Term Goals
-
-- e.g. Ship a stable v1 of my company's platform this year
-- e.g. Learn conversational Spanish over the next two years
-
----
-
-# Preferences
-
-Describe stable preferences that should shape AI assistance.
-
-## General Preferences
-
-- e.g. Prefer concise answers with the recommendation up front
-- e.g. Skip emoji and marketing language
-
-## Product Preferences
-
-- e.g. Ubuntu on my laptops, iOS on phone
-- e.g. Neovim as primary editor; VS Code for pair-programming
-
-## Recommendation Preferences
-
-- e.g. Suggest open-source tools before commercial ones when quality is similar
-- e.g. Weight long-term maintenance cost over initial ease
-
----
-
-# Persona
-
-Describe your personality, working style, and how you tend to think.
-
-- e.g. Direct communicator; comfortable with pushback
-- e.g. Thinks in systems and second-order effects
-- e.g. Prefers writing over meetings for durable decisions
-
----
-
-# Projects
-
-List active, planned, inactive, or completed projects that are durable enough to belong in the context.
-
-## Active Projects
-
-- e.g. PortableAI open standard — reference editor and spec
-- e.g. Home irrigation controller — Raspberry Pi + soil sensors
-
-## Planned Projects
-
-- e.g. Migrate personal notes from Evernote to plain Markdown
-
-## Inactive Projects
-
-- e.g. Weekly newsletter about neighborhood urbanism — paused Q1
-
-## Completed Projects
-
-- e.g. Kitchen renovation, finished last spring
-
----
-
-# Interests
-
-List durable interests, hobbies, and topics.
-
-- e.g. Distributed systems and consensus protocols
-- e.g. Urban planning and public transit
-- e.g. Trail running
-
----
-
-# Knowledge & Expertise
-
-List areas where you have meaningful background knowledge or expertise.
-
-- e.g. B2B SaaS product strategy — 10+ years
-- e.g. Basic electrical wiring and home renovation
-- e.g. Postgres performance tuning
-
----
-
-# Decision Style
-
-Describe how you make decisions.
-
-- e.g. Prefer reversible decisions made fast; slow down for one-way doors
-- e.g. Write short memos before big choices
-- e.g. Trust data over anecdote, but weight lived experience of the people closest to the work
-
----
-
-# Communication Style
-
-Describe how AI systems should communicate with you.
-
-- e.g. Lead with the answer; put reasoning after
-- e.g. Ask a clarifying question if the request is genuinely ambiguous
-- e.g. Flag when you're uncertain rather than hedging every sentence
-
----
-
-# AI Collaboration Instructions
-
-Describe how AI systems should work with you.
-
-- e.g. Treat me as a peer collaborator, not a customer
-- e.g. Push back when you disagree — say why
-- e.g. Don't invent facts; say when you don't know
-
----
-
-# Notes
-
-Freeform notes that don't fit elsewhere.
-
-- e.g. Prefers Fahrenheit for weather, Celsius for cooking
-- e.g. Allergic to sulfa antibiotics
-`;
-
+// Profile templates are NOT embedded here. They live in templates/*.md and
+// are fetched at load time via js/templates.js (the type registry), so a
+// template edit is a pure content change with no JS release. See
+// loadTemplate() below.
 // The editor state is intentionally just Markdown text. The Markdown document
 // is the only canonical source; the Read-mode preview and any future
 // AI-specific exports must be generated from this text rather than stored as
@@ -164,7 +24,7 @@ const appMain = document.querySelector("main.page");
 
 const emptyState = document.querySelector("#empty-state");
 const editorSurface = document.querySelector("#editor-surface");
-const loadSampleButton = document.querySelector("#load-sample");
+const templateOptions = document.querySelector("#template-options");
 const openProfileButton = document.querySelector("#open-profile");
 // The empty-state secondary card links straight to generate-a-profile.html; no JS.
 
@@ -364,7 +224,7 @@ const stripIntegrityBlock = (value) => {
   return { text, stripped: true };
 };
 
-// Sets the editor content for every load path (sample, file, restored draft).
+// Sets the editor content for every load path (template, file, restored draft).
 // Strips any stale integrity block first (see above) and reports whether it did
 // so, letting the caller surface a message. Returns { strippedIntegrity }.
 const setEditorValue = (value) => {
@@ -379,17 +239,61 @@ const setEditorValue = (value) => {
 const INTEGRITY_STRIPPED_NOTE =
   "Removed a stale integrity block \u2014 this editor doesn't recompute hashes, so it'll be regenerated when you next export from a tool that does.";
 
-const loadSampleTemplate = () => {
+// Load a blank template for the given profile type into the editor.
+//
+// The template body is fetched from templates/*.md at click time (URL resolved
+// by js/templates.js). No template text is embedded in this file, so clarifying
+// a template or adding an example is a pure edit to the .md with no JS release.
+const loadTemplate = async (type) => {
+  const registry = window.PORTABLE_AI_TEMPLATES;
+  if (!registry) {
+    setStatus("Templates are unavailable right now.");
+    return;
+  }
+  const entry = registry.get(type);
+
   if (
     hasEditorContent() &&
-    !window.confirm("Replace the current profile with a new sample profile?")
+    !window.confirm(
+      `Replace the current profile with a new ${entry.label} template?`,
+    )
   ) {
     setStatus("Kept the current draft.");
     return;
   }
 
-  setEditorValue(portableAiPersonaTemplate);
-  setStatus("Sample profile loaded. Edit it directly.");
+  setStatus(`Loading the ${entry.label} template\u2026`);
+  try {
+    const res = await fetch(registry.url(type), { cache: "no-cache" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    setEditorValue(text);
+    setStatus(`${entry.label} template loaded. Edit it directly.`);
+  } catch (err) {
+    // The editor is served over http(s) alongside cloud AIs; a failure here is
+    // almost always an offline/opaque-origin (file://) load, which we don't
+    // support for template fetching. Fail gracefully with a clear message.
+    setStatus(
+      `Couldn't load the ${entry.label} template. Make sure you're online at PortableAI.org, then try again.`,
+    );
+  }
+};
+
+// Build the empty-state template picker from the type registry (data-driven:
+// a new profile type in js/templates.js appears here automatically).
+const buildTemplatePicker = () => {
+  const registry = window.PORTABLE_AI_TEMPLATES;
+  if (!templateOptions || !registry) return;
+  templateOptions.textContent = "";
+  for (const [type, entry] of registry.entries()) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "type-option";
+    btn.dataset.type = type;
+    btn.textContent = entry.label;
+    btn.addEventListener("click", () => loadTemplate(type));
+    templateOptions.appendChild(btn);
+  }
 };
 
 // Compose the download filename: portableai-profile-YYYY-MM-DD.md.
@@ -963,7 +867,7 @@ editor.addEventListener("input", () => {
 copyButton.addEventListener("click", copyMarkdown);
 downloadButton.addEventListener("click", downloadMarkdown);
 if (addSectionButton) addSectionButton.addEventListener("click", addSection);
-loadSampleButton.addEventListener("click", loadSampleTemplate);
+buildTemplatePicker();
 openProfileButton.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", () => loadMarkdownFile(fileInput.files[0]));
 

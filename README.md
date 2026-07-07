@@ -36,9 +36,8 @@ A PortableAI Persona is intended to be:
 ├── docs/              Project docs (release checklist, archived material)
 ├── examples/          Example PortableAI documents (see examples/profiles/)
 ├── spec/              PortableAI specs (Core, Persona, Software Project) + registry
-├── templates/         Starter templates
 ├── tests/             Reference-editor smoke tests and screenshot harness
-└── website/           PortableAI.org site and reference editor
+└── website/           PortableAI.org site and reference editor (incl. templates/)
 ```
 
 ## Canonical format
