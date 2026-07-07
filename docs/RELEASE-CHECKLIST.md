@@ -56,7 +56,7 @@ These must be complete (or explicitly waived) before the public announcement.
 
 - [x] `SECURITY.md`, `CHANGELOG.md`, `THIRD_PARTY_NOTICES.md` present
 - [x] Sample profiles under `examples/profiles/` (Persona + Software Project); per-type coverage rule set by ADR-0006 (#36 — closed)
-- [x] README repo tree reflects the real v1 structure, including `ai/`, `docs/`, `tests/` (#56)
+- [x] README repo tree reflects the real v1 structure, including `docs/`, `tests/` (#56)
 - [x] Documentation consistency pass across README, WHY, CONTRIBUTING, ROADMAP, website README, templates, examples (#26)
 - [x] `GOVERNANCE.md` documents the spec change process (non-breaking vs breaking, ADR expectations) (#55)
 - [x] Contributor-facing docs read as approachable; positive language preferred over long non-goal lists (#26)
