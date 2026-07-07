@@ -67,6 +67,33 @@
         <a class="link" href="https://github.com/refineryllc/portable-ai-working/blob/main/spec/registry/well-known-sections-v1.md">Well-Known Section Registry</a>.
       </p>
 
+      <h2>Profile types &amp; example profiles</h2>
+      <p>
+        PortableAI supports more than one kind of profile. Each profile type has
+        its own well-known sections, a blank <strong>template</strong> you can load
+        in the editor to start from, and at least one complete <strong>example</strong>
+        you can read to see what a finished profile looks like.
+      </p>
+      <ul>
+        <li>
+          <strong>Persona</strong> — your durable, cross-session context (preferences,
+          working style, goals, expertise). Example:
+          <a class="link" href="https://github.com/refineryllc/portable-ai-working/blob/main/examples/profiles/persona-jordan-rivera.md">persona-jordan-rivera.md</a>.
+        </li>
+        <li>
+          <strong>Software Project</strong> — durable knowledge about a software
+          project (architecture, stack, conventions, key decisions) so any AI can
+          pick up the work. Example:
+          <a class="link" href="https://github.com/refineryllc/portable-ai-working/blob/main/examples/profiles/software-project-tidesynth.md">software-project-tidesynth.md</a>.
+        </li>
+      </ul>
+      <p>
+        Browse all worked examples in
+        <a class="link" href="https://github.com/refineryllc/portable-ai-working/tree/main/examples/profiles">examples/profiles/</a>,
+        and the starter templates in
+        <a class="link" href="https://github.com/refineryllc/portable-ai-working/tree/main/website/templates">website/templates/</a>.
+        In the editor, use <em>Load a template</em> and pick the profile type you want.
+      </p>
       <h2>How the reference editor works</h2>
       <p>
         The editor at PortableAI.org is a reference implementation.
@@ -90,7 +117,7 @@
 
       <h2>How you use it</h2>
       <ol>
-        <li>Draft a profile — either paste one in, load the sample profile, or ask an AI you already use to draft one for you.</li>
+        <li>Draft a profile — either paste one in, load a template for the profile type you want, or ask an AI you already use to draft one for you.</li>
         <li>Edit it here in the reference editor, or in any Markdown editor you already like.</li>
         <li>Download the profile document. Keep it wherever you keep your important files.</li>
         <li>When you talk to an AI, paste or attach the profile so it starts with your context.</li>

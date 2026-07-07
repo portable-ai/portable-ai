@@ -63,7 +63,15 @@
             <div class="empty-state-actions">
               <a class="link" href="generate-a-profile.html" id="empty-generate-profile">Generate a profile</a>
               <button class="link" type="button" id="open-profile">Open a profile</button>
-              <button class="link" type="button" id="load-sample">Load a sample</button>
+            </div>
+
+            <!-- Load a template: one option per profile type, built from
+                 js/templates.js (the type registry). Data-driven — a new type
+                 appears here automatically. The template body is fetched from
+                 templates/*.md at click time; no template text lives in JS. -->
+            <div class="template-loader">
+              <span class="template-loader-label" id="template-loader-label">Load a template</span>
+              <div class="type-options" role="group" aria-labelledby="template-loader-label" id="template-options"></div>
             </div>
           </div>
 
@@ -135,6 +143,7 @@
 
   <script src="js/vendor/marked.min.js"></script>
   <script src="js/prompt.js"></script>
+  <script src="js/templates.js"></script>
   <script src="js/app.js"></script>
   <script src="js/version.js"></script>
   <script src="js/header.js"></script>
