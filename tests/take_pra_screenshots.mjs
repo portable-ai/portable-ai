@@ -37,7 +37,7 @@ await page.waitForSelector("#empty-state", { state: "visible" });
 await page.locator("#editor").scrollIntoViewIfNeeded();
 await page.screenshot({ path: path.join(OUT, "01_empty_state.png"), fullPage: true });
 
-// 2) Edit mode after loading sample
+// 2) Edit mode after loading a template
 page.once("dialog", (d) => d.accept());
 await page.click('#template-options [data-type="persona"]');
 await page.waitForFunction(() => document.querySelector("#persona-editor").value.includes("standard: PortableAI Persona"), { timeout: 5000 });

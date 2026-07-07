@@ -55,13 +55,15 @@ function assert(cond, label) {
   console.log(`${mark} ${label}`);
 }
 
-// Load the Persona template via the empty-state type picker and wait for the
-// fetched .md to populate the editor (templates are fetched, not embedded).
-async function loadPersonaTemplate(page) {
+// Load a template via the empty-state type picker and wait for the fetched .md
+// to populate the editor (templates are fetched, not embedded). Defaults to the
+// Persona type, which most editor cases use for content.
+async function loadTemplateFromPicker(page, type = "persona", expected = "standard: PortableAI Persona") {
   page.once("dialog", (d) => d.accept()); // in case a replace-confirm appears
-  await page.click('#template-options [data-type="persona"]');
+  await page.click(`#template-options [data-type="${type}"]`);
   await page.waitForFunction(
-    () => document.querySelector("#persona-editor").value.includes("standard: PortableAI Persona"),
+    (needle) => document.querySelector("#persona-editor").value.includes(needle),
+    expected,
     { timeout: 5000 },
   );
 }
@@ -208,7 +210,7 @@ try {
   // --- Case 2: load the Persona template → editor surface visible with Edit/Read ---
   // The template body is fetched from templates/*.md, so wait for the editor to
   // populate rather than assuming a synchronous load.
-  await loadPersonaTemplate(page);
+  await loadTemplateFromPicker(page);
   await page.waitForSelector("#editor-surface", { state: "visible" });
   assert(
     await page.isVisible("#editor-surface"),
@@ -235,11 +237,11 @@ try {
     "Download button visible when editor has content",
   );
 
-  // Editor should have the sample
+  // Editor should have the loaded template
   const editorValue = await page.$eval("#persona-editor", (el) => el.value);
   assert(
     editorValue.includes("standard: PortableAI Persona"),
-    "Editor contains sample front-matter",
+    "Editor contains template front-matter",
   );
   assert(
     editorValue.includes("My PortableAI Persona"),
@@ -270,7 +272,7 @@ try {
     await page.isVisible("#persona-metadata"),
     "Metadata card visible in Read mode",
   );
-  // #110: the sample must ship with real-ish values — no literal YYYY-MM-DD
+  // #110: the template must ship with real-ish values — no literal YYYY-MM-DD
   // placeholder rendered in the metadata card.
   const metadataText = await page.textContent("#persona-metadata");
   assert(
@@ -279,7 +281,7 @@ try {
   );
   assert(
     /\d{4}-\d{2}-\d{2}/.test(metadataText),
-    `Metadata card shows a real ISO date for the sample (#110); got "${metadataText.replace(/\s+/g, " ").trim()}"`,
+    `Metadata card shows a real ISO date for the template (#110); got "${metadataText.replace(/\s+/g, " ").trim()}"`,
   );
 
   // Read-mode H1 font size should be small (~1.15rem = 18.4px), not the huge hero size.
@@ -572,12 +574,12 @@ try {
   );
 
   // --- Case 15 (#83): teleport gutter ---
-  // Fresh load, populate the editor with the built-in sample so we have real
+  // Fresh load, populate the editor with a template so we have real
   // headings/blocks in both views.
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(url);
   await page.waitForSelector("#empty-state");
-  await loadPersonaTemplate(page);
+  await loadTemplateFromPicker(page);
   await page.waitForSelector("#editor-surface", { state: "visible" });
 
   // Edit is the default mode. The Edit gutter should have a bar per block.
@@ -744,7 +746,7 @@ try {
   );
 
   // Load a template so the editor has content, then Add section becomes available.
-  await loadPersonaTemplate(page);
+  await loadTemplateFromPicker(page);
   await page.waitForSelector("#editor-surface", { state: "visible" });
   assert(
     await page.isVisible("#add-section"),
