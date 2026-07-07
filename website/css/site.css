@@ -192,13 +192,30 @@ h3 {
   font-size: 1.15rem;
 }
 
+/* Home hero tagline (#123): a smaller italic subline beneath the bold
+   headline (#site-title). */
 .tagline {
   max-width: 720px;
-  margin: 0.5rem 0 0;
-  color: var(--text);
-  font-size: 1rem;
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-style: italic;
   font-weight: 400;
   line-height: 1.5;
+}
+
+/* Home vs Edit visibility (#121), driven by main[data-mode]. */
+[data-mode="home"] .hero-edit {
+  display: none;
+}
+
+[data-mode="edit"] .hero-home {
+  display: none;
+}
+
+/* Edit-mode title: compact, in place of the big home byline. */
+#edit-title {
+  font-size: 1.4rem;
 }
 
 .tagline .link {
@@ -265,54 +282,47 @@ textarea:focus-visible {
   margin-bottom: 0.75rem;
 }
 
-.editor-blurb {
-  margin: 0;
-  color: var(--text);
-  font-size: 1rem;
-  line-height: 1.5;
-  max-width: 62ch;
-}
-
+/* Editor action nav (#123): plain link buttons, no dividers or middot.
+   Add section  Copy Markdown  Download   [Clear pushed right] */
 .editor-toolbar {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1.25rem;
   flex-shrink: 0;
 }
 
-/* Grouped action clusters in the consolidated top row (#117):
-   Add section | Copy Markdown · Download | Clear */
-.editor-action-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+/* Clear is the one destructive action: pushed to the far right so it is not
+   flush against Download (misclick guard), without needing a divider. */
+.editor-toolbar .clear-action {
+  margin-left: auto;
 }
 
-/* Vertical rule between action groups (the "|"). */
-.editor-action-divider {
-  align-self: stretch;
-  width: 1px;
-  min-height: 1rem;
-  background: var(--border, rgba(0, 0, 0, 0.15));
+/* Fixed bottom status gutter (#122): always present on Home and Edit. Gray
+   bar with black monospace text. Because it is permanent, changing the text
+   never causes layout shift. */
+.status-gutter {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  padding: 0.4rem 1.25rem;
+  background: #e5e7eb;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-/* Middot joining Copy Markdown and Download within their group. */
-.editor-toolbar .sep {
-  color: var(--muted);
-  user-select: none;
+.status-gutter .save-status {
+  color: #000;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
-/* Status text lives at the far right of the row and always reserves its
-   line so toggling the message never reflows the buttons (#117). It grows to
-   fill remaining space and pushes to the right; on narrow widths the row
-   wraps and the status drops to its own line. */
-.editor-toolbar .save-status {
-  flex: 1 1 auto;
-  min-width: 0;
-  text-align: right;
-  min-height: 1.35em;
+/* Keep page content clear of the fixed gutter. */
+body {
+  padding-bottom: 2.5rem;
 }
 
 .canonical-editor {
@@ -632,7 +642,7 @@ footer {
   }
 
   .tagline {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .editor-heading {
@@ -824,7 +834,7 @@ footer {
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.5rem;
+  gap: 1.25rem;
 }
 
 .empty-state-secondary {

@@ -86,8 +86,8 @@ try {
     "Empty state hint reads 'Load a profile or create a new one'",
   );
   assert(
-    (await page.textContent("#load-sample")).trim() === "Load a sample profile",
-    "Primary action is 'Load a sample profile'",
+    (await page.textContent("#load-sample")).trim() === "Load a sample",
+    "Primary action is 'Load a sample' (#123 — shortened from 'Load a sample profile')",
   );
   assert(
     (await page.textContent("#open-profile")).trim() === "Open a profile",
@@ -96,8 +96,13 @@ try {
   // #86: empty-state primary actions in order: Generate a profile · Open a profile · Load a sample profile.
   const emptyActionLabels = await page.locator(".empty-state-actions .link").allTextContents();
   assert(
-    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample profile",
+    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample",
     `Empty-state actions are ordered Generate/Open/Load (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
+  );
+  // #123: plain link buttons, no middot separators between entry actions.
+  assert(
+    (await page.locator(".empty-state-actions .sep").count()) === 0,
+    "Empty-state entry actions have no middot separators (#123)",
   );
   assert(
     (await page.textContent(".empty-state-secondary-title")).trim() === "Ask an AI to draft one",
@@ -116,14 +121,25 @@ try {
     "Clear button hidden when editor is empty",
   );
 
-  // Hero copy (PR A3: rewritten)
+  // Hero copy (#123: two-part tagline). Home mode shows the bold headline +
+  // smaller italic subline; the big byline is replaced by "Edit profile" in
+  // edit mode (#121).
   assert(
-    (await page.textContent("#site-title")).includes("Every AI needs you to start over"),
-    "Hero H1 reads 'Every AI needs you to start over' (was 'asks')",
+    (await page.textContent("#site-title")).includes("Now it\u2019s portable"),
+    "Hero H1 headline reads 'Your AI profile. Now it\u2019s portable.' (#123)",
   );
   assert(
-    (await page.textContent(".tagline")).includes("take your profile anywhere"),
-    "Hero tagline preserved",
+    (await page.textContent(".tagline")).includes("bring it to any AI"),
+    "Hero tagline subline reads 'Build it once, bring it to any AI.' (#123)",
+  );
+  // #121: on an empty editor the app is in home mode; the edit-only title hidden.
+  assert(
+    (await page.getAttribute("main.page", "data-mode")) === "home",
+    "App starts in home mode when nothing is loaded (#121)",
+  );
+  assert(
+    !(await page.isVisible("#edit-title")),
+    "'Edit profile' title hidden in home mode (#121)",
   );
   assert(
     (await page.locator(".tagline .link").count()) === 0,
@@ -142,12 +158,8 @@ try {
     "'Edit your profile' h2 removed",
   );
   assert(
-    (await page.textContent(".editor-blurb")).toLowerCase().includes("never stored on portableai"),
-    "Editor blurb mentions non-storage",
-  );
-  assert(
-    (await page.locator(".editor-blurb .link").count()) === 0,
-    "Editor blurb no longer has an in-body 'Read more' link (#86 — header nav covers it)",
+    (await page.locator(".editor-blurb").count()) === 0,
+    "Editor blurb removed — no duplicate 'take it anywhere' copy in the editor (#123)",
   );
   const h1Size = await page.$eval("#site-title", (el) => parseFloat(getComputedStyle(el).fontSize));
   assert(
@@ -495,7 +507,9 @@ try {
   // --- Case 11 (PR A4): regular text flattened to 1rem #111 ---
   await page.goto(url);
   await page.waitForSelector(".tagline");
-  const flatTargets = [".tagline", ".editor-blurb", "#empty-state .empty-state-hint", ".site-footer .footer-meta", ".site-footer .footer-note", ".site-footer .footer-contact"];
+  // #123: .tagline is now a smaller italic subline (its own assertions above),
+  // so it is excluded from the 1rem/#111 flat-text set here.
+  const flatTargets = ["#empty-state .empty-state-hint", ".site-footer .footer-meta", ".site-footer .footer-note", ".site-footer .footer-contact"];
   for (const sel of flatTargets) {
     const { size, color } = await page.$eval(sel, (el) => {
       const s = getComputedStyle(el);

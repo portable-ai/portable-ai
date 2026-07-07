@@ -156,12 +156,8 @@ const copyButton = document.querySelector("#copy-markdown");
 const downloadButton = document.querySelector("#download-markdown");
 const clearButton = document.querySelector("#clear-draft");
 const addSectionButton = document.querySelector("#add-section");
-// Separators inside the consolidated top action row (#117): group dividers
-// and the single middot between Copy Markdown and Download. They toggle with
-// content so an empty editor shows no stray rules or dots.
-const actionSeparators = Array.from(
-  document.querySelectorAll(".editor-toolbar .editor-action-divider, .editor-toolbar .sep"),
-);
+// The app container whose data-mode drives Home vs Edit (#121).
+const appMain = document.querySelector("main.page");
 // The in-app AI-draft flow was removed in favor of the dedicated
 // "Generate a profile" page (generate-a-profile.html). The empty-state link to
 // that page is all that remains in the editor.
@@ -242,8 +238,11 @@ const renderMarkdown = (markdown) => {
   return markedInstance.parse(markdown);
 };
 
+// The status gutter is always present and must never read empty (#122): an
+// empty message falls back to the idle "Ready…" state.
+const READY_STATUS = "Ready\u2026";
 const setStatus = (message) => {
-  status.textContent = message;
+  status.textContent = message || READY_STATUS;
 };
 
 // Guarded localStorage access. Browsers throw SecurityError when the page is
@@ -301,9 +300,10 @@ const updateSurfaceVisibility = () => {
   if (copyButton) copyButton.hidden = !hasContent;
   if (clearButton) clearButton.hidden = !hasContent;
   if (addSectionButton) addSectionButton.hidden = !hasContent;
-  actionSeparators.forEach((el) => {
-    el.hidden = !hasContent;
-  });
+  // Drive the Home vs Edit state (#121): content present => edit mode
+  // (compact "Edit profile" title, action nav visible); empty => home mode
+  // (value-prop hero, entry actions, no action nav).
+  if (appMain) appMain.dataset.mode = hasContent ? "edit" : "home";
   autoGrowEditor();
   // Rebuild the teleport gutter for whatever just became visible (#83).
   if (typeof refreshGutters === "function") scheduleGutterRefresh();
