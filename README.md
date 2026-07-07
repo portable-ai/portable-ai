@@ -32,7 +32,7 @@ A PortableAI Persona is intended to be:
 ├── CHANGELOG.md
 ├── THIRD_PARTY_NOTICES.md
 ├── adr/               Architecture Decision Records
-├── docs/              Project docs (release checklist, archived material)
+├── docs/              Project docs (release checklist)
 ├── examples/          Example PortableAI documents (see examples/profiles/)
 ├── spec/              PortableAI specs (Core, Persona, Software Project) + registry
 ├── tests/             Reference-editor smoke tests and screenshot harness
