@@ -33,7 +33,7 @@ See the registry for descriptions and recommended titles.
 
 ## Custom sections
 
-Custom sections MUST use reverse-DNS keys (e.g., `org.example.team/onboarding_notes`) per the Core spec.
+Custom sections use plain keys derived from their heading (e.g., `## Onboarding Notes` → `onboarding_notes`) per the Core spec §5.1 and §5.3.
 
 ## Open sections (to be written)
 
