@@ -14,7 +14,7 @@ status: DRAFT
 
 This registry enumerates the well-known section keys recognized by PortableAI editors and consumers at registry version **1**.
 
-A **well-known key** is a `snake_case` identifier assigned centrally by this registry. Custom sections use reverse-DNS keys instead; see [Core spec §5.1](../portable-ai-core-spec-v0.3.md#51-section-anatomy).
+A **well-known key** is a `snake_case` identifier assigned centrally by this registry. Sections whose headings are not well-known keys are **custom sections**; their keys are derived from the heading the same way (lowercase, whitespace → `_`) and are also plain `snake_case`. See [Core spec §5.1](../portable-ai-core-spec-v0.3.md#51-section-anatomy).
 
 ## 2. Versioning
 
@@ -27,7 +27,7 @@ Editors SHOULD ship with the registry embedded at build time and SHOULD warn (no
 ## 3. Rules for well-known keys
 
 - Keys MUST be `snake_case` (lowercase ASCII letters, digits, and `_`).
-- Keys MUST NOT contain `.` or `/` (those are reserved for reverse-DNS custom keys).
+- Keys MUST NOT contain `.` or `/`.
 - The section heading in Markdown is the human-readable **title**. The mapping from title → key is: lowercase the title, replace runs of whitespace with `_`, strip punctuation. Example: `Communication Style` → `communication_style`.
 - Titles are **not** normative; editors MAY use different titles as long as the key resolves to the same registry entry.
 
@@ -74,7 +74,7 @@ Keys usable in any document type.
 
 ## 5. Custom sections
 
-Any section that is not in this registry MUST use a reverse-DNS custom key. See [Core spec §5.1](../portable-ai-core-spec-v0.3.md#51-section-anatomy) and §5.3.
+Any section that is not in this registry is a custom section, with a plain key derived from its heading. See [Core spec §5.1](../portable-ai-core-spec-v0.3.md#51-section-anatomy) and §5.3, and [ADR-0007](../../adr/0007-custom-sections-plain-keys.md).
 
 ## 6. Requesting a new well-known key
 
@@ -82,7 +82,7 @@ New well-known keys are proposed through the governance process defined in [`GOV
 
 - The proposed key and recommended title
 - The document type(s) it targets
-- A rationale for why it belongs in the shared registry rather than as a custom reverse-DNS section
+- A rationale for why it belongs in the shared registry rather than as a custom section
 - At least one worked example
 
 ## 7. Changelog

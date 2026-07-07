@@ -15,3 +15,4 @@ Initial ADRs will be added one at a time as the project evolves.
 - [ADR-0004: Reference Editor Requires No Login](0004-no-login-reference-editor.md)
 - [ADR-0005: Non-Storage Principle](0005-non-storage-principle.md)
 - [ADR-0006: Every Profile Type Ships a Reference Sample](0006-profile-types-ship-a-sample.md)
+- [ADR-0007: Custom Sections Use Plain Derived Keys, Not Reverse-DNS](0007-custom-sections-plain-keys.md)
