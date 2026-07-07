@@ -14,3 +14,4 @@ Initial ADRs will be added one at a time as the project evolves.
 - [ADR-0003: AI Exports Are Derived](0003-ai-exports-are-derived.md)
 - [ADR-0004: Reference Editor Requires No Login](0004-no-login-reference-editor.md)
 - [ADR-0005: Non-Storage Principle](0005-non-storage-principle.md)
+- [ADR-0006: Every Profile Type Ships a Reference Sample](0006-profile-types-ship-a-sample.md)
