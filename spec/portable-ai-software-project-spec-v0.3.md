@@ -53,7 +53,7 @@ Guidance per section:
 
 ## Custom sections
 
-Custom sections use plain keys derived from their heading (e.g., `## Threat Model` → `threat_model`) per the Core spec §5.1 and §5.3.
+Custom sections use plain keys derived from their heading (e.g., `# Threat Model` → `threat_model`) per the Core spec §5.1 and §5.3.
 
 ## Example front-matter
 
