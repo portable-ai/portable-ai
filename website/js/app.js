@@ -373,14 +373,14 @@ const INTEGRITY_STRIPPED_NOTE =
 const loadSampleTemplate = () => {
   if (
     hasEditorContent() &&
-    !window.confirm("Replace the current Markdown draft with a new PortableAI profile sample?")
+    !window.confirm("Replace the current profile with a new sample profile?")
   ) {
     setStatus("Kept the current draft.");
     return;
   }
 
   setEditorValue(portableAiPersonaTemplate);
-  setStatus("Sample profile loaded. Edit the Markdown directly.");
+  setStatus("Sample profile loaded. Edit it directly.");
 };
 
 // Compose the download filename: portableai-profile-YYYY-MM-DD.md.
@@ -407,7 +407,7 @@ const downloadMarkdown = () => {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-  setStatus("Markdown downloaded. Your draft remains local to this browser.");
+  setStatus("Profile downloaded. Your draft remains local to this browser.");
 };
 
 const copyTextToClipboard = async (text, fallbackField) => {
@@ -473,7 +473,7 @@ const loadMarkdownFile = async (file) => {
 
   if (
     hasEditorContent() &&
-    !window.confirm("Replace the current Markdown draft with the selected file?")
+    !window.confirm("Replace the current profile with the selected profile document?")
   ) {
     fileInput.value = "";
     setStatus("Kept the current draft.");
@@ -489,7 +489,7 @@ const loadMarkdownFile = async (file) => {
         : `Loaded ${file.name} into the editor. Draft saved locally in this browser.`,
     );
   } catch {
-    setStatus("Could not load the selected Markdown file.");
+    setStatus("Could not load the selected profile document.");
   } finally {
     fileInput.value = "";
   }
@@ -972,7 +972,7 @@ clearButton.addEventListener("click", () => {
   if (
     hasEditorContent() &&
     !window.confirm(
-      "Clear the current Markdown draft from the editor and this browser? " +
+      "Clear the current profile draft from the editor and this browser? " +
         "Useful on a shared computer. This can't be undone \u2014 download first if you want to keep it."
     )
   ) {
