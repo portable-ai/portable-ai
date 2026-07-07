@@ -22,11 +22,16 @@ Markdown is readable, portable, versionable, and already widely supported.
 
 A person should be able to open their PortableAI Document in any text editor, commit it to Git, email it, print it, or share it with an AI assistant without needing proprietary software.
 
-## What this project is not
+## What this project is
 
-PortableAI is not a social network, cloud storage platform, proprietary identity provider, or replacement for AI memory systems.
+PortableAI is an open standard and reference implementation for portable AI
+context — a way to keep the durable context about yourself in one Markdown
+document you own and can take anywhere.
 
-It is an open standard and reference implementation for portable AI context.
+To stay focused on that, it deliberately stays narrow: it is not a social
+network, cloud storage platform, proprietary identity provider, or a
+replacement for the memory features built into individual AI assistants. Those
+boundaries are what keep your document portable and vendor-neutral.
 
 ## What success looks like
 

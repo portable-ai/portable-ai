@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in Portable AI.
+Thank you for your interest in PortableAI.
 
 This project is in early draft form. Contributions should preserve the core principles:
 
