@@ -676,7 +676,7 @@ try {
   );
   await page.setViewportSize({ width: 1280, height: 900 });
 
-  // --- Case 16 (#43): footer version + build-date stamp ---
+  // --- Case 16 (#43, #109): footer version + release-date stamp ---
   for (const p of ["index.html", "learn.html", "generate-a-profile.html"]) {
     await page.goto(`${url}/${p}`);
     await page.waitForSelector("#footer-version");
@@ -688,8 +688,8 @@ try {
     const buildText = (await page.textContent("#footer-build")).trim();
     const buildDatetime = await page.getAttribute("#footer-build", "datetime");
     assert(
-      /^Updated /.test(buildText) && buildDatetime === "2026-07-06",
-      `${p}: footer build date stamped (got "${buildText}", datetime="${buildDatetime}")`,
+      /^Released /.test(buildText) && buildDatetime === "2026-07-06",
+      `${p}: footer release date stamped as "Released ..." (#109) (got "${buildText}", datetime="${buildDatetime}")`,
     );
   }
   await page.setViewportSize({ width: 1280, height: 900 });
