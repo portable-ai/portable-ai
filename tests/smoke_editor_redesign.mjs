@@ -663,6 +663,24 @@ try {
     "Nav links visible after tapping hamburger",
   );
   await page.setViewportSize({ width: 1280, height: 900 });
+
+  // --- Case 16 (#43): footer version + build-date stamp ---
+  for (const p of ["index.html", "learn.html", "generate-a-profile.html"]) {
+    await page.goto(`${url}/${p}`);
+    await page.waitForSelector("#footer-version");
+    const ver = (await page.textContent("#footer-version")).trim();
+    assert(
+      ver === "v0.3.0-rc.1",
+      `${p}: footer version stamped from version.js (got "${ver}")`,
+    );
+    const buildText = (await page.textContent("#footer-build")).trim();
+    const buildDatetime = await page.getAttribute("#footer-build", "datetime");
+    assert(
+      /^Updated /.test(buildText) && buildDatetime === "2026-07-06",
+      `${p}: footer build date stamped (got "${buildText}", datetime="${buildDatetime}")`,
+    );
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
 } finally {
   await browser.close();
   server.close();
