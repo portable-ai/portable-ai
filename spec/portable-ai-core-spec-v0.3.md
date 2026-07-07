@@ -1,13 +1,13 @@
 ---
 standard: PortableAI Core
-spec_version: 0.3-draft
+spec_version: 0.3
 document_type: spec
-status: DRAFT
+status: Released
 ---
 
-# PortableAI Core Spec v0.3 (DRAFT)
+# PortableAI Core Spec v0.3
 
-> **Status: DRAFT.** This is the First Public Draft target. Content is normative but subject to change until v0.3 is released. See the [v1.0 milestone](../../milestone/1) for open work.
+> **Status: Released (2026-07-07).** This is the First Public Draft. Content is normative. Future work is tracked in the [v0.3.0 milestone](../../milestone/1).
 
 ## 1. Purpose
 

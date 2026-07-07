@@ -4,11 +4,11 @@ A living release gate for **v0.3 (First Public Draft)**. This is the single
 place to see what must be true before PortableAI is announced publicly, and
 what is explicitly *out of scope* for the first draft.
 
-- **Current state:** `v0.3.0-rc.1` (first informal release candidate) is tagged.
+- **Current state:** `v0.3.0` (First Public Draft) released 2026-07-07.
 - **How to use this:** check items off as they land. When every blocker in
   "Release blockers" is checked, we are ready to cut the First Public Draft.
   Known future work is listed separately and does **not** block the release.
-- **Related:** issue #27 (this checklist), milestone [v1.0](../../milestone/1),
+- **Related:** issue #27 (this checklist), milestone [v0.3.0](../../milestone/1),
   `ROADMAP.md`, `CHANGELOG.md`.
 
 Legend: `[ ]` open · `[x]` done · each item links the tracking issue where useful.
@@ -31,7 +31,7 @@ These must be complete (or explicitly waived) before the public announcement.
 
 ### Reference editor (Epic #15)
 
-- [x] Empty-state landing with clear first actions (Load a sample / Open a profile / Generate a profile)
+- [x] Empty-state landing with clear first actions (Load a template / Open a profile / Generate a profile)
 - [x] Edit / Read mode toggle over a single canonical Markdown surface
 - [x] Live GitHub-Flavored Markdown preview (vendored marked.js)
 - [x] Front-matter rendered as a metadata card, not raw YAML in the body
