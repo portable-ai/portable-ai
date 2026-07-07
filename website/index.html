@@ -23,35 +23,24 @@
     </div>
   </header>
 
-  <main class="page">
+  <main class="page" data-mode="home">
     <section class="hero" aria-labelledby="site-title">
-      <h1 id="site-title">Every AI needs you to start over.</h1>
-      <p class="tagline">
-        PortableAI is an open standard that lets you take your profile anywhere.
-      </p>
+      <!-- Home mode: the value-prop hero. Hidden in edit mode (see data-mode). -->
+      <h1 id="site-title" class="hero-home">Your AI profile. Now it&rsquo;s portable.</h1>
+      <p class="tagline hero-home">Build it once, bring it to any AI.</p>
+      <!-- Edit mode: compact title in place of the big byline. -->
+      <h1 id="edit-title" class="hero-edit">Edit profile</h1>
     </section>
 
     <section class="editor-panel" id="editor" aria-label="Reference editor">
       <div class="editor-heading">
-        <p class="editor-blurb">
-          Your profile is a document you own. Edit it here, then download and take it anywhere.
-          Your profile is never stored on PortableAI.
-        </p>
+        <!-- Editor action nav (#123): plain link buttons, no dividers or middot.
+             Shown only in edit mode; Clear is set apart on the right. -->
         <div class="editor-toolbar" aria-label="Editor actions">
-          <div class="editor-action-group">
-            <button class="link" type="button" id="add-section" hidden>Add section</button>
-          </div>
-          <span class="editor-action-divider" aria-hidden="true" hidden></span>
-          <div class="editor-action-group">
-            <button class="link" type="button" id="copy-markdown" hidden>Copy Markdown</button>
-            <span class="sep" aria-hidden="true" hidden>·</span>
-            <button class="link" type="button" id="download-markdown" hidden>Download</button>
-          </div>
-          <span class="editor-action-divider" aria-hidden="true" hidden></span>
-          <div class="editor-action-group">
-            <button class="link" type="button" id="clear-draft" hidden>Clear</button>
-          </div>
-          <span id="save-status" class="save-status" role="status" aria-live="polite"></span>
+          <button class="link" type="button" id="add-section" hidden>Add section</button>
+          <button class="link" type="button" id="copy-markdown" hidden>Copy Markdown</button>
+          <button class="link" type="button" id="download-markdown" hidden>Download</button>
+          <button class="link clear-action" type="button" id="clear-draft" hidden>Clear</button>
         </div>
       </div>
 
@@ -73,10 +62,8 @@
             <p class="empty-state-hint">Load a profile or create a new one.</p>
             <div class="empty-state-actions">
               <a class="link" href="generate-a-profile.html" id="empty-generate-profile">Generate a profile</a>
-              <span class="sep" aria-hidden="true">·</span>
               <button class="link" type="button" id="open-profile">Open a profile</button>
-              <span class="sep" aria-hidden="true">·</span>
-              <button class="link" type="button" id="load-sample">Load a sample profile</button>
+              <button class="link" type="button" id="load-sample">Load a sample</button>
             </div>
           </div>
 
@@ -137,6 +124,15 @@
       <a href="mailto:security@portableai.org">security@portableai.org</a>
     </p>
   </footer>
+
+  <!-- Fixed bottom status gutter (#122): always present on Home and Edit.
+       Gray bar, black monospace text. Starts as "Ready…" and reflects the
+       current status. #save-status keeps its ID so existing status writes
+       (setStatus) route here unchanged. -->
+  <div class="status-gutter" role="status" aria-live="polite">
+    <span id="save-status" class="save-status">Ready…</span>
+  </div>
+
   <script src="js/vendor/marked.min.js"></script>
   <script src="js/prompt.js"></script>
   <script src="js/app.js"></script>
