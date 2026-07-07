@@ -81,6 +81,9 @@
           </div>
 
           <div class="mode-panel" role="tabpanel" id="panel-edit" aria-labelledby="mode-edit">
+            <!-- Teleport gutter: hover a block's margin bar, click it to switch modes
+                 and land on the same block in Read (#83). Populated by app.js. -->
+            <div id="gutter-edit" class="editor-gutter" aria-label="Jump to this block in Read view"></div>
             <div class="field-group markdown-field">
               <label for="persona-editor" class="visually-hidden">Markdown profile</label>
               <textarea id="persona-editor" spellcheck="true" aria-label="Markdown profile"></textarea>
@@ -88,6 +91,9 @@
           </div>
 
           <div class="mode-panel" role="tabpanel" id="panel-read" aria-labelledby="mode-read" hidden>
+            <!-- Teleport gutter for Read view: click a block's margin bar to switch
+                 to Edit and land on the same block (#83). Populated by app.js. -->
+            <div id="gutter-read" class="editor-gutter" aria-label="Jump to this block in Edit view"></div>
             <div id="persona-metadata" class="metadata-card" hidden aria-label="Document metadata"></div>
             <div id="persona-preview" class="preview-content"></div>
           </div>
