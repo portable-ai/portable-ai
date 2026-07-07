@@ -87,7 +87,7 @@ sections:
     well_known: true
     title: Profile
     updated: 2026-07-04
-  - key: org.refinery.david/negotiation_style
+  - key: negotiation_style
     well_known: false
     title: Negotiation style
     updated: 2026-06-30
@@ -104,7 +104,7 @@ A "section" in a PortableAI Document is an H2 (`##`) heading in the Markdown bod
 Every section has a **key**. The key is either:
 
 - A **well-known key** from the [Well-Known Section Registry](registry/well-known-sections-v1.md), matched case-insensitively to the section heading with spaces converted to `_` (e.g., heading `Communication Style` → key `communication_style`).
-- A **custom key** in **reverse-DNS form** (e.g., `org.refinery.david/negotiation_style`). Custom keys MUST contain at least one `.` and at least one `/`. The part before the first `/` is the namespace; the part after is the local name (`snake_case`).
+- A **custom key** for any heading that is not a well-known key. Custom keys are **derived from the heading using the same rule**: lowercased and trimmed, with runs of whitespace converted to a single `_` (e.g., heading `Negotiation Style` → key `negotiation_style`). Matching is case-insensitive. Custom keys are plain `snake_case` identifiers; they do not use namespaces, `.`, or `/`.
 
 ### 5.2 The `sections` block (optional)
 
@@ -114,7 +114,7 @@ Each entry MAY contain:
 
 | Field | Type | Description |
 |---|---|---|
-| `key` | string | Section key (well-known or reverse-DNS). REQUIRED if the entry is present. |
+| `key` | string | Section key (well-known or custom), derived from the heading. REQUIRED if the entry is present. |
 | `well_known` | boolean | `true` if the key appears in the Well-Known Section Registry. |
 | `title` | string | Display title used in the section heading. |
 | `updated` | string | ISO 8601 date the section was last edited. |
@@ -124,7 +124,11 @@ When the `sections` block is present, entries SHOULD appear in document order.
 
 ### 5.3 Custom sections
 
-Custom sections MUST use reverse-DNS keys. The namespace SHOULD be a domain the author controls or an org/user identifier the author is willing to be identified by. Custom sections MUST be preserved by conforming editors even if the editor does not recognize them.
+A **custom section** is any `##` section whose heading does not match a well-known key. Its key is derived from the heading exactly as in §5.1 (lowercased, whitespace → `_`) and, when listed in the `sections` block, is flagged `well_known: false`. Custom sections MUST be preserved by conforming editors even if the editor does not recognize them.
+
+If two headings in the same Document derive to the same key, that is the author's choice; both sections MUST still be preserved verbatim (see §10). Editors MUST NOT merge, rename, or drop either section.
+
+See [ADR-0007](../adr/0007-custom-sections-plain-keys.md) for the rationale behind plain derived keys.
 
 ## 6. Well-Known Section Registry
 
