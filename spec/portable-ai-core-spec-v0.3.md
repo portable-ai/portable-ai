@@ -99,7 +99,9 @@ sections:
 
 ### 5.1 Section anatomy
 
-A "section" in a PortableAI Document is an H2 (`##`) heading in the Markdown body, together with the content up to the next H2 or the end of the document (excluding the integrity block, if present).
+A "section" in a PortableAI Document is an H1 (`#`) heading in the Markdown body, together with the content up to the next H1 or the end of the document (excluding the integrity block, if present).
+
+Using a single heading level for sections keeps documents flat and easy to author — there is no "what level am I at?" to track. Deeper headings (`##`, `###`, …) MAY appear inside a section as ordinary content (for example, to group bullets); they do not start a new section.
 
 Every section has a **key**. The key is either:
 
@@ -124,7 +126,7 @@ When the `sections` block is present, entries SHOULD appear in document order.
 
 ### 5.3 Custom sections
 
-A **custom section** is any `##` section whose heading does not match a well-known key. Its key is derived from the heading exactly as in §5.1 (lowercased, whitespace → `_`) and, when listed in the `sections` block, is flagged `well_known: false`. Custom sections MUST be preserved by conforming editors even if the editor does not recognize them.
+A **custom section** is any `#` (H1) section whose heading does not match a well-known key. Its key is derived from the heading exactly as in §5.1 (lowercased, whitespace → `_`) and, when listed in the `sections` block, is flagged `well_known: false`. Custom sections MUST be preserved by conforming editors even if the editor does not recognize them.
 
 If two headings in the same Document derive to the same key, that is the author's choice; both sections MUST still be preserved verbatim (see §10). Editors MUST NOT merge, rename, or drop either section.
 
