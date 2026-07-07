@@ -519,6 +519,128 @@ try {
     `Footer left edge aligns with editor panel (footer ${footerLeft} vs panel ${panelLeft})`,
   );
 
+  // --- Case 15 (#83): teleport gutter ---
+  // Fresh load, populate the editor with the built-in sample so we have real
+  // headings/blocks in both views.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(url);
+  await page.waitForSelector("#empty-state");
+  await page.click("#load-sample");
+  await page.waitForSelector("#editor-surface", { state: "visible" });
+
+  // Edit is the default mode. The Edit gutter should have a bar per block.
+  await page.waitForSelector("#gutter-edit .gutter-bar");
+  const editBarCount = await page.locator("#gutter-edit .gutter-bar").count();
+  assert(editBarCount > 0, `Edit gutter renders bars (${editBarCount})`);
+
+  // The textarea is auto-height: it shows all content without scrolling
+  // internally (scrollHeight ~= clientHeight, overflow hidden).
+  const taMetrics = await page.$eval("#persona-editor", (el) => ({
+    scrollH: el.scrollHeight,
+    clientH: el.clientHeight,
+    overflowY: getComputedStyle(el).overflowY,
+  }));
+  assert(
+    Math.abs(taMetrics.scrollH - taMetrics.clientH) <= 2 && taMetrics.overflowY === "hidden",
+    `Edit textarea is auto-height / no inner scroll (scrollH ${taMetrics.scrollH} ≈ clientH ${taMetrics.clientH}, overflow ${taMetrics.overflowY})`,
+  );
+
+  // Each Edit gutter bar aligns to the top of its block's text row. Check that
+  // the first bar sits at/after the textarea's content top (not above it).
+  const editAlign = await page.evaluate(() => {
+    const panel = document.querySelector("#panel-edit").getBoundingClientRect();
+    const ta = document.querySelector("#persona-editor").getBoundingClientRect();
+    const bar = document.querySelector('#gutter-edit .gutter-bar[data-block-index="0"]');
+    const b = bar.getBoundingClientRect();
+    return { barTop: b.top - panel.top, taTop: ta.top - panel.top };
+  });
+  assert(
+    editAlign.barTop >= editAlign.taTop - 2,
+    `First Edit bar sits within the textarea content (bar ${Math.round(editAlign.barTop)} >= ta ${Math.round(editAlign.taTop)})`,
+  );
+
+  // Clicking an Edit gutter bar teleports to Read view, same block.
+  await page.click('#gutter-edit .gutter-bar[data-block-index="1"]');
+  await page.waitForSelector("#panel-read", { state: "visible" });
+  assert(
+    (await page.getAttribute("#mode-read", "aria-selected")) === "true",
+    "Clicking an Edit gutter bar switches to Read view",
+  );
+  const readHasBlock1 = await page.evaluate(() => {
+    const pv = document.querySelector("#panel-read .preview-content");
+    return !!pv.querySelector('[data-block-index="1"]');
+  });
+  assert(readHasBlock1, "Target block exists in Read view after teleport");
+
+  // Read gutter also renders a bar per block.
+  await page.waitForSelector("#gutter-read .gutter-bar");
+  const readBarCount = await page.locator("#gutter-read .gutter-bar").count();
+  assert(readBarCount > 0, `Read gutter renders bars (${readBarCount})`);
+  assert(
+    readBarCount === editBarCount,
+    `Read and Edit gutters have matching bar counts (${readBarCount} == ${editBarCount})`,
+  );
+
+  // Clicking a Read gutter bar teleports back to Edit view, same block.
+  await page.click('#gutter-read .gutter-bar[data-block-index="1"]');
+  await page.waitForSelector("#panel-edit", { state: "visible" });
+  assert(
+    (await page.getAttribute("#mode-edit", "aria-selected")) === "true",
+    "Clicking a Read gutter bar switches back to Edit view",
+  );
+
+  // Gutter bars are keyboard-focusable buttons.
+  const barIsButton = await page.$eval(
+    '#gutter-edit .gutter-bar[data-block-index="0"]',
+    (el) => el.tagName === "BUTTON" && el.tabIndex === 0,
+  );
+  assert(barIsButton, "Gutter bars are focusable <button> elements");
+
+  // Clicking the textarea body (not a bar) does NOT toggle mode.
+  await page.evaluate(() => document.querySelector("#mode-edit").click());
+  await page.evaluate(() => {
+    const ta = document.querySelector("#persona-editor");
+    const r = ta.getBoundingClientRect();
+    ta.focus();
+  });
+  const editBodyClick = await page.evaluate(() => {
+    const ta = document.querySelector("#persona-editor");
+    const r = ta.getBoundingClientRect();
+    return { x: Math.round(r.x + r.width * 0.5), y: Math.round(r.y + 150) };
+  });
+  await page.mouse.click(editBodyClick.x, editBodyClick.y);
+  assert(
+    (await page.getAttribute("#mode-edit", "aria-selected")) === "true",
+    "Clicking the textarea body does not toggle mode",
+  );
+
+  // Clicking the preview text body (Read) does NOT toggle mode.
+  await page.evaluate(() => { document.querySelector("#mode-read").click(); window.scrollTo(0, 0); });
+  await page.waitForSelector("#panel-read", { state: "visible" });
+  const readBodyClick = await page.evaluate(() => {
+    const pv = document.querySelector("#panel-read .preview-content");
+    const el = pv.querySelector('[data-block-index="1"]');
+    const r = el.getBoundingClientRect();
+    return { x: Math.round(r.x + r.width * 0.6), y: Math.round(r.y + Math.min(12, r.height / 2)) };
+  });
+  await page.mouse.click(readBodyClick.x, readBodyClick.y);
+  assert(
+    (await page.getAttribute("#mode-read", "aria-selected")) === "true",
+    "Clicking the preview text body does not toggle mode",
+  );
+
+  // Header Edit|Read toggle still switches modes both directions.
+  await page.click("#mode-edit");
+  assert(
+    (await page.getAttribute("#mode-edit", "aria-selected")) === "true",
+    "Header Edit button still selects Edit view",
+  );
+  await page.click("#mode-read");
+  assert(
+    (await page.getAttribute("#mode-read", "aria-selected")) === "true",
+    "Header Read button still selects Read view",
+  );
+
   // --- Case 14 (PR A4): mobile hamburger toggles nav ---
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto(url);

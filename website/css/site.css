@@ -306,7 +306,10 @@ label {
 }
 
 textarea {
-  min-height: 70vh;
+  /* Auto-height: the textarea grows to fit its content and the PAGE scrolls,
+     so Edit and Read share one coordinate space. JS sets the exact height on
+     input (see autoGrowEditor). min-height keeps an empty editor usable. */
+  min-height: 12rem;
   width: 100%;
   padding: 1rem;
   border: 1px solid var(--border);
@@ -314,7 +317,8 @@ textarea {
   color: var(--text);
   background: var(--background);
   font: 0.95rem/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  resize: vertical;
+  resize: none;
+  overflow: hidden;
 }
 
 .help-text,
@@ -338,8 +342,8 @@ textarea {
 }
 
 .preview-content {
-  max-height: 560px;
-  overflow: auto;
+  /* Grows with content; the page scrolls, matching the auto-height editor so
+     the gutter can measure both views identically. */
   padding-right: 0.25rem;
 }
 
@@ -620,7 +624,7 @@ footer {
   }
 
   textarea {
-    min-height: 560px;
+    min-height: 12rem;
   }
 }
 
@@ -670,6 +674,62 @@ footer {
 
 .mode-panel[hidden] {
   display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Teleport gutter (#83)
+   A quiet left-margin affordance: hovering a block lights a narrow vertical
+   bar in the margin; clicking it switches Edit<->Read and lands on the same
+   block. Block-level granularity. Positioned relative to the mode-panel so
+   the bar can sit just left of the 880px content column. -------------------- */
+.mode-panel {
+  position: relative;
+}
+
+.editor-gutter {
+  position: absolute;
+  top: 0;
+  left: -1.25rem;
+  width: 1rem;
+  height: 100%;
+  /* Above the panel content so bars are hoverable/clickable, but the column
+     itself is transparent and does not block text selection to its right. */
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* One focusable bar per block, absolutely positioned by app.js (top/height in
+   px). Invisible until hovered/focused so the margin stays quiet. */
+.gutter-bar {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background-color 0.12s ease;
+}
+
+.gutter-bar:hover,
+.gutter-bar:focus-visible,
+.gutter-bar.is-active {
+  background: var(--accent);
+}
+
+.gutter-bar:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* On coarse-pointer / narrow screens the left margin isn't available; hide the
+   gutter and fall back to the header Edit|Read toggle only. */
+@media (max-width: 960px) {
+  .editor-gutter {
+    display: none;
+  }
 }
 
 /* Read-mode type ramp
