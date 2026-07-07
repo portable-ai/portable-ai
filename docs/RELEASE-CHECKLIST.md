@@ -37,7 +37,7 @@ These must be complete (or explicitly waived) before the public announcement.
 - [x] Front-matter rendered as a metadata card, not raw YAML in the body
 - [x] Left-margin block-level teleport gutter between Edit and Read (#83)
 - [x] Auto-height Edit view (page scrolls; no inner scroll) (#83)
-- [x] Local draft persistence: auto-save, restore-or-clear banner, confirmed clear (#32 — verify against acceptance criteria, then close)
+- [x] Local draft persistence: auto-save, restore-or-clear banner, confirmed clear with shared-computer guidance (#32 — closed)
 - [ ] **Custom sections**: add / rename / preserve on download / visible in Preview (#23, P0)
 - [ ] Download produces canonical, spec-valid Markdown with the standard filename
 - [ ] Editor works with both Day-1 profile types (Persona, Software Project)
@@ -55,8 +55,8 @@ These must be complete (or explicitly waived) before the public announcement.
 ### Documentation (Epic #17)
 
 - [x] `SECURITY.md`, `CHANGELOG.md`, `THIRD_PARTY_NOTICES.md` present
-- [x] Sample profiles under `examples/profiles/` (Persona + Software Project) (#36 — verify against acceptance criteria, then close)
-- [ ] README repo tree reflects the real v1 structure, including `ai/` (#56)
+- [x] Sample profiles under `examples/profiles/` (Persona + Software Project); per-type coverage rule set by ADR-0006 (#36 — closed)
+- [x] README repo tree reflects the real v1 structure, including `ai/`, `docs/`, `tests/` (#56)
 - [ ] Documentation consistency pass across README, WHY, CONTRIBUTING, ROADMAP, website README, templates, examples (#26)
 - [ ] `GOVERNANCE.md` documents the spec change process (non-breaking vs breaking, ADR expectations) (#55)
 - [ ] Contributor-facing docs read as approachable; positive language preferred over long non-goal lists

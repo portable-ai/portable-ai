@@ -30,11 +30,14 @@ A PortableAI Persona is intended to be:
 ├── ROADMAP.md
 ├── SECURITY.md
 ├── CHANGELOG.md
+├── THIRD_PARTY_NOTICES.md
 ├── adr/               Architecture Decision Records
 ├── ai/                Bootstrap prompts for AI coding assistants
-├── examples/          Example PortableAI documents
-├── spec/              PortableAI specs (Core + Persona)
+├── docs/              Project docs (release checklist, archived material)
+├── examples/          Example PortableAI documents (see examples/profiles/)
+├── spec/              PortableAI specs (Core, Persona, Software Project) + registry
 ├── templates/         Starter templates
+├── tests/             Reference-editor smoke tests and screenshot harness
 └── website/           PortableAI.org site and reference editor
 ```
 
