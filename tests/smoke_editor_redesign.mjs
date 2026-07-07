@@ -681,6 +681,78 @@ try {
     );
   }
   await page.setViewportSize({ width: 1280, height: 900 });
+
+  // --- Case 17 (#23): "Add section" appends an H1 section and focuses it ---
+  await page.goto(url);
+  await page.waitForSelector("#empty-state", { state: "visible" });
+  // On the empty state, the Add section action is hidden (kept uncluttered).
+  assert(
+    !(await page.isVisible("#add-section")),
+    "Add section is hidden on the empty state",
+  );
+
+  // Load a sample so the editor has content, then Add section becomes available.
+  await page.click("#load-sample");
+  await page.waitForSelector("#editor-surface", { state: "visible" });
+  assert(
+    await page.isVisible("#add-section"),
+    "Add section is visible once the editor has content",
+  );
+
+  const beforeValue = await page.$eval("#persona-editor", (el) => el.value);
+  const beforeH1Count = (beforeValue.match(/^# .+$/gm) || []).length;
+
+  await page.click("#add-section");
+  await page.waitForSelector("#panel-edit", { state: "visible" });
+
+  // Clicking Add section switches to Edit mode.
+  assert(
+    (await page.getAttribute("#mode-edit", "aria-selected")) === "true",
+    "Add section switches to Edit mode",
+  );
+
+  const afterValue = await page.$eval("#persona-editor", (el) => el.value);
+  const afterH1Count = (afterValue.match(/^# .+$/gm) || []).length;
+
+  // Exactly one new H1 section was appended, at the very end of the document.
+  assert(
+    afterH1Count === beforeH1Count + 1,
+    `Add section adds exactly one H1 section (was ${beforeH1Count}, now ${afterH1Count})`,
+  );
+  assert(
+    /# New section\n\n$/.test(afterValue),
+    "New section heading is appended at the end with a trailing blank line",
+  );
+
+  // Caret sits on the blank line beneath the new heading, ready for input.
+  const sel = await page.$eval("#persona-editor", (el) => ({
+    start: el.selectionStart,
+    end: el.selectionEnd,
+    len: el.value.length,
+  }));
+  assert(
+    sel.start === sel.len && sel.end === sel.len,
+    "Caret is placed at the end, beneath the new heading",
+  );
+
+  // The new section round-trips into the Read preview as an <h1>.
+  await page.click("#mode-read");
+  await page.waitForSelector("#panel-read", { state: "visible" });
+  const previewHasNewSection = await page.evaluate(() => {
+    const hs = Array.from(document.querySelectorAll("#persona-preview h1"));
+    return hs.some((h) => h.textContent.trim() === "New section");
+  });
+  assert(
+    previewHasNewSection,
+    "New section renders as an <h1> in the Read preview",
+  );
+
+  // It also survives a download round-trip (present in the generated blob).
+  const downloadValue = await page.$eval("#persona-editor", (el) => el.value);
+  assert(
+    downloadValue.includes("# New section"),
+    "New section is preserved in the editor value used for download",
+  );
 } finally {
   await browser.close();
   server.close();

@@ -10,6 +10,7 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
 
 ### Added
 
+- **"Add section" button in the reference editor (#23).** Appends a new `# New section` heading to the end of the document, switches to Edit, and drops the cursor on the blank line beneath the heading so you can type the section name and content immediately. Always appends to the end — predictable and position-agnostic — rather than guessing from the cursor or nearby content. Sections are H1 (`#`) to match every shipped document and template. Per ADR-0007, the section's key is simply derived from whatever you rename the heading to, so there is nothing else to configure. Shown only when the editor has content, alongside Copy Markdown and Clear. Smoke tests extended to 144 assertions (Case 17: visibility gating, append behavior, Edit-mode switch, caret placement, and Read/download round-trip).
 - `SECURITY.md` — security policy and vulnerability reporting process
 - `CHANGELOG.md` — this file
 - ADR-0005: Non-Storage Principle
