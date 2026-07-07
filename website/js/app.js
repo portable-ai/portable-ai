@@ -888,7 +888,10 @@ if (discardDraftButton) {
 clearButton.addEventListener("click", () => {
   if (
     hasEditorContent() &&
-    !window.confirm("Clear the current Markdown draft from the editor and this browser?")
+    !window.confirm(
+      "Clear the current Markdown draft from the editor and this browser? " +
+        "Useful on a shared computer. This can't be undone \u2014 download first if you want to keep it."
+    )
   ) {
     setStatus("Kept the current draft.");
     return;
