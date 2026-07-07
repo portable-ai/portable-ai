@@ -206,14 +206,6 @@ h3 {
 }
 
 .actions,
-.editor-actions {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-}
-
 /* ==========================================================================
    Link-style buttons (design tone: quiet, minimalist)
    ========================================================================== */
@@ -285,8 +277,42 @@ textarea:focus-visible {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
+  align-items: center;
   gap: 0.75rem;
   flex-shrink: 0;
+}
+
+/* Grouped action clusters in the consolidated top row (#117):
+   Add section | Copy Markdown · Download | Clear */
+.editor-action-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Vertical rule between action groups (the "|"). */
+.editor-action-divider {
+  align-self: stretch;
+  width: 1px;
+  min-height: 1rem;
+  background: var(--border, rgba(0, 0, 0, 0.15));
+}
+
+/* Middot joining Copy Markdown and Download within their group. */
+.editor-toolbar .sep {
+  color: var(--muted);
+  user-select: none;
+}
+
+/* Status text lives at the far right of the row and always reserves its
+   line so toggling the message never reflows the buttons (#117). It grows to
+   fill remaining space and pushes to the right; on narrow widths the row
+   wraps and the status drops to its own line. */
+.editor-toolbar .save-status {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: right;
+  min-height: 1.35em;
 }
 
 .canonical-editor {
@@ -367,11 +393,6 @@ textarea {
   padding: 0.1rem 0.25rem;
   border-radius: 0.25rem;
   background: var(--surface-strong);
-}
-
-.editor-actions {
-  align-items: center;
-  gap: 0.75rem;
 }
 
 .save-status {

@@ -37,8 +37,21 @@
           Your profile is a document you own. Edit it here, then download and take it anywhere.
           Your profile is never stored on PortableAI.
         </p>
-        <div class="editor-toolbar" aria-label="Editor toolbar">
-          <button class="link" type="button" id="download-markdown" hidden>Download</button>
+        <div class="editor-toolbar" aria-label="Editor actions">
+          <div class="editor-action-group">
+            <button class="link" type="button" id="add-section" hidden>Add section</button>
+          </div>
+          <span class="editor-action-divider" aria-hidden="true" hidden></span>
+          <div class="editor-action-group">
+            <button class="link" type="button" id="copy-markdown" hidden>Copy Markdown</button>
+            <span class="sep" aria-hidden="true" hidden>·</span>
+            <button class="link" type="button" id="download-markdown" hidden>Download</button>
+          </div>
+          <span class="editor-action-divider" aria-hidden="true" hidden></span>
+          <div class="editor-action-group">
+            <button class="link" type="button" id="clear-draft" hidden>Clear</button>
+          </div>
+          <span id="save-status" class="save-status" role="status" aria-live="polite"></span>
         </div>
       </div>
 
@@ -100,12 +113,6 @@
         </div>
       </div>
 
-      <div class="editor-actions" aria-label="Editor actions">
-        <button class="link" type="button" id="add-section" hidden>Add section</button>
-        <button class="link" type="button" id="copy-markdown" hidden>Copy Markdown</button>
-        <button class="link" type="button" id="clear-draft" hidden>Clear</button>
-        <span id="save-status" class="save-status" role="status" aria-live="polite"></span>
-      </div>
     </section>
   </main>
 
