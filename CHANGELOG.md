@@ -2,11 +2,15 @@
 
 All notable changes to the PortableAI standard and reference implementation are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](../../milestone/1).
+Nothing yet.
+
+## [0.3.0] — 2026-07-07
+
+**First Public Draft** — the first public release of the PortableAI standard and reference editor. Tracked in the [v0.3.0 milestone](../../milestone/1).
 
 ### Added
 
@@ -80,7 +84,7 @@ Work toward **v0.3 (First Public Draft)** — tracked in the [v1.0 milestone](..
 
 ### Deprecated
 
-- Spec version `v0.2` will be deprecated when `v0.3` is published.
+- Spec version `v0.2` is deprecated as of the `v0.3` publication; the frozen v0.2 spec file is retained as a migration reference.
 
 ## [0.2] — 2026-07-03
 
@@ -89,3 +93,7 @@ Initial private draft of the PortableAI Persona spec. Not publicly released.
 - `spec/portable-ai-persona-spec-v0.2.md` (formerly `Portable_AI_Persona_Specification_v0.2.md`)
 - Initial reference editor at PortableAI.org
 - ADRs 0000 through 0004
+
+[Unreleased]: https://github.com/refineryllc/portable-ai-working/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/refineryllc/portable-ai-working/compare/v0.2...v0.3.0
+[0.2]: https://github.com/refineryllc/portable-ai-working/releases/tag/v0.2
