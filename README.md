@@ -54,12 +54,13 @@ Version 1 intentionally uses plain HTML, CSS, and JavaScript with no framework, 
 
 ## Project status
 
-This project is in early draft status. The current published spec is **v0.2**. Work toward **v0.3** (First Public Draft) is tracked in the [v1.0 milestone](../../milestone/1).
+The current released spec is **v0.3** (First Public Draft), published 2026-07-07. Future work is tracked in the [v0.3.0 milestone](../../milestone/1).
 
-The v0.3 spec is being split into two documents:
+The v0.3 spec is split into layered documents:
 
 - `spec/portable-ai-core-spec-v0.3.md` — the shared PortableAI Document envelope
 - `spec/portable-ai-persona-spec-v0.3.md` — Persona-specific sections
+- `spec/portable-ai-software-project-spec-v0.3.md` — Software Project-specific sections
 
 ## Contact
 

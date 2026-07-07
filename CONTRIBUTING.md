@@ -2,7 +2,7 @@
 
 Thank you for your interest in PortableAI.
 
-This project is in early draft form. Contributions should preserve the core principles:
+PortableAI is at its First Public Draft (spec v0.3). Contributions should preserve the core principles:
 
 - Human-readable first
 - One canonical Markdown document

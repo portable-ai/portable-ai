@@ -16,8 +16,8 @@ Only the current spec version and the latest deployed reference editor are activ
 
 | Spec version | Status |
 |---|---|
-| v0.3 | Supported (First Public Draft, in progress) |
-| v0.2 | Deprecated once v0.3 lands |
+| v0.3 | Supported (First Public Draft, released 2026-07-07) |
+| v0.2 | Deprecated |
 | < v0.2 | Unsupported |
 
 ## Reporting a vulnerability
