@@ -1,13 +1,14 @@
 ---
-standard: PortableAI Core
-spec_version: 0.3-draft
+standard: PortableAI
 document_type: spec
-status: DRAFT
+spec_version: 0.3
+document_name: PortableAI Core Spec
+status: Released
 ---
 
-# PortableAI Core Spec v0.3 (DRAFT)
+# PortableAI Core Spec v0.3
 
-> **Status: DRAFT.** This is the First Public Draft target. Content is normative but subject to change until v0.3 is released. See the [v1.0 milestone](../../milestone/1) for open work.
+> **Status: Released (2026-07-07).** This is the First Public Draft. Content is normative. Future work is tracked in the [v0.3.0 milestone](../../milestone/1).
 
 ## 1. Purpose
 
@@ -44,20 +45,20 @@ Every PortableAI Document MUST begin with a YAML front-matter block delimited by
 
 | Field | Type | Description |
 |---|---|---|
-| `standard` | string | Human-readable standard name (e.g., `PortableAI Persona`). |
-| `spec_version` | string | The PortableAI spec version this document targets (e.g., `0.3`). |
-| `document_type` | string | Document type from the registry (see §4.3). |
-| `document_id` | string | Stable [ULID](https://github.com/ulid/spec) identifying this document across edits and renames. |
-| `language` | string | [BCP 47](https://www.rfc-editor.org/info/bcp47) language tag for the document's primary language (e.g., `en`, `en-US`, `ja`). |
+| `standard` | string | The standard this document belongs to. Constant: `PortableAI`. |
+| `document_type` | string | The kind of document (see §4.3). Extensible beyond profiles. |
+| `spec_version` | string | The PortableAI spec version this document conforms to (e.g., `0.3`). |
 
 ### 4.2 Recommended fields
 
 | Field | Type | Description |
 |---|---|---|
-| `document_name` | string | Human-readable name for this specific document. |
+| `document_name` | string | Human-readable name for this specific document (e.g., `Jordan Rivera — Persona`). |
 | `document_version` | string | [SemVer](https://semver.org/) version of the document's content. |
 | `last_updated` | string | ISO 8601 date the document was last edited. |
 | `sections` | list | Section metadata block; see §5.2. |
+
+> **Reserved for a future version.** `document_id` (a stable [ULID](https://github.com/ulid/spec)) and `language` (a [BCP 47](https://www.rfc-editor.org/info/bcp47) tag) are reserved but **not required at v0.3**. Documents MAY include them; conforming tools MUST preserve them if present.
 
 ### 4.3 Document types
 
@@ -74,12 +75,10 @@ Additional document types MAY be defined in future spec versions.
 
 ```yaml
 ---
-standard: PortableAI Persona
-spec_version: "0.3"
+standard: PortableAI
 document_type: persona
-document_id: 01J9Z8V6C1QW2XKQ3F0B7E9N4T
-language: en-US
-document_name: David's Persona
+spec_version: 0.3
+document_name: Jordan Rivera — Persona
 document_version: 1.2.0
 last_updated: 2026-07-04
 sections:
@@ -215,7 +214,7 @@ Products that store user documents on servers MAY be part of the PortableAI ecos
 - Additive changes that do not break existing conforming documents are minor version bumps.
 - Any change that could invalidate a previously conforming document is a major version bump and requires an ADR.
 
-Documents declare the spec version they target via `spec_version` in front-matter. Consumers SHOULD accept documents from any spec version they recognize and SHOULD warn (not reject) on unrecognized versions.
+Documents declare the spec version they conform to via `spec_version` in front-matter. Consumers SHOULD accept documents from any spec version they recognize and SHOULD warn (not reject) on unrecognized versions.
 
 ## 10. Compatibility
 

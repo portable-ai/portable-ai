@@ -1,13 +1,14 @@
 ---
-standard: PortableAI Persona
-spec_version: 0.3-draft
+standard: PortableAI
 document_type: spec
-status: DRAFT
+spec_version: 0.3
+document_name: PortableAI Persona Spec
+status: Released
 ---
 
-# PortableAI Persona Spec v0.3 (DRAFT)
+# PortableAI Persona Spec v0.3
 
-> **Status: DRAFT.** Persona-specific sections layered on top of the [PortableAI Core spec](portable-ai-core-spec-v0.3.md). Content is subject to change until v0.3 is released. See the [v1.0 milestone](../../milestone/1).
+> **Status: Released (2026-07-07).** Persona-specific sections layered on top of the [PortableAI Core spec](portable-ai-core-spec-v0.3.md). Content is normative. Future work is tracked in the [v0.3.0 milestone](../../milestone/1).
 
 ## Purpose
 

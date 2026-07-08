@@ -1,14 +1,15 @@
 ---
-standard: PortableAI Well-Known Section Registry
-spec_version: 0.3-draft
+standard: PortableAI
 document_type: spec
+spec_version: 0.3
+document_name: PortableAI Well-Known Section Registry
 registry_version: 1
-status: DRAFT
+status: Released
 ---
 
-# PortableAI Well-Known Section Registry v1 (DRAFT)
+# PortableAI Well-Known Section Registry v1
 
-> **Status: DRAFT.** Normative for the First Public Draft. See the [v1.0 milestone](../../../milestone/1).
+> **Status: Released (2026-07-07).** Normative for the First Public Draft. Future work is tracked in the [v0.3.0 milestone](../../../milestone/1).
 
 ## 1. Purpose
 

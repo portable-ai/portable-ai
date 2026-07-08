@@ -1,13 +1,14 @@
 ---
-standard: PortableAI Software Project
-spec_version: 0.3-draft
+standard: PortableAI
 document_type: spec
-status: DRAFT
+spec_version: 0.3
+document_name: PortableAI Software Project Spec
+status: Released
 ---
 
-# PortableAI Software Project Spec v0.3 (DRAFT)
+# PortableAI Software Project Spec v0.3
 
-> **Status: DRAFT.** Software-Project-specific sections layered on top of the [PortableAI Core spec](portable-ai-core-spec-v0.3.md). Content is subject to change until v0.3 is released. See the [v1.0 milestone](../../milestone/1).
+> **Status: Released (2026-07-07).** Software-Project-specific sections layered on top of the [PortableAI Core spec](portable-ai-core-spec-v0.3.md). Content is normative. Future work is tracked in the [v0.3.0 milestone](../../milestone/1).
 
 ## Purpose
 
@@ -59,11 +60,9 @@ Custom sections use plain keys derived from their heading (e.g., `# Threat Model
 
 ```yaml
 ---
-standard: PortableAI Software Project
-spec_version: "0.3"
+standard: PortableAI
 document_type: software-project
-document_id: 01J9ZB2K7M4QW8XKQ3F0B7E9N5V
-language: en-US
+spec_version: 0.3
 document_name: PortableAI Reference Editor
 document_version: 0.1.0
 last_updated: 2026-07-06

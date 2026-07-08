@@ -4,7 +4,7 @@
 // header.js reads these to stamp the footer on every page.
 window.PORTABLE_AI_VERSION = {
   // Matches the current git tag on main.
-  version: "v0.3.0-rc.1",
+  version: "v0.3.0",
   // ISO date (YYYY-MM-DD) the current version was released.
-  releaseDate: "2026-07-06",
+  releaseDate: "2026-07-07",
 };

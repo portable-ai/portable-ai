@@ -16,3 +16,4 @@ Initial ADRs will be added one at a time as the project evolves.
 - [ADR-0005: Non-Storage Principle](0005-non-storage-principle.md)
 - [ADR-0006: Every Profile Type Ships a Reference Sample](0006-profile-types-ship-a-sample.md)
 - [ADR-0007: Custom Sections Use Plain Derived Keys, Not Reverse-DNS](0007-custom-sections-plain-keys.md)
+- [ADR-0008: Every Profile Type Ships a Template](0008-profile-types-ship-a-template.md)
