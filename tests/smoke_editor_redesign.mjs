@@ -60,6 +60,13 @@ function assert(cond, label) {
 // Persona type, which most editor cases use for content.
 async function loadTemplateFromPicker(page, type = "persona", expected = "document_type: persona") {
   page.once("dialog", (d) => d.accept()); // in case a replace-confirm appears
+  // The type pills are revealed via "Load a sample" (progressive disclosure) so
+  // the home landing shows entry actions only. Reveal them first if hidden.
+  const loaderHidden = await page.$eval("#template-loader", (el) => el.hidden);
+  if (loaderHidden) {
+    await page.click("#load-sample");
+    await page.waitForSelector("#template-loader", { state: "visible" });
+  }
   await page.click(`#template-options [data-type="${type}"]`);
   await page.waitForFunction(
     (needle) => document.querySelector("#persona-editor").value.includes(needle),
@@ -102,18 +109,36 @@ try {
     (await page.textContent("#open-profile")).trim() === "Open a profile",
     "Open-file action is labeled 'Open a profile' (#86)",
   );
-  // Empty-state link actions are now Generate + Open; templates load from the
-  // type picker below (Load a template).
+  // Empty-state link actions are Generate + Open + Load a sample. The type
+  // pills are NOT shown on the fresh home landing (progressive disclosure):
+  // they only appear after the user clicks "Load a sample".
   const emptyActionLabels = await page.locator(".empty-state-actions .link").allTextContents();
   assert(
-    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile",
-    `Empty-state actions are Generate/Open (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
+    emptyActionLabels.map((t) => t.trim()).join(" | ") === "Generate a profile | Open a profile | Load a sample",
+    `Empty-state actions are Generate/Open/Load a sample (got ${emptyActionLabels.map((t) => t.trim()).join(" | ")})`,
   );
-  // Template loader: a quiet 'Load a template' label + one pill per profile
-  // type, built data-driven from js/templates.js.
+  // Fresh home landing: the template loader (and its type pills) is hidden
+  // until "Load a sample" is clicked, so the landing shows no bare pills.
   assert(
-    (await page.textContent("#template-loader-label")).trim() === "Load a template",
-    "Template loader is labeled 'Load a template'",
+    (await page.$eval("#template-loader", (el) => el.hidden)) === true,
+    "Template loader is hidden on the fresh home landing (no bare type pills)",
+  );
+  assert(
+    (await page.getAttribute("#load-sample", "aria-expanded")) === "false",
+    "Load a sample starts collapsed (aria-expanded=false)",
+  );
+  // Click "Load a sample" to reveal the type picker.
+  await page.click("#load-sample");
+  await page.waitForSelector("#template-loader", { state: "visible" });
+  assert(
+    (await page.getAttribute("#load-sample", "aria-expanded")) === "true",
+    "Load a sample expands the type picker (aria-expanded=true)",
+  );
+  // Template loader: a quiet 'Choose a sample type' label + one pill per
+  // profile type, built data-driven from js/templates.js.
+  assert(
+    (await page.textContent("#template-loader-label")).trim() === "Choose a sample type",
+    "Template loader is labeled 'Choose a sample type'",
   );
   const templateTypeLabels = await page.locator("#template-options .type-option").allTextContents();
   assert(
