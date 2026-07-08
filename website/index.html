@@ -63,14 +63,17 @@
             <div class="empty-state-actions">
               <a class="link" href="generate-a-profile.html" id="empty-generate-profile">Generate a profile</a>
               <button class="link" type="button" id="open-profile">Open a profile</button>
+              <button class="link" type="button" id="load-sample" aria-expanded="false" aria-controls="template-loader">Load a sample</button>
             </div>
 
             <!-- Load a template: one option per profile type, built from
                  js/templates.js (the type registry). Data-driven — a new type
                  appears here automatically. The template body is fetched from
-                 templates/*.md at click time; no template text lives in JS. -->
-            <div class="template-loader">
-              <span class="template-loader-label" id="template-loader-label">Load a template</span>
+                 templates/*.md at click time; no template text lives in JS.
+                 Kept hidden until the user clicks "Load a sample" (#) so the
+                 home landing shows entry actions only, not bare type pills. -->
+            <div class="template-loader" id="template-loader" hidden>
+              <span class="template-loader-label" id="template-loader-label">Choose a sample type</span>
               <div class="type-options" role="group" aria-labelledby="template-loader-label" id="template-options"></div>
             </div>
           </div>

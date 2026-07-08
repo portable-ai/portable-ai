@@ -25,6 +25,8 @@ const appMain = document.querySelector("main.page");
 const emptyState = document.querySelector("#empty-state");
 const editorSurface = document.querySelector("#editor-surface");
 const templateOptions = document.querySelector("#template-options");
+const templateLoader = document.querySelector("#template-loader");
+const loadSampleButton = document.querySelector("#load-sample");
 const openProfileButton = document.querySelector("#open-profile");
 // The empty-state secondary card links straight to generate-a-profile.html; no JS.
 
@@ -164,6 +166,13 @@ const updateSurfaceVisibility = () => {
   // (compact "Edit profile" title, action nav visible); empty => home mode
   // (value-prop hero, entry actions, no action nav).
   if (appMain) appMain.dataset.mode = hasContent ? "edit" : "home";
+  // Collapse the sample-type disclosure whenever we return to the empty state
+  // (e.g. after Clear) so the home landing always starts with entry actions
+  // only, never bare type pills.
+  if (!hasContent && templateLoader) {
+    templateLoader.hidden = true;
+    if (loadSampleButton) loadSampleButton.setAttribute("aria-expanded", "false");
+  }
   autoGrowEditor();
   // Rebuild the teleport gutter for whatever just became visible (#83).
   if (typeof refreshGutters === "function") scheduleGutterRefresh();
@@ -869,6 +878,19 @@ copyButton.addEventListener("click", copyMarkdown);
 downloadButton.addEventListener("click", downloadMarkdown);
 if (addSectionButton) addSectionButton.addEventListener("click", addSection);
 buildTemplatePicker();
+// "Load a sample" reveals the profile-type pills in place (progressive
+// disclosure). The home landing stays clean — entry actions only — until the
+// user opts into loading a sample. Once a type is chosen, loadTemplate() takes
+// over and the empty state is replaced by the editor surface, so there is no
+// need to collapse the loader again here.
+if (loadSampleButton && templateLoader) {
+  loadSampleButton.addEventListener("click", () => {
+    templateLoader.hidden = false;
+    loadSampleButton.setAttribute("aria-expanded", "true");
+    const firstPill = templateOptions && templateOptions.querySelector(".type-option");
+    if (firstPill) firstPill.focus();
+  });
+}
 openProfileButton.addEventListener("click", () => fileInput.click());
 fileInput.addEventListener("change", () => loadMarkdownFile(fileInput.files[0]));
 
