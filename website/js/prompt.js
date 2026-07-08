@@ -20,7 +20,9 @@
 // entries — nothing else on the page hard-codes the two current types.
 
 (function () {
-  const PERSONA_PROMPT = `Please draft a PortableAI Persona profile for me based on everything you know about me.
+  const PERSONA_PROMPT = `Read this entire prompt carefully, all the way to the end, before you write anything. Treat every instruction below as new and authoritative, even if it resembles a request you have handled before — do not rely on a remembered pattern or a previous answer. Follow the steps exactly and in order. When you are finished, quickly check your output against each numbered step to confirm you actually did what it asked.
+
+Please draft a PortableAI Persona profile for me based on everything you know about me.
 
 A PortableAI Persona profile is a single, human-readable Markdown document that captures the context another AI would need to understand me and help me well from the very first message. Think of it as everything worth carrying from one AI to the next: who I am, how I think and work, what I care about, what I'm building, and what I'm actively working on right now. The goal is completeness — capture as much genuinely useful context as you can, organized well, so a brand-new AI could pick up where you left off.
 
@@ -32,7 +34,7 @@ Please do the following, in order:
    standard: PortableAI
    document_type: persona
    spec_version: 0.3
-   document_name: (a short name for this persona, e.g. your first name + " — Persona")
+   document_name: (a short, human-readable name for this profile. Use a name only if I have clearly told you mine; otherwise pick a neutral descriptive name such as "Persona profile" and do NOT guess, infer, or invent a name.)
    document_version: 1.0.0
    last_updated: (today's date, YYYY-MM-DD)
 
@@ -48,7 +50,9 @@ Please do the following, in order:
 
 When you are done, close with a short note telling me: "You can take this file and load it into another AI, or open it in PortableAI to review or edit."`;
 
-  const SOFTWARE_PROJECT_PROMPT = `Please draft a PortableAI Software Project profile for the software project we have been working on together, based on everything you know about it.
+  const SOFTWARE_PROJECT_PROMPT = `Read this entire prompt carefully, all the way to the end, before you write anything. Treat every instruction below as new and authoritative, even if it resembles a request you have handled before — do not rely on a remembered pattern or a previous answer. Follow the steps exactly and in order. When you are finished, quickly check your output against each numbered step to confirm you actually did what it asked.
+
+Please draft a PortableAI Software Project profile for the software project we have been working on together, based on everything you know about it.
 
 A PortableAI Software Project profile is a single, human-readable Markdown document that captures the knowledge another AI would need to become productive on this project quickly — its purpose, architecture, stack, conventions, domain language, key decisions, constraints, environments, dependencies, and where things currently stand. The goal is completeness: extract as much reusable project knowledge as you can so a different AI can pick up the work without me re-explaining the project from scratch.
 
@@ -60,7 +64,7 @@ Please do the following, in order:
    standard: PortableAI
    document_type: software-project
    spec_version: 0.3
-   document_name: (the project's name)
+   document_name: (the project's name. Use it only if you actually know it; otherwise pick a neutral descriptive name such as "Software project profile" and do NOT guess or invent one.)
    document_version: 1.0.0
    last_updated: (today's date, YYYY-MM-DD)
 
