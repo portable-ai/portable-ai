@@ -73,6 +73,18 @@ Keys usable in any document type.
 | `notes` | Notes | Freeform notes that don't fit elsewhere. |
 | `changelog` | Changelog | Human-readable summary of changes to this document. |
 
+### 4.4 Chat document keys
+
+| Key | Recommended title | Description |
+|---|---|---|
+| `overview` | Overview | Short summary of what the conversation was about, participants, and final state. Shared key with Software Project documents. |
+| `transcript` | Transcript | Turn-by-turn record of the conversation, labeled by speaker and timestamped when known. |
+| `reasoning_traces` | Reasoning Traces | Model reasoning content exposed by the source platform, present only when the `export_thinking` option was applied. |
+| `attachments` | Attachments | Files, images, or artifacts referenced in the conversation, represented per the `attachment_mode` option. |
+| `decisions` | Decisions | Material decisions reached during the conversation, with rationale. |
+| `rejected_alternatives` | Rejected Alternatives | Options considered and ruled out, with reasons, so they are not re-litigated. |
+| `open_threads` | Open Threads | Unresolved questions and next steps left for a future session. |
+
 ## 5. Custom sections
 
 Any section that is not in this registry is a custom section, with a plain key derived from its heading. See [Core spec §5.1](../portable-ai-core-spec-v0.3.md#51-section-anatomy) and §5.3, and [ADR-0007](../../adr/0007-custom-sections-plain-keys.md).
