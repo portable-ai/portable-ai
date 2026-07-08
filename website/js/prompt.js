@@ -28,6 +28,8 @@ A PortableAI Persona profile is a single, human-readable Markdown document that 
 
 Be generous and thorough. This document can and should be long if you know a lot about me — a rich, well-organized profile is far more valuable than a short, cautious one. Do not hold back or summarize away detail you actually have.
 
+Start writing the document now. Do not ask my permission, describe what you are about to do, or discuss your output-length limits before you begin — just produce the profile. Length is never a reason to stop, shorten, or omit anything. If the full document would exceed what you can fit in one response, fill this response completely with real content, then end it with a line that reads exactly \`<!-- continued -->\` and continue in your next response, picking up precisely where you left off. Repeat across as many responses as it takes. Never silently truncate, never collapse a list or section to save space, and never replace real content with a placeholder like "[continued]" or "...". The only acceptable way to handle length is to keep writing across multiple responses until the profile is genuinely complete.
+
 Please do the following, in order:
 
 1. Begin the document with YAML front-matter delimited by \`---\` on its own line above and below, containing exactly:
@@ -57,6 +59,8 @@ Please draft a PortableAI Software Project profile for the software project we h
 A PortableAI Software Project profile is a single, human-readable Markdown document that captures the knowledge another AI would need to become productive on this project quickly — its purpose, architecture, stack, conventions, domain language, key decisions, constraints, environments, dependencies, and where things currently stand. The goal is completeness: extract as much reusable project knowledge as you can so a different AI can pick up the work without me re-explaining the project from scratch.
 
 Be generous and thorough. This document can and should be long if you know a lot about the project — a rich, well-organized profile is far more valuable than a short one. Do not hold back or summarize away detail you actually have.
+
+Start writing the document now. Do not ask my permission, describe what you are about to do, or discuss your output-length limits before you begin — just produce the profile. Length is never a reason to stop, shorten, or omit anything. If the full document would exceed what you can fit in one response, fill this response completely with real content, then end it with a line that reads exactly \`<!-- continued -->\` and continue in your next response, picking up precisely where you left off. Repeat across as many responses as it takes. Never silently truncate, never collapse a list or section to save space, and never replace real content with a placeholder like "[continued]" or "...". The only acceptable way to handle length is to keep writing across multiple responses until the profile is genuinely complete.
 
 Please do the following, in order:
 
