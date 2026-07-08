@@ -1,7 +1,8 @@
 ---
-standard: PortableAI Persona
-spec_version: 0.3
+standard: PortableAI
 document_type: spec
+spec_version: 0.3
+document_name: PortableAI Persona Spec
 status: Released
 ---
 

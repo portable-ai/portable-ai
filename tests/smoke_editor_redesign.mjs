@@ -58,7 +58,7 @@ function assert(cond, label) {
 // Load a template via the empty-state type picker and wait for the fetched .md
 // to populate the editor (templates are fetched, not embedded). Defaults to the
 // Persona type, which most editor cases use for content.
-async function loadTemplateFromPicker(page, type = "persona", expected = "standard: PortableAI Persona") {
+async function loadTemplateFromPicker(page, type = "persona", expected = "document_type: persona") {
   page.once("dialog", (d) => d.accept()); // in case a replace-confirm appears
   await page.click(`#template-options [data-type="${type}"]`);
   await page.waitForFunction(
@@ -240,12 +240,12 @@ try {
   // Editor should have the loaded template
   const editorValue = await page.$eval("#persona-editor", (el) => el.value);
   assert(
-    editorValue.includes("standard: PortableAI Persona"),
+    editorValue.includes("document_type: persona"),
     "Editor contains template front-matter",
   );
   assert(
     editorValue.includes("My PortableAI Persona"),
-    "Persona template uses placeholder profile_name 'My PortableAI Persona'",
+    "Persona template uses placeholder document_name 'My PortableAI Persona'",
   );
 
   // --- Case 3: switch to Read mode ---
@@ -265,7 +265,7 @@ try {
     "Read mode renders H1s",
   );
   assert(
-    !previewHtml.includes("standard: PortableAI Persona"),
+    !previewHtml.includes("document_type: persona"),
     "Read mode strips front-matter YAML (rendered separately in metadata card)",
   );
   assert(
@@ -812,8 +812,9 @@ try {
   const fixtureDir = fs.mkdtempSync(path.join(os.tmpdir(), "pra-integrity-"));
   const docWithBlock = [
     "---",
-    "standard: PortableAI Persona",
-    "standard_version: 0.3",
+    "standard: PortableAI",
+    "document_type: persona",
+    "spec_version: 0.3",
     "---",
     "",
     "# Profile",
@@ -873,7 +874,7 @@ try {
   const cleanPath = path.join(fixtureDir, "clean.md");
   fs.writeFileSync(
     cleanPath,
-    "---\nstandard: PortableAI Persona\n---\n\n# Profile\n\nJust content, no block.\n",
+    "---\nstandard: PortableAI\ndocument_type: persona\n---\n\n# Profile\n\nJust content, no block.\n",
   );
   await page.goto(url);
   await page.waitForSelector("#empty-state", { state: "visible" });

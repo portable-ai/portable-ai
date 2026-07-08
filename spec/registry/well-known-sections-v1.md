@@ -1,7 +1,8 @@
 ---
-standard: PortableAI Well-Known Section Registry
-spec_version: 0.3
+standard: PortableAI
 document_type: spec
+spec_version: 0.3
+document_name: PortableAI Well-Known Section Registry
 registry_version: 1
 status: Released
 ---

@@ -1,7 +1,8 @@
 ---
-standard: PortableAI Software Project
-spec_version: 0.3
+standard: PortableAI
 document_type: spec
+spec_version: 0.3
+document_name: PortableAI Software Project Spec
 status: Released
 ---
 
@@ -59,11 +60,9 @@ Custom sections use plain keys derived from their heading (e.g., `# Threat Model
 
 ```yaml
 ---
-standard: PortableAI Software Project
-spec_version: "0.3"
+standard: PortableAI
 document_type: software-project
-document_id: 01J9ZB2K7M4QW8XKQ3F0B7E9N5V
-language: en-US
+spec_version: 0.3
 document_name: PortableAI Reference Editor
 document_version: 0.1.0
 last_updated: 2026-07-06

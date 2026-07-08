@@ -1,9 +1,9 @@
 ---
-standard: PortableAI Persona
+standard: PortableAI
 document_type: persona
-standard_version: 0.3
-profile_name: Jordan Rivera — Persona
-profile_version: 1.0.0
+spec_version: 0.3
+document_name: Jordan Rivera — Persona
+document_version: 1.0.0
 last_updated: 2026-07-06
 ---
 
