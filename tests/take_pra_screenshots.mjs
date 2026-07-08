@@ -40,7 +40,7 @@ await page.screenshot({ path: path.join(OUT, "01_empty_state.png"), fullPage: tr
 // 2) Edit mode after loading a template
 page.once("dialog", (d) => d.accept());
 await page.click('#template-options [data-type="persona"]');
-await page.waitForFunction(() => document.querySelector("#persona-editor").value.includes("standard: PortableAI Persona"), { timeout: 5000 });
+await page.waitForFunction(() => document.querySelector("#persona-editor").value.includes("document_type: persona"), { timeout: 5000 });
 await page.waitForSelector("#editor-surface", { state: "visible" });
 await page.locator("#editor").scrollIntoViewIfNeeded();
 await page.screenshot({ path: path.join(OUT, "02_edit_mode.png"), fullPage: true });
@@ -115,7 +115,7 @@ await footerEl.screenshot({ path: path.join(OUT, "10_footer.png") });
 await page.goto(url);
 page.once("dialog", (d) => d.accept());
 await page.click('#template-options [data-type="persona"]');
-await page.waitForFunction(() => document.querySelector("#persona-editor").value.includes("standard: PortableAI Persona"), { timeout: 5000 });
+await page.waitForFunction(() => document.querySelector("#persona-editor").value.includes("document_type: persona"), { timeout: 5000 });
 await page.waitForSelector("#editor-surface", { state: "visible" });
 await page.click("#add-section");
 await page.waitForSelector("#panel-edit", { state: "visible" });

@@ -1,9 +1,9 @@
 ---
-standard: PortableAI Software Project
+standard: PortableAI
 document_type: software-project
-standard_version: 0.3
-profile_name: TideSynth — Software Project
-profile_version: 1.0.0
+spec_version: 0.3
+document_name: TideSynth — Software Project
+document_version: 1.0.0
 last_updated: 2026-07-06
 ---
 

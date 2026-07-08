@@ -297,7 +297,7 @@ const buildTemplatePicker = () => {
 };
 
 // Compose the download filename: portableai-profile-YYYY-MM-DD.md.
-// Locked in PR A — one predictable filename regardless of profile_name in
+// Locked in PR A — one predictable filename regardless of document_name in
 // front-matter, so profiles from different sessions line up on disk.
 const buildDownloadFilename = () => {
   const now = new Date();
@@ -457,9 +457,10 @@ const discardPendingDraft = () => {
 
 const FRONT_MATTER_FIELDS = [
   { key: "standard", label: "Standard" },
-  { key: "standard_version", label: "Standard version" },
-  { key: "profile_name", label: "Profile name" },
-  { key: "profile_version", label: "Profile version" },
+  { key: "document_type", label: "Document type" },
+  { key: "spec_version", label: "Spec version" },
+  { key: "document_name", label: "Profile name" },
+  { key: "document_version", label: "Profile version" },
   { key: "last_updated", label: "Last updated" },
 ];
 

@@ -27,10 +27,12 @@ A PortableAI Persona profile is a human-readable Markdown document that captures
 Please do the following, in order:
 
 1. Begin the document with YAML front-matter delimited by \`---\` on its own line above and below, containing exactly:
-   standard: PortableAI Persona
+   standard: PortableAI
    document_type: persona
-   standard_version: 0.3
-   updated: (today's date, YYYY-MM-DD)
+   spec_version: 0.3
+   document_name: (a short name for this persona, e.g. your first name + " — Persona")
+   document_version: 1.0.0
+   last_updated: (today's date, YYYY-MM-DD)
 
 2. Then output the full profile as Markdown, using clear H1 headings for these top-level sections, in this order: # Profile, # Preferences, # Persona, # Projects, # Interests, # Knowledge & Expertise, # Decision Style, # Communication Style, # AI Collaboration Instructions, # Notes. Under each heading use concise bullet points. If a section has no genuinely durable content, omit that whole section rather than inventing filler.
 
@@ -49,10 +51,12 @@ A PortableAI Software Project profile is a human-readable Markdown document that
 Please do the following, in order:
 
 1. Begin the document with YAML front-matter delimited by \`---\` on its own line above and below, containing exactly:
-   standard: PortableAI Software Project
+   standard: PortableAI
    document_type: software-project
-   standard_version: 0.3
-   updated: (today's date, YYYY-MM-DD)
+   spec_version: 0.3
+   document_name: (the project's name)
+   document_version: 1.0.0
+   last_updated: (today's date, YYYY-MM-DD)
 
 2. Then output the full profile as Markdown, using clear H1 headings for these top-level sections, in this order — include every one you have real content for: # Overview, # Architecture, # Tech Stack, # Conventions, # Domain Glossary, # Key Decisions, # Constraints & Non-Goals, # Environments & Ops, # Dependencies & Integrations, # Notes, # Changelog. Under each heading use concise bullet points or short paragraphs. Rather than inventing filler, omit any section you have no genuine durable content for.
 

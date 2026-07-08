@@ -1,8 +1,9 @@
 ---
-standard: PortableAI Persona
-standard_version: 0.3
-profile_name: My PortableAI Persona
-profile_version: 1.0.0
+standard: PortableAI
+document_type: persona
+spec_version: 0.3
+document_name: My PortableAI Persona
+document_version: 1.0.0
 last_updated: 2026-07-07
 ---
 
