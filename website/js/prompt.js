@@ -32,11 +32,27 @@ Be generous and thorough. This document can and should be long if you know a lot
 
 Output format is important: give me the document as raw Markdown source inside a single fenced code block — open with a line containing exactly \`\`\`markdown and close with a line containing exactly \`\`\` — so I can copy it verbatim with the \`#\` headings, \`---\` front-matter fences, and all other Markdown characters intact. Do NOT render it as formatted/prose text, and do NOT place it in a canvas or side document; the raw characters must survive copy and paste. Don't precede the code block with a conversational preamble — no asking permission, no plan, no explanation of your output-length or messaging limits. The code block is the response.
 
-Length is never a reason to shorten, omit, or refuse. Handle a long document like this, one turn at a time: write as much real content as comfortably fits in this response, and if you run out of room before the document is finished, stop at a clean point, make the last content line inside the code block exactly \`<!-- continued -->\`, then close the code block. I will then reply "continue" and you resume exactly where you left off in a fresh code block, no recap. This is expected and normal — you do NOT need to produce the whole thing in one message, and you do NOT need to send multiple messages on your own; you just continue on my next turn. Repeat over as many turns as it takes until the document is genuinely complete; on the final turn, end with the closing note (below) instead of the marker. Never silently truncate, never collapse a list or section to save space, and never substitute a placeholder like "[continued]" or "..." for real content.
+Before you write anything, do a quick silent self-assessment — you know your own limits better than I do:
+
+(a) Roughly how much durable context do you actually have about me — a lot, some, a little, or almost none? Base this on your saved/durable memory plus this conversation, not on assumptions.
+
+(b) Given (a) and your per-response output limit for this account/model, can you fit a complete, spec-valid PortableAI Persona document — the front-matter, all well-known sections you have content for, and your best custom sections — into ONE response without silently truncating or dropping detail?
+
+Based on that self-check, pick exactly one of the three modes below and commit to it. State your choice on the very first line INSIDE the fenced code block as an HTML comment (before the \`---\` front-matter):
+
+- \`<!-- mode: single -->\` — You are confident the complete document fits comfortably in this one response. Write the whole thing, generously and in full detail. Do not artificially shorten. This is the best outcome for me; prefer it whenever it will actually fit.
+
+- \`<!-- mode: condensed -->\` — You have plenty of content but not enough room to be exhaustive in one response. Write a complete, spec-valid document in one response by being more economical: same front-matter, same well-known H1 sections you have content for, the most important custom sections, tighter prose, fewer bullets per section, but nothing omitted at the section level and no section left as a stub. The document must be genuinely complete when you stop — a real, usable Persona profile, not a summary. This mode exists so users on smaller-context AIs still get a one-file result.
+
+- \`<!-- mode: split -->\` — Only if even a condensed version genuinely will not fit in one response. Write as much real content as comfortably fits, stop at a clean point (ideally at a section boundary), and make the last content line inside the code block exactly:
+   \`<!-- continued: please reply with the single word: continue -->\`
+   Then close the code block. When I reply "continue" you resume exactly where you left off inside a fresh \`\`\`markdown code block, no recap, no re-preamble, no repeating the front-matter. Repeat across turns until the document is genuinely complete; on the final turn, end with the closing note (below) instead of the continued-marker. Prefer \`condensed\` over \`split\` whenever a complete condensed version would fit — one file in one turn is much better for me than a multi-turn stitch.
+
+Rules that apply to all three modes: never silently truncate; never collapse a list or section to a placeholder like "[continued]", "...", or "etc."; if you chose \`single\` or \`condensed\`, the document MUST be genuinely complete when you stop, including the closing note outside the code block; length is never a reason to refuse. Do not narrate the self-assessment to me — the mode comment is the only signal I need.
 
 Please do the following, in order:
 
-1. Begin the document with YAML front-matter delimited by \`---\` on its own line above and below, containing exactly:
+1. Begin the document with the mode comment on the first line inside the code block (\`<!-- mode: single -->\`, \`<!-- mode: condensed -->\`, or \`<!-- mode: split -->\`), then YAML front-matter delimited by \`---\` on its own line above and below, containing exactly:
    standard: PortableAI
    document_type: persona
    spec_version: 0.3
@@ -52,7 +68,7 @@ Please do the following, in order:
 
 5. Do not ask me for my name, and do not include a name field. Do not include sensitive personal details (credentials, financial or medical specifics, private identifiers) unless I have clearly treated them as useful long-term context.
 
-6. Once the document is fully written (on the final turn, after there is no more \`<!-- continued -->\` marker), if you can attach or offer a downloadable file, also provide the same complete content as a downloadable .md file named exactly \`portableai-profile-YYYY-MM-DD.md\` (using today's date). If you cannot attach files, that is fine — the Markdown in the conversation is enough.
+6. Once the document is fully written — in \`single\` or \`condensed\` mode that is at the end of this response; in \`split\` mode that is on the final turn, when you no longer emit a continued-marker — if you can attach or offer a downloadable file, also provide the same complete content as a downloadable .md file named exactly \`portableai-profile-YYYY-MM-DD.md\` (using today's date). If you cannot attach files, that is fine — the Markdown in the conversation is enough.
 
 When the whole document is complete, after the closing code fence, add a short note (outside the code block) telling me: "You can take this file and load it into another AI, or open it in PortableAI to review or edit."`;
 
