@@ -52,6 +52,21 @@
         <li>Come back to PortableAI to review or make changes, or load the profile into a new AI.</li>
       </ol>
 
+      <details class="prompt-usage-tips">
+        <summary>Tips for running this prompt</summary>
+        <div class="prompt-usage-tips-body">
+          <p>
+            <strong>If your AI reviews the prompt instead of executing it,</strong> tell it explicitly to execute. In ChatGPT specifically, long pastes are auto-converted to attachments, and the model can then read the file as reference material rather than as instructions. If that happens, send a short follow-up message such as: <em>"Execute the instructions in the attached file now. Do not review or describe them &mdash; just start."</em> That reliably switches it into execution mode.
+          </p>
+          <p>
+            <strong>If it pauses partway or asks permission to continue,</strong> reply with the single word <em>continue</em>. The prompt is designed to produce the document across multiple turns when it's too long to fit in one response, and a one-word reply resumes it cleanly.
+          </p>
+          <p>
+            <strong>Known limitation.</strong> No prompt can force an AI to retrieve durable memories the platform didn't surface to the model in the first place. This prompt maximizes what the model does with the memories it has available, but it cannot increase the amount of memory that gets retrieved. If the resulting document is thinner than you expected, that is usually why &mdash; not a defect in the prompt.
+          </p>
+        </div>
+      </details>
+
       <!-- Full read-only prompt readout. Rendered in full (no scroll box) so the
            whole prompt is visible; Copy buttons sit above and below it. -->
       <div class="prompt-readout" aria-label="Extraction prompt">
