@@ -6,7 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **Chat spec v0.1 (DRAFT)** — `spec/portable-ai-chat-spec-v0.1.md` — third PortableAI profile type: a retrospective artifact that captures the durable content of an AI conversation so it survives session limits, model deprecations, and platform lock-in. Where Persona and Software Project describe how an AI should behave going forward, Chat records what actually happened. Adds `document_type: chat`, chat-specific front-matter fields (`source_platform`, `source_model`, `participants`, `date_started`, `date_ended`, `chat_url`, `options_applied`), and an options set (`export_thinking`, `summarize_long_points`, `attachment_mode`, `redact_code_over_lines`) that lets the user choose how lossy the artifact should be at capture time. Companion child work: extraction prompt (#151), reference implementation from the PortableAI Space chatlog (#152), and informational docs page (#153). No capture UX on the .org side — the whole free-tier deliverable is the copy/paste prompt. Streaming capture, extensions, and cloud integrations are out of scope and live on the PortableChat.ai commercial side (#149, #150).
+- **Well-Known Section Registry §4.4: Chat document keys** — `overview`, `transcript`, `reasoning_traces`, `attachments`, `decisions`, `rejected_alternatives`, `open_threads`. Additive within registry v1 (#149, #150).
 
 ## [0.3.0] — 2026-07-07
 
