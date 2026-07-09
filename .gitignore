@@ -20,3 +20,11 @@ node_modules/
 dist/
 build/
 .cache/
+
+# Private artifacts -- never publish to GitHub.
+# Any file whose name contains the substring "private" (any casing, anywhere in
+# the name, with or without a dash) is treated as chat-scoped context that
+# belongs in the workspace or a private Drive folder, not in the repo.
+# Git globs are case-sensitive on Linux, so we spell out each letter as a
+# character class to catch every casing: private, Private, PRIVATE, PrIvAtE, etc.
+*[Pp][Rr][Ii][Vv][Aa][Tt][Ee]*
