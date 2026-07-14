@@ -157,12 +157,18 @@ The PortableAI service performs repository creation.
 
 # Repository Structure
 
+This is universal guidance rather than a strict mandate. A typical layout
+looks like the following. Projects may add or omit folders as needed to
+fit their language, framework, and workflow.
+
 ``` text
 README.md
+LICENSE
+.gitignore
 SOFTWARE-PROJECT-PROFILE.md
 PRODUCT-SPEC.md
 SYSTEM-DESIGN.md
-DATA-MODEL.md
+DATA-MODEL.md          (optional, project-dependent)
 AGENTS.md
 AI-POLICY.md
 SECURITY.md
@@ -172,23 +178,29 @@ CHANGELOG.md
 
 .portableai/
     project.yaml
-    template-version.yaml
 
-docs/
+docs/                  (main documentation area)
 prompts/
-src/
-tests/
-scripts/
+src/                   (optional, project-dependent)
+tests/                 (optional, project-dependent)
+scripts/               (optional, project-dependent)
 .github/
 ```
+
+`docs/` is the main documentation area for the project.
+
+Code layout is intentionally not prescribed. Folders such as `src/`,
+`tests/`, and `scripts/` are optional and project-dependent, because
+different projects organize code differently. The template standardizes
+where project knowledge lives, not how code is arranged.
 
 # Canonical Documents
 
 -   README.md --- Project overview and orientation.
+-   LICENSE --- License terms for the project.
 -   SOFTWARE-PROJECT-PROFILE.md --- Portable project context.
 -   PRODUCT-SPEC.md --- Product requirements.
 -   SYSTEM-DESIGN.md --- Technical architecture.
--   DATA-MODEL.md --- Domain model.
 -   AGENTS.md --- AI coding instructions.
 -   AI-POLICY.md --- AI usage policy.
 -   SECURITY.md --- Security expectations.
@@ -196,10 +208,19 @@ scripts/
 -   CONTRIBUTING.md --- Development workflow.
 -   CHANGELOG.md --- Project history.
 
+Optional documents (include when relevant to the project):
+
+-   DATA-MODEL.md --- Domain model. Optional and project-dependent;
+    include it when the project has a meaningful data model to describe.
+
+Supporting files:
+
+-   .gitignore --- Files excluded from version control.
+
 # .portableai Directory
 
 The `.portableai` directory stores machine-readable metadata describing
-the individual project.
+the individual project in a single `project.yaml` file.
 
 It indicates that the repository follows the PortableAI Project
 Template.
@@ -210,7 +231,8 @@ It does **not** define the PortableAI standard itself.
 
 The template uses semantic versioning.
 
-PortableAI should record:
+Versioning metadata lives as fields inside `.portableai/project.yaml`
+rather than in a separate file. PortableAI should record:
 
 -   Template version
 -   Source template revision
@@ -285,7 +307,9 @@ The template does not:
 Remaining implementation decisions include:
 
 -   Final template repository name
--   Required vs. optional files
+-   Required vs. optional files (this revision marks several files, such
+    as DATA-MODEL.md and the code folders, as optional; the precise final
+    set may still evolve)
 -   Final `.portableai` schema
 -   Template upgrade mechanism
 -   Provenance tracking
@@ -296,18 +320,18 @@ Remaining implementation decisions include:
 
 ``` text
 PortableAI
-│
-├── Profiles
-│   ├── Persona Profile
-│   ├── Software Project Profile
-│   └── Chat Profile
-│
-└── Project Creation Service
-    └── PortableAI Project Template
-        ├── Initialize from Software Project Profile
-        ├── Initialize from uploaded documents
-        ├── Guided interview
-        └── Blank project
+|
++-- Profiles
+|   +-- Persona Profile
+|   +-- Software Project Profile
+|   +-- Chat Profile
+|
++-- Project Creation Service
+    +-- PortableAI Project Template
+        +-- Initialize from Software Project Profile
+        +-- Initialize from uploaded documents
+        +-- Guided interview
+        +-- Blank project
 ```
 
 **Summary**
